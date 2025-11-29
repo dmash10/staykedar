@@ -248,70 +248,77 @@ const Nav = () => {
             </div>
           </div>
 
-          {/* Bottom Navigation */}
-          <div className="flex items-center space-x-6 py-2 relative">
-            <Link
-              to="/"
-              className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-full text-white transition duration-200",
-                isActivePath("/") ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
-              )}
+          {/* Bottom Navigation (Desktop) */}
+          <div className="hidden md:flex items-center space-x-6 py-2 relative">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-3 rounded-full text-white transition duration-200",
+                  isActivePath(link.path) ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
+                )}
+              >
+                {link.icon}
+                <span className="font-medium">{link.name}</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center py-2">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-white p-2"
             >
-              <Home className="w-5 h-5" />
-              <span className="font-medium">Home</span>
-            </Link>
-            <Link
-              to="/stays"
-              className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-full text-white transition duration-200",
-                isActivePath("/stays") ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
-              )}
-            >
-              <Bed className="w-5 h-5" />
-              <span className="font-medium">Stays</span>
-            </Link>
-            <Link
-              to="/packages"
-              className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-full text-white transition duration-200",
-                isActivePath("/packages") ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
-              )}
-            >
-              <Package className="w-5 h-5" />
-              <span className="font-medium">Package</span>
-            </Link>
-            <Link
-              to="/weather"
-              className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-full text-white transition duration-200",
-                isActivePath("/weather") ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
-              )}
-            >
-              <Cloud className="w-5 h-5" />
-              <span className="font-medium">Weather</span>
-            </Link>
-            <Link
-              to="/attractions"
-              className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-full text-white transition duration-200",
-                isActivePath("/attractions") ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
-              )}
-            >
-              <MapPin className="w-5 h-5" />
-              <span className="font-medium">Attraction</span>
-            </Link>
-            <Link
-              to="/blogs"
-              className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-full text-white transition duration-200",
-                isActivePath("/blogs") ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
-              )}
-            >
-              <BookOpen className="w-5 h-5" />
-              <span className="font-medium">blogs</span>
-            </Link>
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+            <span className="ml-2 font-medium">Menu</span>
           </div>
         </Container>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-[#003580] border-t border-[#004cb8] py-4 px-4 animate-fade-in">
+            <div className="flex flex-col space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-lg text-white transition duration-200",
+                    isActivePath(link.path) ? "bg-[#004cb8]" : "hover:bg-[#004cb8]"
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.icon}
+                  <span className="font-medium">{link.name}</span>
+                </Link>
+              ))}
+
+              {!user && (
+                <div className="pt-4 mt-2 border-t border-[#004cb8] flex flex-col gap-3">
+                  <Link
+                    to="/auth"
+                    className="w-full"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Button className="w-full bg-white text-[#003580] hover:bg-gray-100">
+                      Sign In / Register
+                    </Button>
+                  </Link>
+                  <Link
+                    to="/property-owner-signup"
+                    className="w-full text-center py-2 text-white border border-white rounded-md font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    List your property
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Sign Out Confirmation Dialog */}
