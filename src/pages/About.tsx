@@ -11,20 +11,20 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About Us | KedarnathStays</title>
-        <meta name="description" content="Learn about KedarnathStays, our mission, and why we're dedicated to making your spiritual journey to Kedarnath seamless and memorable." />
+        <title>About Us | StayKedarnath</title>
+        <meta name="description" content="Learn about StayKedarnath, our mission, and why we're dedicated to making your spiritual journey to Kedarnath seamless and memorable." />
       </Helmet>
-      
+
       <div className="min-h-screen flex flex-col">
         <Nav />
-        
+
         <main className="flex-grow">
           {/* Header Banner */}
           <section className="bg-gradient-primary py-20 px-4">
             <Container className="text-center">
               <div className="animate-fade-in">
                 <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
-                  About KedarnathStays
+                  About StayKedarnath
                 </h1>
                 <div className="flex items-center justify-center text-white/80">
                   <Link to="/" className="hover:text-white transition-colors duration-300 flex items-center">
@@ -63,8 +63,8 @@ const About = () => {
                     description: "We bridge the gap between modern travelers and the ancient spiritual experience of Kedarnath."
                   }
                 ].map((item, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="glass-card p-6 flex flex-col items-center text-center animate-fade-in"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
@@ -96,26 +96,26 @@ const About = () => {
                   <p className="text-mist mb-6">
                     KedarnathStays was born from a profound personal experience during a pilgrimage to Kedarnath in 2018. Our founder, overwhelmed by the beauty of the shrine but challenged by the logistics of the journey, envisioned a service that would allow pilgrims to focus on their spiritual connection rather than travel complications.
                   </p>
-                  
+
                   <p className="text-mist mb-6">
                     Starting as a simple guide sharing recommendations and insights, we've grown into a comprehensive platform serving thousands of pilgrims annually. Our journey has been guided by the principle that a spiritual pilgrimage deserves support that honors its sacred purpose.
                   </p>
-                  
+
                   <p className="text-mist">
                     Today, we continue to expand our services while remaining true to our original vision: making the divine experience of Kedarnath accessible to all who seek its blessings.
                   </p>
                 </div>
-                
+
                 <div className="flex justify-center order-1 lg:order-2 animate-fade-in">
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-primary opacity-10 rounded-full animate-pulse-slow"></div>
-                    <svg 
-                      className="w-72 h-72 text-indigo-deep animate-float" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
+                    <svg
+                      className="w-72 h-72 text-indigo-deep animate-float"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
                       strokeWidth="1"
-                      strokeLinecap="round" 
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     >
                       <path d="M14 9V7a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8h-4" />
@@ -190,7 +190,7 @@ const About = () => {
             </Container>
           </section>
         </main>
-        
+
         <Footer />
       </div>
     </>
