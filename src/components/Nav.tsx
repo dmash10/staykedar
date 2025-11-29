@@ -26,6 +26,7 @@ const ADMIN_EMAILS: string[] = [];
 // Regular navigation links visible to all users
 const publicNavLinks = [
   { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
+  { name: "Stays", path: "/stays", icon: <Bed className="w-4 h-4" /> },
   { name: "Weather", path: "/weather", icon: <Cloud className="w-4 h-4" /> },
   { name: "Attractions", path: "/attractions", icon: <MapPin className="w-4 h-4" /> },
   { name: "Packages", path: "/packages", icon: <Package className="w-4 h-4" /> },
