@@ -1,0 +1,312 @@
+/* Blog Content Display Styles - Matches Editor Styling */
+
+.blog-content {
+    max-width: none;
+    margin-bottom: 3rem;
+}
+
+/* Headings - Blue Color */
+.blog-content h1 {
+    font-size: 2.25rem;
+    font-weight: bold;
+    color: #2563eb;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.blog-content h2 {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: #2563eb;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.blog-content h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2563eb;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Paragraph and Text */
+.blog-content p {
+    color: #374151;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+}
+
+.blog-content strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+.blog-content em {
+    font-style: italic;
+    color: #4b5563;
+}
+
+.blog-content code {
+    background-color: #f3f4f6;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #1e40af;
+    font-family: 'Courier New', monospace;
+}
+
+.blog-content u {
+    text-decoration: underline;
+}
+
+/* Lists */
+.blog-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: #374151;
+}
+
+.blog-content ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: #374151;
+}
+
+.blog-content li {
+    margin-bottom: 0.5rem;
+}
+
+.blog-content li p {
+    margin: 0;
+}
+
+/* Blockquote (Tip Boxes) - Gray background with blue border */
+.blog-content blockquote {
+    border-left: 4px solid #3b82f6;
+    background-color: #f3f4f6;
+    padding-left: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    color: #4b5563;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Links */
+.blog-content a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.blog-content a:hover {
+    color: #1d4ed8;
+}
+
+/* Images */
+.blog-content img {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Highlight */
+.blog-content mark {
+    background-color: #fef08a;
+    color: #78350f;
+    padding: 0 0.25rem;
+    border-radius: 0.125rem;
+}
+
+/* Code Blocks */
+.blog-content pre {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+}
+
+.blog-content pre code {
+    background-color: transparent;
+    color: #f3f4f6;
+    padding: 0;
+}
+
+/* Tables */
+.blog-content table {
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    border: 1px solid #d1d5db;
+}
+
+.blog-content th {
+    background-color: #2563eb;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem;
+    text-align: left;
+    border: 1px solid #1d4ed8;
+}
+
+.blog-content td {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.blog-content tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.blog-content tr:hover {
+    background-color: #f3f4f6;
+}
+
+/* YouTube Embeds */
+.blog-content iframe {
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    min-height: 400px;
+}
+
+.blog-content div[data-youtube-video] {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+/* Horizontal Rule */
+.blog-content hr {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-top: 2px solid #d1d5db;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+/* Text Alignment */
+.blog-content .text-left {
+    text-align: left;
+}
+
+.blog-content .text-center {
+    text-align: center;
+}
+
+.blog-content .text-right {
+    text-align: right;
+}
+
+.blog-content .text-justify {
+    text-align: justify;
+}
+
+/* Custom Cards */
+.blog-content div[data-type="custom-card"] {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-left-width: 4px;
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Card Types */
+.blog-content div[data-type="custom-card"][type="info"] {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.blog-content div[data-type="custom-card"][type="warning"] {
+    border-color: #f59e0b;
+    background-color: #fffbeb;
+}
+
+.blog-content div[data-type="custom-card"][type="tip"] {
+    border-color: #22c55e;
+    background-color: #f0fdf4;
+}
+
+.blog-content div[data-type="custom-card"][type="weather"] {
+    border-color: #0ea5e9;
+    background-color: #f0f9ff;
+}
+
+.blog-content div[data-type="custom-card"][type="route"] {
+    border-color: #6366f1;
+    background-color: #eef2ff;
+}
+
+/* Card Header */
+.blog-content div[data-type="custom-card"]>div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    user-select: none;
+}
+
+/* Card Icons (using pseudo-elements or SVGs if possible, but here we rely on the rendered HTML structure) */
+/* Since the React Node View renders SVGs, we need to ensure they are preserved or handled. 
+   However, Tiptap's renderHTML for the node just outputs the div. 
+   The React component is for the EDITOR. 
+   For the public page, we need to ensure the HTML content has the icon or we add it via CSS.
+   
+   Actually, the `renderHTML` in CustomCard.tsx only outputs `['div', mergeAttributes(HTMLAttributes, { 'data-type': 'custom-card' }), 0]`.
+   It DOES NOT render the icon in the saved HTML.
+   
+   FIX: We need to update CustomCard.tsx to include the header in the rendered HTML, 
+   OR we use CSS pseudo-elements to add the "Title" and "Icon" based on the type attribute.
+   
+   Let's use CSS pseudo-elements for the Title to keep it simple and robust without complex HTML parsing on the frontend.
+*/
+
+.blog-content div[data-type="custom-card"]::before {
+    content: attr(type);
+    display: block;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin-bottom: 0.5rem;
+}
+
+.blog-content div[data-type="custom-card"][type="info"]::before {
+    content: "ℹ️ Information";
+    color: #1e3a8a;
+}
+
+.blog-content div[data-type="custom-card"][type="warning"]::before {
+    content: "⚠️ Warning";
+    color: #78350f;
+}
+
+.blog-content div[data-type="custom-card"][type="tip"]::before {
+    content: "💡 Pro Tip";
+    color: #14532d;
+}
+
+.blog-content div[data-type="custom-card"][type="weather"]::before {
+    content: "⛅ Weather Update";
+    color: #0c4a6e;
+}
+
+.blog-content div[data-type="custom-card"][type="route"]::before {
+    content: "🗺️ Route Details";
+    color: #312e81;
+}
