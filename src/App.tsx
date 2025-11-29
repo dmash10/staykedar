@@ -27,6 +27,7 @@ import WhatsAppButton from "./components/WhatsAppButton";
 import { AdminToolbar } from "./components/admin/AdminToolbar";
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import AuthCallback from "./pages/AuthCallback";
 import AdminBlogList from './pages/admin/AdminBlogList';
 import AdminBlogEditor from './pages/admin/AdminBlogEditor';
 import UsersPage from './pages/admin/UsersPage';
@@ -75,6 +76,9 @@ const App = () => {
                     <AdminToolbar />
                   </ErrorBoundary>
                   <Routes>
+                    {/* Auth callback route */}
+                    <Route path="/auth/callback" element={<AuthCallback />} />
+
                     {/* Public routes */}
                     <Route path="/" element={<Index />} />
                     <Route path="/about" element={<About />} />

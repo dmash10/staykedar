@@ -61,6 +61,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             if (error) throw error;
 
+            // Check if email is verified
+            if (data.user && !data.user.email_confirmed_at) {
+                // User hasn't verified email - sign them out immediately
+                await supabase.auth.signOut();
+
+                throw new Error("Please verify your email before signing in. Check your inbox for the verification link.");
+            }
+
             return { user: data.user, error: null };
         } catch (error: any) {
             console.error("Sign in error:", error);
@@ -94,16 +102,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         full_name: userData.full_name,
                         phone_number: userData.phone_number,
                         role: userData.role || 'customer',
-                    } as any
+                    } as any,
+                    emailRedirectTo: `${window.location.origin}/auth/callback`
                 }
             });
 
             if (error) throw error;
 
+            // Sign out immediately after signup to prevent auto-login
+            if (data.session) {
+                await supabase.auth.signOut();
+            }
+
             // Note: customer_details record is auto-created by database trigger
-            // See migration: secure_customer_details_auto_creation
-            // The trigger (handle_new_user) runs when auth.users gets a new row
-            console.log("User signed up successfully, profile will be auto-created by trigger");
+            console.log("User signed up successfully, must verify email before accessing");
 
             return { data, error: null };
         } catch (error: any) {

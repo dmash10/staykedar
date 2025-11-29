@@ -129,17 +129,18 @@ const Auth = () => {
       if (!error) {
         console.log("Sign up successful!");
 
-        // Show success message
+        // Show email verification message
         toast({
-          title: "Account Created!",
-          description: "Welcome! Redirecting you to your dashboard...",
+          title: "Please Verify Your Email",
+          description: "We've sent you a verification email. Please check your inbox and click the link to activate your account.",
+          duration: 6000,
         });
 
-        // In development, email is often auto-confirmed
-        // Redirect to dashboard after a brief delay
+        // Don't redirect - user must verify email first
+        // Switch to sign-in tab after showing message
         setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
+          setActiveTab('login');
+        }, 2000);
       } else {
         console.error("Sign up failed:", error);
         toast({
