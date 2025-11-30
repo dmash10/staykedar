@@ -3,6 +3,14 @@ import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 
+declare module '@tiptap/core' {
+    interface Commands<ReturnType> {
+        resizableYoutube: {
+            setYoutubeVideo: (options: { src: string; width?: number; height?: number }) => ReturnType;
+        };
+    }
+}
+
 const ResizableYoutubeComponent = (props: any) => {
     const { node, updateAttributes } = props;
 

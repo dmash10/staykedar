@@ -4,17 +4,8 @@ import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
-// Define a type for the customer data from Supabase
 interface CustomerData {
-  created_at: string;
-  email: string;
-  firebase_uid: string;
-  id: string;
-  name: string;
-  phone_number: string;
-  updated_at: string;
   role?: 'customer' | 'property_owner' | 'admin';
-  is_approved?: boolean;
 }
 
 interface PropertyOwnerRouteProps {
@@ -24,57 +15,36 @@ interface PropertyOwnerRouteProps {
 const PropertyOwnerRoute = ({ children }: PropertyOwnerRouteProps) => {
   const { user, isLoading: authLoading } = useAuth();
   const [role, setRole] = useState<string | null>(null);
-  const [isApproved, setIsApproved] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     const checkUserRole = async () => {
       if (!user) {
-        console.log("PropertyOwnerRoute: No user found, redirecting to login");
-        setIsLoading(false);
-        return;
-      }
-
-      // First check if email is verified
-      if (!user.emailVerified) {
-        console.log("PropertyOwnerRoute: Email not verified, redirecting to auth");
-        setRole(null);
+        console.log("PropertyOwnerRoute: No user found");
         setIsLoading(false);
         return;
       }
 
       try {
-        console.log("PropertyOwnerRoute: Checking role for user:", user.uid, user.email);
+        console.log("PropertyOwnerRoute: Checking role for user:", user.id);
         const { data, error } = await supabase
           .from('customer_details')
-          .select('*')
+          .select('role')
           .eq('id', user.id)
           .single();
 
-        if (error) {
-          console.error("PropertyOwnerRoute: Error checking user role:", error);
-          setRole(null);
-          setIsApproved(false);
-        } else if (data) {
-          // Cast the data to our CustomerData type with the extended properties
+        if (!error && data) {
           const userData = data as CustomerData;
-          console.log("PropertyOwnerRoute: User data from Supabase:", userData);
-          console.log("PropertyOwnerRoute: Role value:", userData.role);
-          console.log("PropertyOwnerRoute: Is approved value:", userData.is_approved);
-
-          // Use optional chaining and nullish coalescing for safer access to properties
-          setRole(userData.role ?? 'customer');
-          setIsApproved(userData.is_approved ?? false);
+          setRole(userData.role || 'customer');
+          console.log("PropertyOwnerRoute: User role:", userData.role);
         } else {
-          console.log("PropertyOwnerRoute: No user data found in Supabase");
-          setRole(null);
-          setIsApproved(false);
+          console.log("PropertyOwnerRoute: No role found, defaulting to customer");
+          setRole('customer');
         }
       } catch (error) {
         console.error("PropertyOwnerRoute: Error fetching user role:", error);
-        setRole(null);
-        setIsApproved(false);
+        setRole('customer');
       } finally {
         setIsLoading(false);
       }
@@ -99,27 +69,21 @@ const PropertyOwnerRoute = ({ children }: PropertyOwnerRouteProps) => {
     return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} />;
   }
 
-  // If email not verified, redirect to verification page
-  if (!user.emailVerified) {
-    console.log("PropertyOwnerRoute: Email not verified, redirecting to auth");
-    return <Navigate to="/auth" />;
-  }
-
   // If role is admin, allow access (admins can access all areas)
   if (role === 'admin') {
     console.log("PropertyOwnerRoute: User is admin, allowing access");
     return <>{children}</>;
   }
 
-  // If not property_owner, redirect to appropriate dashboard
+  // If not property_owner, redirect to customer dashboard
   if (role !== 'property_owner') {
     console.log("PropertyOwnerRoute: User is not property owner (role:", role, "), redirecting to dashboard");
     return <Navigate to="/dashboard" />;
   }
 
-  // If property owner and approved, allow access
-  console.log("PropertyOwnerRoute: User is property owner and", isApproved ? "approved" : "not approved");
+  // If property owner, allow access
+  console.log("PropertyOwnerRoute: User is property owner, allowing access");
   return <>{children}</>;
 };
 
-export default PropertyOwnerRoute; 
+export default PropertyOwnerRoute;

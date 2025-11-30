@@ -1,591 +1,278 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Container from "../components/Container";
-import { motion } from "framer-motion";
-import { 
-  Package, 
-  Plane, 
-  Calendar, 
-  Users, 
-  PenLine, 
-  Map, 
-  ChevronRight,
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  MapPin,
+  Clock,
+  ArrowRight,
   Star,
-  Check,
-  Mountain,
-  Hotel,
-  Coffee
+  CheckCircle2,
+  Loader2,
+  Filter,
+  Phone,
+  Shield,
+  Search
 } from "lucide-react";
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
-interface PackageOption {
-  id: number;
+interface PackageType {
+  id: string;
   title: string;
+  slug: string;
   description: string;
   price: number;
   duration: string;
-  image: string;
+  images: string[];
   category: string;
   features: string[];
-  popular?: boolean;
+  location: string;
 }
 
-const packageOptions: PackageOption[] = [
-  {
-    id: 1,
-    title: "Basic Kedarnath Yatra",
-    description: "A simple package covering the essentials for your Kedarnath journey.",
-    price: 9999,
-    duration: "3 Days, 2 Nights",
-    image: "https://images.unsplash.com/photo-1535732820275-9ffd998cac22?q=80&w=1000&auto=format&fit=crop",
-    category: "budget",
-    features: [
-      "Accommodation in Sonprayag",
-      "Guided trek to Kedarnath",
-      "Daily breakfast",
-      "Transportation from Rishikesh"
-    ]
-  },
-  {
-    id: 2,
-    title: "Premium Kedarnath Experience",
-    description: "Comfortable accommodations and guided tour with additional amenities.",
-    price: 18999,
-    duration: "4 Days, 3 Nights",
-    image: "https://images.unsplash.com/photo-1507692049790-de58290a4334?q=80&w=1000&auto=format&fit=crop",
-    category: "premium",
-    popular: true,
-    features: [
-      "Deluxe accommodation in Sonprayag",
-      "Guided trek with experienced guide",
-      "All meals included",
-      "Private transportation from Dehradun",
-      "Pooja arrangements",
-      "Medical assistance"
-    ]
-  },
-  {
-    id: 3,
-    title: "Helicopter Darshan",
-    description: "Quick and convenient helicopter service directly to Kedarnath temple.",
-    price: 24999,
-    duration: "2 Days, 1 Night",
-    image: "https://images.unsplash.com/photo-1608778581110-bba5c94a22d0?q=80&w=1000&auto=format&fit=crop", 
-    category: "helicopter",
-    features: [
-      "Helicopter ride to Kedarnath",
-      "Luxury accommodation in Guptkashi",
-      "Priority darshan",
-      "All meals included",
-      "VIP pooja arrangements",
-      "Personal guide"
-    ]
-  },
-  {
-    id: 4,
-    title: "Chardham Special",
-    description: "Complete Chardham Yatra including Kedarnath, Badrinath, Gangotri and Yamunotri.",
-    price: 45999,
-    duration: "12 Days, 11 Nights",
-    image: "https://images.unsplash.com/photo-1468078809804-4c7b3e60a478?q=80&w=1000&auto=format&fit=crop",
-    category: "premium",
-    features: [
-      "Visit all four Dhams",
-      "Comfortable accommodations",
-      "All meals included",
-      "Private transportation",
-      "Experienced guide",
-      "Pooja arrangements at all temples",
-      "Helicopter option for Kedarnath (additional cost)"
-    ]
-  },
-  {
-    id: 5,
-    title: "Solo Traveler Package",
-    description: "Specially designed package for solo travelers with group activities.",
-    price: 13999,
-    duration: "5 Days, 4 Nights",
-    image: "https://images.unsplash.com/photo-1490077476659-095159692ab5?q=80&w=1000&auto=format&fit=crop",
-    category: "budget",
-    features: [
-      "Shared accommodation",
-      "Group trekking",
-      "All meals included",
-      "Transportation from Rishikesh",
-      "Evening spiritual sessions",
-      "Local sightseeing"
-    ]
-  },
-];
-
 const Packages = () => {
-  const [activeTab, setActiveTab] = useState("all");
+  const [packages, setPackages] = useState<PackageType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("all");
   const { toast } = useToast();
 
-  const filteredPackages = activeTab === "all" 
-    ? packageOptions 
-    : packageOptions.filter(pkg => pkg.category === activeTab);
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('packages')
+          .select('*')
+          .order('price', { ascending: true });
 
-  const handlePackageEnquiry = (packageTitle: string) => {
-    toast({
-      title: "Enquiry Sent!",
-      description: `We'll contact you soon about the ${packageTitle} package.`,
-    });
-  };
+        if (error) throw error;
+
+        if (data) {
+          const transformedData = data.map((pkg: any) => ({
+            ...pkg,
+            features: pkg.features || [],
+            images: pkg.images || []
+          }));
+          setPackages(transformedData);
+        }
+      } catch (error) {
+        console.error('Error fetching packages:', error);
+        toast({
+          title: "Error",
+          description: "Could not load packages. Please try again later.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, [toast]);
+
+  const categories = [
+    { id: "all", label: "All Packages" },
+    { id: "budget", label: "Budget Friendly" },
+    { id: "premium", label: "Premium" },
+    { id: "helicopter", label: "Helicopter" }
+  ];
+
+  const filteredPackages = activeCategory === "all"
+    ? packages
+    : packages.filter(pkg => pkg.category?.toLowerCase() === activeCategory);
 
   return (
     <>
       <Helmet>
-        <title>Kedarnath Packages | StayKedarnath</title>
-        <meta name="description" content="Explore our comprehensive Kedarnath Yatra packages. From budget-friendly to luxury options, find the perfect package for your spiritual journey." />
+        <title>Spiritual Yatra Packages | StayKedarnath</title>
+        <meta name="description" content="Book the best Kedarnath, Badrinath, and Chardham Yatra packages. From budget to luxury helicopter tours, find your perfect spiritual journey." />
       </Helmet>
-      
-      <div className="min-h-screen flex flex-col">
+
+      <div className="min-h-screen flex flex-col bg-slate-50">
         <Nav />
-        
+
         <main className="flex-grow">
-          {/* Hero Section */}
-          <section className="py-16 bg-primary-deep/5 mt-16">
-            <Container className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-deep/90 to-primary-light/80 -z-10" />
-              <div 
-                className="absolute inset-0 bg-cover bg-center -z-20" 
-                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1535732820275-9ffd998cac22?q=80&w=1000&auto=format&fit=crop')" }}
+          {/* Compact Hero Section - Strictly matched to homepage visual weight */}
+          <section className="relative py-12 md:py-16 flex items-center justify-center overflow-hidden bg-[#003580]">
+            <div className="absolute inset-0 z-0 opacity-40">
+              <img
+                src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop"
+                alt="Majestic Himalayas"
+                className="w-full h-full object-cover"
               />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#003580] via-[#003580]/80 to-transparent" />
+            </div>
 
-              <div className="container-custom relative">
-                <div className="max-w-3xl">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="mb-6 flex items-center"
-                  >
-                    <Package className="mr-3 text-white" size={30} />
-                    <h1 className="text-4xl md:text-5xl font-display font-bold text-white">
-                      Yatra Packages
-                    </h1>
-                  </motion.div>
-
-                  <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    className="text-xl text-white/90 mb-8"
-                  >
-                    Simplify your spiritual journey with our carefully curated packages. From budget-friendly options
-                    to premium experiences, we have something for every pilgrim.
-                  </motion.p>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="flex flex-wrap gap-4"
-                  >
-                    <div className="flex items-center text-white/90 bg-white/10 px-4 py-2 rounded-full">
-                      <Calendar className="w-5 h-5 mr-2" />
-                      <span>Available Year-Round</span>
-                    </div>
-                    <div className="flex items-center text-white/90 bg-white/10 px-4 py-2 rounded-full">
-                      <Users className="w-5 h-5 mr-2" />
-                      <span>Group & Private Options</span>
-                    </div>
-                    <div className="flex items-center text-white/90 bg-white/10 px-4 py-2 rounded-full">
-                      <Plane className="w-5 h-5 mr-2" />
-                      <span>Helicopter Services</span>
-                    </div>
-                  </motion.div>
-                </div>
+            <Container className="relative z-10">
+              <div className="max-w-3xl">
+                <Badge className="mb-4 bg-blue-500/20 text-blue-100 border-blue-400/30 px-3 py-1 text-xs backdrop-blur-sm">
+                  <Star className="w-3 h-3 mr-1.5 fill-yellow-400 text-yellow-400" />
+                  Best Price Guarantee
+                </Badge>
+                <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4 leading-tight">
+                  Find Your Perfect <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+                    Spiritual Journey
+                  </span>
+                </h1>
+                <p className="text-lg text-blue-100 max-w-xl mb-8 leading-relaxed">
+                  Explore our curated selection of Yatra packages, designed to provide you with a comfortable and divine experience.
+                </p>
               </div>
             </Container>
           </section>
-          
-          {/* Packages Section */}
-          <section className="py-16 bg-white">
+
+          {/* Sticky Filter Bar */}
+          <div className="sticky top-[72px] z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-300">
             <Container>
-              <div className="mb-12 text-center">
-                <h2 className="text-3xl font-display font-bold text-foreground mb-4">
-                  Choose Your Perfect Package
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Select from our range of packages designed to suit different needs and preferences.
-                  All packages include spiritual guidance and assistance throughout your journey.
-                </p>
-              </div>
-
-              <Tabs defaultValue="all" className="w-full mb-10">
-                <div className="flex justify-center mb-8">
-                  <TabsList className="bg-primary-subtle">
-                    <TabsTrigger 
-                      value="all" 
-                      onClick={() => setActiveTab("all")}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-white"
+              <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${activeCategory === cat.id
+                          ? "bg-[#0071c2] text-white shadow-md ring-2 ring-blue-200 ring-offset-1"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                        }`}
                     >
-                      All Packages
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="budget" 
-                      onClick={() => setActiveTab("budget")}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-white"
-                    >
-                      Budget Friendly
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="premium" 
-                      onClick={() => setActiveTab("premium")}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-white"
-                    >
-                      Premium
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="helicopter" 
-                      onClick={() => setActiveTab("helicopter")}
-                      className="data-[state=active]:bg-primary data-[state=active]:text-white"
-                    >
-                      Helicopter
-                    </TabsTrigger>
-                  </TabsList>
+                      {cat.label}
+                    </button>
+                  ))}
                 </div>
+                <div className="hidden md:flex items-center text-sm text-slate-500">
+                  <span className="font-semibold text-slate-900 mr-1">{filteredPackages.length}</span> packages found
+                </div>
+              </div>
+            </Container>
+          </div>
 
-                <TabsContent value="all" className="mt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Packages Grid */}
+          <section className="py-12 bg-slate-50 min-h-[600px]">
+            <Container>
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="w-10 h-10 animate-spin text-[#0071c2] mb-4" />
+                  <p className="text-slate-500">Loading best packages for you...</p>
+                </div>
+              ) : filteredPackages.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <AnimatePresence mode="popLayout">
                     {filteredPackages.map((pkg) => (
                       <motion.div
+                        layout
                         key={pkg.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="bg-white rounded-xl overflow-hidden shadow-md border border-border relative"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.3 }}
+                        className="group bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 flex flex-col h-full"
                       >
-                        {pkg.popular && (
-                          <div className="absolute top-4 right-4 bg-accent text-accent-foreground text-xs font-medium px-3 py-1 rounded-full flex items-center">
-                            <Star className="w-3 h-3 mr-1 fill-current" />
-                            Most Popular
+                        {/* Card Image */}
+                        <div className="relative h-56 overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
+                          <img
+                            src={pkg.images[0] || 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?q=80&w=1000'}
+                            alt={pkg.title}
+                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute top-3 left-3 z-20">
+                            <span className="bg-white/95 backdrop-blur-sm text-slate-800 text-xs font-bold px-2.5 py-1 rounded-md flex items-center shadow-sm">
+                              <MapPin className="w-3 h-3 mr-1 text-[#0071c2]" />
+                              {pkg.location}
+                            </span>
                           </div>
-                        )}
-                        <div 
-                          className="h-56 bg-cover bg-center" 
-                          style={{ backgroundImage: `url(${pkg.image})` }}
-                        />
-                        <div className="p-6">
-                          <h3 className="text-xl font-bold text-foreground mb-2">{pkg.title}</h3>
-                          <p className="text-muted-foreground mb-4">{pkg.description}</p>
-                          
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center text-muted-foreground">
-                              <Calendar className="w-4 h-4 mr-1" />
-                              <span className="text-sm">{pkg.duration}</span>
+                        </div>
+
+                        {/* Card Content */}
+                        <div className="p-5 flex flex-col flex-grow">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-1.5 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                              <Clock className="w-3.5 h-3.5" />
+                              {pkg.duration}
                             </div>
-                            <span className="font-bold text-primary-deep">₹{pkg.price.toLocaleString()}</span>
+                            <div className="flex items-center gap-1 text-xs font-medium text-amber-500">
+                              <Star className="w-3.5 h-3.5 fill-current" />
+                              4.9
+                            </div>
                           </div>
-                          
-                          <div className="mb-4">
-                            <h4 className="font-medium text-foreground mb-2">Package Includes:</h4>
-                            <ul className="space-y-1">
-                              {pkg.features.slice(0, 3).map((feature, index) => (
-                                <li key={index} className="flex items-start text-sm">
-                                  <Check className="w-4 h-4 text-primary-deep mr-2 mt-0.5 flex-shrink-0" />
-                                  <span className="text-muted-foreground">{feature}</span>
-                                </li>
-                              ))}
-                              {pkg.features.length > 3 && (
-                                <li className="text-sm text-primary-light">+{pkg.features.length - 3} more features</li>
-                              )}
-                            </ul>
-                          </div>
-                          
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <button className="w-full btn-primary">
-                                View Details
-                              </button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-3xl">
-                              <DialogHeader>
-                                <DialogTitle className="text-2xl font-display">{pkg.title}</DialogTitle>
-                              </DialogHeader>
-                              
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                <div>
-                                  <div 
-                                    className="h-64 rounded-lg bg-cover bg-center mb-4" 
-                                    style={{ backgroundImage: `url(${pkg.image})` }}
-                                  />
-                                  <div className="space-y-2">
-                                    <div className="flex items-center text-muted-foreground">
-                                      <Calendar className="w-4 h-4 mr-2 text-primary-deep" />
-                                      <span>{pkg.duration}</span>
-                                    </div>
-                                    <div className="flex items-center text-muted-foreground">
-                                      <Users className="w-4 h-4 mr-2 text-primary-deep" />
-                                      <span>Group and Private options available</span>
-                                    </div>
-                                    <div className="flex items-center text-muted-foreground">
-                                      <Map className="w-4 h-4 mr-2 text-primary-deep" />
-                                      <span>Starts from Rishikesh/Dehradun</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                <div>
-                                  <p className="text-muted-foreground mb-4">{pkg.description}</p>
-                                  
-                                  <h4 className="font-medium text-foreground mb-2">Package Includes:</h4>
-                                  <ul className="space-y-2 mb-6">
-                                    {pkg.features.map((feature, index) => (
-                                      <li key={index} className="flex items-start">
-                                        <Check className="w-4 h-4 text-primary-deep mr-2 mt-0.5 flex-shrink-0" />
-                                        <span className="text-muted-foreground">{feature}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                  
-                                  <div className="flex flex-col space-y-3">
-                                    <p className="text-2xl font-bold text-primary-deep">₹{pkg.price.toLocaleString()}</p>
-                                    <button 
-                                      className="btn-primary"
-                                      onClick={() => handlePackageEnquiry(pkg.title)}
-                                    >
-                                      Book Now
-                                    </button>
-                                  </div>
-                                </div>
+
+                          <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-[#0071c2] transition-colors line-clamp-1">
+                            {pkg.title}
+                          </h3>
+
+                          <p className="text-slate-500 text-sm mb-4 line-clamp-2 leading-relaxed">
+                            {pkg.description}
+                          </p>
+
+                          <div className="space-y-2 mb-5">
+                            {pkg.features.slice(0, 2).map((feature, idx) => (
+                              <div key={idx} className="flex items-start text-xs text-slate-600">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-500 mr-2 mt-0.5 shrink-0" />
+                                <span className="line-clamp-1">{feature}</span>
                               </div>
-                            </DialogContent>
-                          </Dialog>
+                            ))}
+                          </div>
+
+                          <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+                            <div>
+                              <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Starting From</p>
+                              <p className="text-xl font-bold text-[#0071c2]">₹{pkg.price.toLocaleString()}</p>
+                            </div>
+                            <Link to={`/packages/${pkg.slug}`}>
+                              <Button size="sm" className="rounded-lg bg-[#0071c2] hover:bg-[#005a9c] text-white font-semibold shadow-sm hover:shadow-md transition-all">
+                                View Details <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
                       </motion.div>
                     ))}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-slate-200">
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-slate-300" />
                   </div>
-                </TabsContent>
-                
-                <TabsContent value="budget" className="mt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Content will be populated by filteredPackages */}
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="premium" className="mt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Content will be populated by filteredPackages */}
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="helicopter" className="mt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Content will be populated by filteredPackages */}
-                  </div>
-                </TabsContent>
-              </Tabs>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">No packages found</h3>
+                  <p className="text-slate-500 max-w-md mx-auto mb-6">
+                    We couldn't find any packages in this category.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setActiveCategory("all")}
+                    className="text-[#0071c2] border-blue-200 hover:bg-blue-50"
+                  >
+                    View All Packages
+                  </Button>
+                </div>
+              )}
             </Container>
           </section>
 
-          {/* Additional Services */}
-          <section className="py-16" id="helicopter">
+          {/* Trust Indicators (Compact) */}
+          <section className="bg-white border-t border-slate-100 py-12">
             <Container>
-              <div className="mb-12 text-center">
-                <h2 className="text-3xl font-display font-bold text-foreground mb-4">
-                  Additional Services
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Enhance your spiritual journey with our specialized services
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-md border border-border text-center p-8"
-                >
-                  <div className="mb-6 flex justify-center">
-                    <div className="w-16 h-16 rounded-full bg-primary-subtle flex items-center justify-center">
-                      <Plane className="w-8 h-8 text-primary-deep" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                {[
+                  { icon: Shield, label: "100% Secure", sub: "Verified Partners" },
+                  { icon: Star, label: "4.9/5 Ratings", sub: "From 5000+ Pilgrims" },
+                  { icon: Clock, label: "24/7 Support", sub: "Always Here For You" },
+                  { icon: CheckCircle2, label: "Best Price", sub: "Guaranteed" }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex flex-col items-center text-center">
+                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-3 text-[#0071c2]">
+                      <item.icon className="w-5 h-5" />
                     </div>
+                    <h3 className="font-bold text-slate-900 text-sm">{item.label}</h3>
+                    <p className="text-xs text-slate-500">{item.sub}</p>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Helicopter Services</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Skip the trek and reach Kedarnath temple quickly with our helicopter services.
-                    Available from multiple locations with priority darshan.
-                  </p>
-                  <button 
-                    className="btn-secondary"
-                    onClick={() => toast({
-                      title: "Helicopter Enquiry",
-                      description: "We'll contact you soon about helicopter bookings.",
-                    })}
-                  >
-                    Enquire Now
-                  </button>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-md border border-border text-center p-8"
-                  id="pooja"
-                >
-                  <div className="mb-6 flex justify-center">
-                    <div className="w-16 h-16 rounded-full bg-primary-subtle flex items-center justify-center">
-                      <PenLine className="w-8 h-8 text-primary-deep" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">VIP Pooja Arrangements</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Special pooja arrangements at Kedarnath temple with experienced priests.
-                    Includes all pooja materials and personalized ceremonies.
-                  </p>
-                  <button 
-                    className="btn-secondary"
-                    onClick={() => toast({
-                      title: "Pooja Enquiry",
-                      description: "We'll contact you soon about VIP pooja arrangements.",
-                    })}
-                  >
-                    Book Pooja
-                  </button>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-md border border-border text-center p-8"
-                  id="guide"
-                >
-                  <div className="mb-6 flex justify-center">
-                    <div className="w-16 h-16 rounded-full bg-primary-subtle flex items-center justify-center">
-                      <Mountain className="w-8 h-8 text-primary-deep" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Experienced Guides</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Knowledgeable guides who understand the spiritual and cultural significance
-                    of Kedarnath, enhancing your pilgrimage experience.
-                  </p>
-                  <button 
-                    className="btn-secondary"
-                    onClick={() => toast({
-                      title: "Guide Service Enquiry",
-                      description: "We'll contact you soon about guide services.",
-                    })}
-                  >
-                    Hire Guide
-                  </button>
-                </motion.div>
-              </div>
-            </Container>
-          </section>
-
-          {/* Kedarnath Shop Section */}
-          <section className="py-16 bg-secondary/30" id="shop">
-            <Container>
-              <div className="mb-12 text-center">
-                <h2 className="text-3xl font-display font-bold text-foreground mb-4">
-                  Kedarnath Shop
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Everything you need for your spiritual journey
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-md border border-border"
-                >
-                  <div className="p-4">
-                    <h3 className="font-bold text-foreground mb-1">Trekking Essentials</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Walking sticks, raincoats, weather-appropriate gear
-                    </p>
-                    <Link 
-                      to="/packages#shop" 
-                      className="text-sm text-primary-light hover:text-primary-deep flex items-center"
-                    >
-                      View Products
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-md border border-border"
-                >
-                  <div className="p-4">
-                    <h3 className="font-bold text-foreground mb-1">Pooja Items</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Complete pooja kits, prasad, and offering materials
-                    </p>
-                    <Link 
-                      to="/packages#shop" 
-                      className="text-sm text-primary-light hover:text-primary-deep flex items-center"
-                    >
-                      View Products
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-md border border-border"
-                >
-                  <div className="p-4">
-                    <h3 className="font-bold text-foreground mb-1">Souvenirs</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Kedarnath mementos, religious items, and local crafts
-                    </p>
-                    <Link 
-                      to="/packages#shop" 
-                      className="text-sm text-primary-light hover:text-primary-deep flex items-center"
-                    >
-                      View Products
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="bg-white rounded-xl overflow-hidden shadow-md border border-border"
-                >
-                  <div className="p-4">
-                    <h3 className="font-bold text-foreground mb-1">Books & Guides</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Spiritual literature, maps, and guidebooks
-                    </p>
-                    <Link 
-                      to="/packages#shop" 
-                      className="text-sm text-primary-light hover:text-primary-deep flex items-center"
-                    >
-                      View Products
-                      <ChevronRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </motion.div>
+                ))}
               </div>
             </Container>
           </section>

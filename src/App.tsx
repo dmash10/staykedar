@@ -22,6 +22,7 @@ import Auth from "./pages/Auth";
 import Dashboard from './pages/Dashboard'; // Customer dashboard
 import AdminDashboard from './pages/admin/Dashboard'; // Admin dashboard
 import Packages from "./pages/Packages";
+import PackageDetail from "./pages/PackageDetail";
 import { Helmet } from "react-helmet";
 import WhatsAppButton from "./components/WhatsAppButton";
 import { AdminToolbar } from "./components/admin/AdminToolbar";
@@ -44,13 +45,16 @@ import ShippingPolicy from './pages/ShippingPolicy';
 import CancellationPolicy from './pages/CancellationPolicy';
 import ContactUs from './pages/ContactUs';
 import StayListing from './pages/StayListing';
-import RoomDetail from './pages/RoomDetail';
+import PropertyDetail from './pages/PropertyDetail';
 import UserBookings from './pages/UserBookings';
+import PropertyOnboarding from "./pages/PropertyOnboarding";
 import PropertyManagement from './pages/PropertyManagement';
 import PropertyEdit from './pages/PropertyEdit';
 import RoomEdit from './pages/RoomEdit';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import PropertyOwnerSignup from './pages/PropertyOwnerSignup';
+import EmailVerification from './pages/EmailVerification';
 
 const queryClient = new QueryClient();
 
@@ -88,8 +92,9 @@ const App = () => {
                     <Route path="/partner-with-us" element={<PartnerWithUs />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/stays" element={<StayListing />} />
-                    <Route path="/stays/:roomId" element={<RoomDetail />} />
+                    <Route path="/stays/:propertyId" element={<PropertyDetail />} />
                     <Route path="/packages" element={<Packages />} />
+                    <Route path="/packages/:slug" element={<PackageDetail />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blogs" element={<Navigate to="/blog" replace />} />
                     <Route path="/blog/:slug" element={<BlogPost />} />
@@ -99,6 +104,8 @@ const App = () => {
                     <Route path="/cancellation" element={<CancellationPolicy />} />
                     <Route path="/contact" element={<ContactUs />} />
                     <Route path="/property-owner-signup" element={<Signup />} />
+                    <Route path="/become-a-host" element={<PropertyOwnerSignup />} />
+                    <Route path="/email-verification" element={<EmailVerification />} />
 
                     {/* Customer routes - Use CUSTOMER Dashboard */}
                     <Route path="/dashboard" element={

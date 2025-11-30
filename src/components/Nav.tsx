@@ -69,7 +69,7 @@ const Nav = () => {
   // Check if user is admin and get user details
   useEffect(() => {
     const getUserDetails = async () => {
-      if (!user?.uid) {
+      if (!user?.id) {
         setIsAdmin(false);
         setUserRole(null);
         setUserName(null);
@@ -176,7 +176,7 @@ const Nav = () => {
               {/* List Property */}
               {!user && (
                 <Link
-                  to="/property-owner-signup"
+                  to="/become-a-host"
                   className="inline-flex items-center justify-center rounded-md bg-transparent border border-white px-3 py-2 text-white font-medium hover:bg-white hover:text-[#003580] transition-colors"
                 >
                   <span className="text-sm font-semibold">List your property</span>

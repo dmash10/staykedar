@@ -88,16 +88,42 @@ const Auth = () => {
     console.log("Login form submitted with email:", values.email);
     try {
       console.log("Calling signIn function...");
-      const { error } = await signIn(values.email, values.password);
+      const { error, user: signedInUser } = await signIn(values.email, values.password);
 
       console.log("signIn completed, error:", error);
-      if (!error) {
-        console.log("Login successful, no error");
-        setIsSubmitting(false);
+      if (!error && signedInUser) {
+        console.log("Login successful, checking user role...");
 
-        // We'll let the route components handle redirection based on role
-        // This prevents flashing of admin dashboard
-        // Navigate happens in route components
+        // Get user role from database
+        try {
+          const { data: userData, error: roleError } = await supabase
+            .from('customer_details')
+            .select('role')
+            .eq('id', signedInUser.id)
+            .single();
+
+          if (!roleError && userData) {
+            const userRole = userData.role || 'customer';
+            console.log("User role:", userRole);
+
+            // Redirect based on role
+            if (userRole === 'admin') {
+              navigate('/admin');
+            } else if (userRole === 'property_owner') {
+              navigate('/dashboard/properties');
+            } else {
+              navigate('/dashboard');
+            }
+          } else {
+            // Default redirect if role not found
+            navigate('/dashboard');
+          }
+        } catch (err) {
+          console.error("Error fetching user role:", err);
+          navigate('/dashboard');
+        }
+
+        setIsSubmitting(false);
       } else {
         console.log("Login failed with error:", error);
         setIsSubmitting(false);

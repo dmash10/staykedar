@@ -1,5 +1,6 @@
 import { supabase, safeQuery } from "@/integrations/supabase/client";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+import { format } from "date-fns";
 
 // Types
 export type Property = Tables<"properties">;
@@ -151,7 +152,7 @@ export const syncPendingChanges = async (): Promise<void> => {
 export const getProperties = async (): Promise<Property[]> => {
   // Return from cache if valid
   if (isCacheValid('properties')) {
-    return cache.properties;
+    return cache.properties as any;
   }
 
   try {
@@ -163,7 +164,7 @@ export const getProperties = async (): Promise<Property[]> => {
     if (error) throw error;
 
     // Update cache
-    cache.properties = data;
+    cache.properties = data as any;
     cache.lastUpdated['properties'] = Date.now();
 
     return data;
@@ -241,7 +242,7 @@ export const deleteProperty = async (propertyId: string): Promise<void> => {
 
     // Invalidate properties cache
     cache.lastUpdated['properties'] = 0;
-    
+
     // Also invalidate rooms for this property
     delete cache.rooms[propertyId];
   } catch (error) {
@@ -253,10 +254,10 @@ export const deleteProperty = async (propertyId: string): Promise<void> => {
 // Room functions
 export const getRooms = async (propertyId: string): Promise<Room[]> => {
   const cacheKey = `rooms_${propertyId}`;
-  
+
   // Return from cache if valid
   if (isCacheValid(cacheKey) && cache.rooms[propertyId]) {
-    return cache.rooms[propertyId];
+    return cache.rooms[propertyId] as any;
   }
 
   try {
@@ -269,7 +270,7 @@ export const getRooms = async (propertyId: string): Promise<Room[]> => {
     if (error) throw error;
 
     // Update cache
-    cache.rooms[propertyId] = data;
+    cache.rooms[propertyId] = data as any;
     cache.lastUpdated[cacheKey] = Date.now();
 
     return data;
@@ -329,7 +330,7 @@ export const updateRoom = async (roomId: string, updates: Partial<Room>): Promis
 
     // Get the property ID from the returned data
     const propertyId = data.property_id;
-    
+
     // Invalidate rooms cache for this property
     const cacheKey = `rooms_${propertyId}`;
     cache.lastUpdated[cacheKey] = 0;
@@ -365,8 +366,8 @@ export const deleteRoom = async (roomId: string): Promise<void> => {
 
 // Room status functions
 export const updateRoomStatus = async (
-  roomId: string, 
-  newStatus: string, 
+  roomId: string,
+  newStatus: string,
   userId: string,
   updateType: string = UPDATE_TYPES.OWNER,
   notes?: string
@@ -418,7 +419,7 @@ export const searchRooms = async (
   capacity?: number
 ): Promise<RoomSearchResult[]> => {
   console.log('Searching rooms with params:', { checkIn, checkOut, location, capacity });
-  
+
   try {
     const { data, error } = await supabase.rpc("find_available_rooms", {
       check_in: checkIn.toISOString().split('T')[0],
@@ -453,9 +454,9 @@ const fallbackRoomSearch = async (
 ): Promise<RoomSearchResult[]> => {
   try {
     console.log("Executing fallback room search");
-    
+
     // First get all rooms that match the basic criteria
-    const { data: rooms, error: roomsError } = await supabase
+    let query = supabase
       .from('rooms')
       .select(`
         id,
@@ -467,8 +468,13 @@ const fallbackRoomSearch = async (
         property_id,
         properties(id, name, address)
       `)
-      .eq('status', 'available')
-      .order('price');
+      .eq('status', 'available');
+
+    if (capacity) {
+      query = query.gte('capacity', capacity);
+    }
+
+    const { data: rooms, error: roomsError } = await query;
 
     if (roomsError) {
       console.error("Fallback search error:", roomsError);
@@ -479,8 +485,6 @@ const fallbackRoomSearch = async (
       console.log("No rooms found in fallback search");
       return [];
     }
-
-    console.log(`Found ${rooms.length} potentially available rooms`);
 
     // Filter rooms by location if provided
     let filteredRooms = rooms;
@@ -494,13 +498,6 @@ const fallbackRoomSearch = async (
         );
       });
     }
-
-    // Filter by capacity if provided
-    if (capacity && capacity > 0) {
-      filteredRooms = filteredRooms.filter(room => room.capacity >= capacity);
-    }
-
-    console.log(`After filtering, ${filteredRooms.length} rooms match criteria`);
 
     // Check for booking conflicts
     const checkInStr = checkIn.toISOString().split('T')[0];
@@ -518,20 +515,19 @@ const fallbackRoomSearch = async (
       return [];
     }
 
-    // Filter out rooms with conflicting bookings
     const availableRoomIds = new Set(filteredRooms.map(room => room.id));
-    
+
     if (bookings && bookings.length > 0) {
       bookings.forEach(booking => {
         const bookingCheckIn = new Date(booking.check_in_date);
         const bookingCheckOut = new Date(booking.check_out_date);
-        
+
         const hasConflict = (
           (bookingCheckIn <= checkIn && bookingCheckOut > checkIn) ||
           (bookingCheckIn < checkOut && bookingCheckOut >= checkOut) ||
           (bookingCheckIn >= checkIn && bookingCheckOut <= checkOut)
         );
-        
+
         if (hasConflict) {
           availableRoomIds.delete(booking.room_id);
         }
@@ -540,7 +536,7 @@ const fallbackRoomSearch = async (
 
     // Final filtering by availability
     const availableRooms = filteredRooms.filter(room => availableRoomIds.has(room.id));
-    
+
     console.log(`After checking bookings, ${availableRooms.length} rooms are truly available`);
 
     // Transform the data to match the expected structure from the RPC function
@@ -556,7 +552,7 @@ const fallbackRoomSearch = async (
 
     // Cache the results
     updateSearchCache(checkIn, checkOut, location, capacity, formattedRooms);
-    
+
     return formattedRooms;
   } catch (error) {
     console.error("Exception in fallback room search:", error);
@@ -565,8 +561,8 @@ const fallbackRoomSearch = async (
 };
 
 export const checkRoomAvailability = async (
-  roomId: string, 
-  checkIn: string, 
+  roomId: string,
+  checkIn: string,
   checkOut: string
 ): Promise<boolean> => {
   try {
@@ -604,16 +600,16 @@ export const createBooking = async (booking: {
     });
 
     if (error) throw error;
-    
+
     // Invalidate bookings cache for this customer
     const cacheKey = `bookings_${booking.customerId}`;
     cache.lastUpdated[cacheKey] = 0;
-    
+
     // Also invalidate search results as availability has changed
     Object.keys(cache.searchResults).forEach(key => {
       cache.lastUpdated[key] = 0;
     });
-    
+
     return data;
   } catch (error) {
     console.error('Error creating booking:', error);
@@ -623,10 +619,10 @@ export const createBooking = async (booking: {
 
 export const getBookingsForCustomer = async (customerId: string): Promise<Booking[]> => {
   const cacheKey = `bookings_${customerId}`;
-  
+
   // Return from cache if valid
   if (isCacheValid(cacheKey) && cache.bookings[customerId]) {
-    return cache.bookings[customerId];
+    return cache.bookings[customerId] as any;
   }
 
   try {
@@ -637,11 +633,11 @@ export const getBookingsForCustomer = async (customerId: string): Promise<Bookin
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    
+
     // Update cache
-    cache.bookings[customerId] = data;
+    cache.bookings[customerId] = data as any;
     cache.lastUpdated[cacheKey] = Date.now();
-    
+
     return data;
   } catch (error) {
     console.error(`Error getting bookings for customer ID ${customerId}:`, error);
@@ -687,7 +683,7 @@ export const getBookingsForProperty = async (propertyId: string): Promise<Bookin
 };
 
 export const updateBookingStatus = async (
-  bookingId: string, 
+  bookingId: string,
   status: string
 ): Promise<void> => {
   try {
@@ -697,7 +693,7 @@ export const updateBookingStatus = async (
       .eq('id', bookingId);
 
     if (error) throw error;
-    
+
     // Invalidate all booking caches
     Object.keys(cache.bookings).forEach(customerId => {
       const cacheKey = `bookings_${customerId}`;
@@ -718,6 +714,192 @@ const resetCache = (): void => {
   cache.lastUpdated = {};
 };
 
+// Property-centric search
+export interface PropertySearchResult extends Property {
+  lowestPrice: number;
+  roomCount: number;
+}
+
+export const searchProperties = async (
+  checkIn: Date,
+  checkOut: Date,
+  location: string,
+  guests: number,
+  filters?: {
+    amenities?: string[];
+    propertyTypes?: string[];
+    minRating?: number;
+  }
+): Promise<PropertySearchResult[]> => {
+  console.log('Searching properties with params:', { checkIn, checkOut, location, guests, filters });
+
+  // 1. Search for available rooms matching criteria
+  let query = supabase
+    .from('rooms')
+    .select(`
+      id,
+      price,
+      capacity,
+      property_id,
+      properties!inner (
+        id,
+        name,
+        description,
+        address,
+        images,
+        amenities,
+        property_type,
+        rating
+      )
+    `)
+    .eq('status', ROOM_STATUSES.AVAILABLE)
+    .gte('capacity', guests);
+
+  // Apply location filter on the joined property
+  if (location) {
+    query = query.ilike('properties.address', `%${location}%`);
+  }
+
+  // Apply property type filter
+  if (filters?.propertyTypes && filters.propertyTypes.length > 0) {
+    query = query.in('properties.property_type', filters.propertyTypes);
+  }
+
+  // Apply rating filter
+  if (filters?.minRating) {
+    query = query.gte('properties.rating', filters.minRating);
+  }
+
+  const { data: rooms, error } = await query;
+
+  if (error) {
+    console.error('Error searching properties:', error);
+    throw error;
+  }
+
+  if (!rooms || rooms.length === 0) {
+    return [];
+  }
+
+  // 2. Check availability for specific dates
+  const roomIds = rooms.map(r => r.id);
+
+  const { data: bookings } = await supabase
+    .from('bookings')
+    .select('room_id')
+    .in('room_id', roomIds)
+    .in('status', [BOOKING_STATUSES.CONFIRMED, BOOKING_STATUSES.CHECKED_IN, BOOKING_STATUSES.PENDING])
+    .or(`check_in_date.lte.${format(checkOut, 'yyyy-MM-dd')},check_out_date.gte.${format(checkIn, 'yyyy-MM-dd')}`);
+
+  const bookedRoomIds = new Set(bookings?.map(b => b.room_id) || []);
+
+  const availableRooms = rooms.filter(r => !bookedRoomIds.has(r.id));
+
+  // 3. Group by property
+  const propertyMap = new Map<string, PropertySearchResult>();
+
+  availableRooms.forEach(room => {
+    // Filter by amenities if needed (client-side for JSONB)
+    if (filters?.amenities && filters.amenities.length > 0) {
+      const propertyAmenities = (room.properties?.amenities as string[]) || [];
+      const hasAllAmenities = filters.amenities.every(a => propertyAmenities.includes(a));
+      if (!hasAllAmenities) return;
+    }
+
+    const property = room.properties;
+    if (!property) return;
+
+    if (!propertyMap.has(property.id)) {
+      propertyMap.set(property.id, {
+        ...property,
+        lowestPrice: room.price,
+        roomCount: 1
+      });
+    } else {
+      const entry = propertyMap.get(property.id)!;
+      entry.lowestPrice = Math.min(entry.lowestPrice, room.price);
+      entry.roomCount += 1;
+    }
+  });
+
+  return Array.from(propertyMap.values());
+};
+
+// Get room types with availability count for a property
+export interface RoomTypeAvailability {
+  name: string;
+  type: string;
+  price: number;
+  capacity: number;
+  amenities: any;
+  images: string[];
+  availableCount: number;
+  roomIds: string[]; // IDs of available rooms of this type
+}
+
+export const getPropertyRoomTypes = async (
+  propertyId: string,
+  checkIn: Date,
+  checkOut: Date
+): Promise<RoomTypeAvailability[]> => {
+  // 1. Get all rooms for property
+  const allRooms = await getRooms(propertyId);
+
+  // 2. Filter for availability
+  const { data: bookings } = await supabase
+    .from('bookings')
+    .select('room_id, check_in_date, check_out_date, status')
+    .not('status', 'eq', 'cancelled')
+    .eq('rooms.property_id', propertyId)
+    .or(`check_in_date.lte.${checkOut.toISOString().split('T')[0]},check_out_date.gte.${checkIn.toISOString().split('T')[0]}`);
+
+  // Need to join with rooms to filter by propertyId in the query above, but we can also just filter bookings by roomIds of the property
+  // Since we already fetched allRooms, let's filter bookings by those room IDs
+  // Actually, the query above tries to use 'rooms.property_id' which requires a join.
+  // Let's fix this query to be simpler:
+
+  const roomIds = allRooms.map(r => r.id);
+
+  const { data: conflictingBookings } = await supabase
+    .from('bookings')
+    .select('room_id')
+    .in('room_id', roomIds)
+    .not('status', 'eq', 'cancelled')
+    .or(`check_in_date.lte.${checkOut.toISOString().split('T')[0]},check_out_date.gte.${checkIn.toISOString().split('T')[0]}`);
+
+  const conflictingRoomIds = new Set(conflictingBookings?.map(b => b.room_id) || []);
+
+  const availableRooms = allRooms.filter(room =>
+    room.status === 'available' && !conflictingRoomIds.has(room.id)
+  );
+
+  // 3. Group by "Room Type" (Name + Type + Price + Capacity)
+  const roomTypesMap = new Map<string, RoomTypeAvailability>();
+
+  availableRooms.forEach(room => {
+    const key = `${room.name}-${room.room_type}-${room.price}-${room.capacity}`;
+
+    if (!roomTypesMap.has(key)) {
+      roomTypesMap.set(key, {
+        name: room.name,
+        type: room.room_type,
+        price: room.price,
+        capacity: room.capacity,
+        amenities: room.amenities,
+        images: room.images || [],
+        availableCount: 0,
+        roomIds: []
+      });
+    }
+
+    const entry = roomTypesMap.get(key)!;
+    entry.availableCount++;
+    entry.roomIds.push(room.id);
+  });
+
+  return Array.from(roomTypesMap.values());
+};
+
 // Default export
 const stayService = {
   getProperties,
@@ -733,6 +915,8 @@ const stayService = {
   updateRoomStatus,
   getRoomStatusLogs,
   searchRooms,
+  searchProperties,
+  getPropertyRoomTypes,
   checkRoomAvailability,
   createBooking,
   getBookingsForCustomer,
@@ -746,4 +930,4 @@ const stayService = {
   UPDATE_TYPES,
 };
 
-export default stayService; 
+export default stayService;

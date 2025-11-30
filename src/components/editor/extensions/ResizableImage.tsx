@@ -3,6 +3,14 @@ import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 import { ResizableBox } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 
+declare module '@tiptap/core' {
+    interface Commands<ReturnType> {
+        resizableImage: {
+            setImage: (options: { src: string; alt?: string; width?: number; height?: number }) => ReturnType;
+        };
+    }
+}
+
 const ResizableImageComponent = (props: any) => {
     const { node, updateAttributes } = props;
 
