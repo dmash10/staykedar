@@ -7,7 +7,7 @@ const WhatsAppButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState("Hi, I'm interested in booking a stay in Kedarnath.");
-  const phoneNumber = "919876543210"; // Replace with your actual phone number
+  const phoneNumber = "919027475942"; // WhatsApp contact number
   const location = useLocation();
 
   //Hide WhatsApp button on admin pages

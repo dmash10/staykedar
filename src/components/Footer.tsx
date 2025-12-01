@@ -215,7 +215,7 @@ const Footer = () => {
                 <EditableButton
                   section="footer"
                   contentKey="company_email"
-                  defaultValue="info@staykedar.com"
+                  defaultValue="dmworkforash@gmail.com"
                   className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-sm"
                   variant="ghost"
                 />
@@ -225,7 +225,7 @@ const Footer = () => {
                 <EditableButton
                   section="footer"
                   contentKey="company_phone"
-                  defaultValue="+91 98765 43210"
+                  defaultValue="+91 9027475942"
                   className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-sm"
                   variant="ghost"
                 />
