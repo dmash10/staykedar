@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewContent } from '@tiptap/react';
-import { Info, AlertTriangle, Lightbulb, CloudSun, Map } from 'lucide-react';
+import { Info, AlertTriangle, Lightbulb, CloudSun, Map, CheckCircle, XCircle, FileText, AlertOctagon, Quote as QuoteIcon } from 'lucide-react';
 
 const CustomCardComponent = ({ node }: any) => {
     const { type } = node.attrs;
@@ -46,6 +46,46 @@ const CustomCardComponent = ({ node }: any) => {
                     borderColor: 'border-indigo-500',
                     bgColor: 'bg-indigo-50',
                     textColor: 'text-indigo-900',
+                };
+            case 'success':
+                return {
+                    icon: <CheckCircle className="w-5 h-5 text-emerald-600" />,
+                    title: 'Success',
+                    borderColor: 'border-emerald-500',
+                    bgColor: 'bg-emerald-50',
+                    textColor: 'text-emerald-900',
+                };
+            case 'error':
+                return {
+                    icon: <XCircle className="w-5 h-5 text-red-600" />,
+                    title: 'Error',
+                    borderColor: 'border-red-500',
+                    bgColor: 'bg-red-50',
+                    textColor: 'text-red-900',
+                };
+            case 'note':
+                return {
+                    icon: <FileText className="w-5 h-5 text-gray-600" />,
+                    title: 'Note',
+                    borderColor: 'border-gray-400',
+                    bgColor: 'bg-gray-50',
+                    textColor: 'text-gray-900',
+                };
+            case 'danger':
+                return {
+                    icon: <AlertOctagon className="w-5 h-5 text-rose-600" />,
+                    title: 'Danger',
+                    borderColor: 'border-rose-500',
+                    bgColor: 'bg-rose-50',
+                    textColor: 'text-rose-900',
+                };
+            case 'quote':
+                return {
+                    icon: <QuoteIcon className="w-5 h-5 text-purple-600" />,
+                    title: 'Quote',
+                    borderColor: 'border-purple-500',
+                    bgColor: 'bg-purple-50',
+                    textColor: 'text-purple-900',
                 };
             default:
                 return {

@@ -22,7 +22,7 @@
     pointer-events: none;
 }
 
-/* Headings - Blue Color */
+/* Headings - Blue for Editor */
 .ProseMirror h1 {
     font-size: 2.25rem;
     font-weight: bold;
@@ -47,19 +47,47 @@
     margin-bottom: 0.75rem;
 }
 
+/* FORCE ALL ARTICLE HEADINGS TO BE BLACK */
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+    color: #000000 !important;
+    font-weight: bold !important;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.article-content h1 {
+    font-size: 2rem;
+}
+
+.article-content h2 {
+    font-size: 1.5rem;
+}
+
+.article-content h3 {
+    font-size: 1.25rem;
+}
+
 /* Paragraph and Text */
-.ProseMirror p {
+.ProseMirror p,
+.article-content p {
     color: #374151;
     line-height: 1.75;
     margin-bottom: 1rem;
 }
 
-.ProseMirror strong {
+.ProseMirror strong,
+.article-content strong {
     font-weight: 600;
     color: #111827;
 }
 
-.ProseMirror em {
+.ProseMirror em,
+.article-content em {
     font-style: italic;
     color: #4b5563;
 }
@@ -78,25 +106,29 @@
 }
 
 /* Lists */
-.ProseMirror ul {
+.ProseMirror ul,
+.article-content ul {
     list-style-type: disc;
     padding-left: 1.5rem;
     margin-bottom: 1rem;
     color: #374151;
 }
 
-.ProseMirror ol {
+.ProseMirror ol,
+.article-content ol {
     list-style-type: decimal;
     padding-left: 1.5rem;
     margin-bottom: 1rem;
     color: #374151;
 }
 
-.ProseMirror li {
+.ProseMirror li,
+.article-content li {
     margin-bottom: 0.5rem;
 }
 
-.ProseMirror li p {
+.ProseMirror li p,
+.article-content li p {
     margin: 0;
 }
 
@@ -115,17 +147,20 @@
 }
 
 /* Links */
-.ProseMirror a {
+.ProseMirror a,
+.article-content a {
     color: #2563eb;
     text-decoration: underline;
 }
 
-.ProseMirror a:hover {
+.ProseMirror a:hover,
+.article-content a:hover {
     color: #1d4ed8;
 }
 
 /* Images */
-.ProseMirror img {
+.ProseMirror img,
+.article-content img {
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     margin-top: 1rem;
@@ -243,6 +278,110 @@
 .ProseMirror sup {
     font-size: 0.75rem;
     vertical-align: super;
+}
+
+/* Custom Cards - Styled for Frontend Display */
+.ProseMirror div[data-type="custom-card"],
+.article-content div[data-type="custom-card"] {
+    border-left: 4px solid;
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Info Card - Blue */
+.ProseMirror div[data-type="custom-card"][type="info"],
+.article-content div[data-type="custom-card"][type="info"] {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #1e3a8a;
+}
+
+/* Warning Card - Amber */
+.ProseMirror div[data-type="custom-card"][type="warning"],
+.article-content div[data-type="custom-card"][type="warning"] {
+    background-color: #fffbeb;
+    border-color: #f59e0b;
+    color: #78350f;
+}
+
+/* Tip Card - Green */
+.ProseMirror div[data-type="custom-card"][type="tip"],
+.article-content div[data-type="custom-card"][type="tip"] {
+    background-color: #f0fdf4;
+    border-color: #22c55e;
+    color: #14532d;
+}
+
+/* Weather Card - Sky */
+.ProseMirror div[data-type="custom-card"][type="weather"],
+.article-content div[data-type="custom-card"][type="weather"] {
+    background-color: #f0f9ff;
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+/* Route Card - Indigo */
+.ProseMirror div[data-type="custom-card"][type="route"],
+.article-content div[data-type="custom-card"][type="route"] {
+    background-color: #eef2ff;
+    border-color: #6366f1;
+    color: #312e81;
+}
+
+/* Success Card - Emerald */
+.ProseMirror div[data-type="custom-card"][type="success"],
+.article-content div[data-type="custom-card"][type="success"] {
+    background-color: #ecfdf5;
+    border-color: #10b981;
+    color: #064e3b;
+}
+
+/* Error Card - Red */
+.ProseMirror div[data-type="custom-card"][type="error"],
+.article-content div[data-type="custom-card"][type="error"] {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+    color: #7f1d1d;
+}
+
+/* Note Card - Gray */
+.ProseMirror div[data-type="custom-card"][type="note"],
+.article-content div[data-type="custom-card"][type="note"] {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+    color: #1f2937;
+}
+
+/* Danger Card - Rose */
+.ProseMirror div[data-type="custom-card"][type="danger"],
+.article-content div[data-type="custom-card"][type="danger"] {
+    background-color: #fff1f2;
+    border-color: #f43f5e;
+    color: #881337;
+}
+
+/* Quote Card - Purple */
+.ProseMirror div[data-type="custom-card"][type="quote"],
+.article-content div[data-type="custom-card"][type="quote"] {
+    background-color: #faf5ff;
+    border-color: #a855f7;
+    color: #581c87;
+    font-style: italic;
+}
+
+/* Card content styling */
+.ProseMirror div[data-type="custom-card"] p,
+.article-content div[data-type="custom-card"] p {
+    color: inherit;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.ProseMirror div[data-type="custom-card"] strong,
+.article-content div[data-type="custom-card"] strong {
+    font-weight: 600;
 }
 
 /* Selection */

@@ -1,282 +1,123 @@
-import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Container from "@/components/Container";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { Mail, Phone, MapPin, MessageSquare, Search, Headphones } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ContactUs = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: "",
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<{
-    type: "success" | "error" | null;
-    message: string;
-  }>({ type: null, message: "" });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus({ type: null, message: "" });
-
-    try {
-      // Here you would typically make an API call to your backend
-      // For now, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setSubmitStatus({
-        type: "success",
-        message: "Thank you for your message. We'll get back to you soon!"
-      });
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-      });
-    } catch (error) {
-      setSubmitStatus({
-        type: "error",
-        message: "There was an error sending your message. Please try again."
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <>
       <Helmet>
-        <title>Contact Us | Staykedar</title>
-        <meta name="description" content="Get in touch with Staykedar - we're here to help with your travel plans and queries" />
+        <title>Help Center | Staykedar Support</title>
+        <meta name="description" content="Get support for your Kedarnath yatra. Raise tickets, track requests, and find answers." />
       </Helmet>
-      
-      <div className="min-h-screen flex flex-col">
+
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-indigo-50/30">
         <Nav />
-        
+
         <main className="flex-grow">
-          {/* Header Banner */}
-          <section className="bg-gradient-primary py-16 px-4">
+          {/* Hero Section */}
+          <section className="bg-gradient-to-r from-primary-deep to-primary py-20">
             <Container className="text-center">
-              <div className="animate-fade-in">
-                <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
-                  Contact Us
-                </h1>
-                <p className="text-white/90 text-lg max-w-2xl mx-auto">
-                  Have questions about your upcoming trip? We're here to help you plan the perfect spiritual journey.
-                </p>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                How can we help you?
+              </h1>
+              <p className="text-xl text-white/90 max-w-2xl mx-auto">
+                We're here to assist you with your pilgrimage journey. Get support quickly and easily.
+              </p>
+            </Container>
+          </section>
+
+          {/* Main Actions */}
+          <section className="py-16 -mt-12">
+            <Container>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {/* Raise Ticket Card */}
+                <Card className="hover:shadow-2xl transition-all duration-300 border-t-4 border-t-primary cursor-pointer group h-full">
+                  <CardHeader className="pb-4">
+                    <div className="bg-gradient-to-br from-primary/10 to-primary/5 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <MessageSquare className="w-8 h-8 text-primary" />
+                    </div>
+                    <CardTitle className="text-2xl font-bold">Submit a Request</CardTitle>
+                    <CardDescription className="text-base">
+                      Create a new support ticket for bookings, payments, or general inquiries.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild size="lg" className="w-full font-semibold">
+                      <Link to="/support/raise">Create Ticket</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Track Ticket Card */}
+                <Card className="hover:shadow-2xl transition-all duration-300 border-t-4 border-t-secondary cursor-pointer group h-full">
+                  <CardHeader className="pb-4">
+                    <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Search className="w-8 h-8 text-secondary" />
+                    </div>
+                    <CardTitle className="text-2xl font-bold">Track Your Request</CardTitle>
+                    <CardDescription className="text-base">
+                      Check the status of your existing ticket using your Ticket ID.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" size="lg" className="w-full border-secondary text-secondary hover:bg-secondary hover:text-white font-semibold transition-all">
+                      <Link to="/support/track">Track Status</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
               </div>
             </Container>
           </section>
 
-          <div className="py-12 bg-gray-50">
+          {/* Contact Info Section */}
+          <section className="py-16 bg-white/50">
             <Container>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Contact Information */}
-                <div className="lg:col-span-1">
-                  <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-6">Get in Touch</h2>
-                    
-                    <div className="space-y-6">
-                      <div className="flex items-start">
-                        <div className="p-2 bg-primary-light/20 rounded-full mr-4">
-                          <Phone className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-800">Phone</h3>
-                          <p className="text-gray-600">+91 98765 43210</p>
-                          <p className="text-gray-600">+91 98765 43211</p>
-                        </div>
-                      </div>
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Other Ways to Reach Us</h2>
+                <p className="text-lg text-gray-600">We're available to help you via phone and email.</p>
+              </div>
 
-                      <div className="flex items-start">
-                        <div className="p-2 bg-primary-light/20 rounded-full mr-4">
-                          <Mail className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-800">Email</h3>
-                          <p className="text-gray-600">support@staykedar.com</p>
-                          <p className="text-gray-600">info@staykedar.com</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <div className="p-2 bg-primary-light/20 rounded-full mr-4">
-                          <MapPin className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-800">Office Address</h3>
-                          <p className="text-gray-600">
-                            123 Pilgrimage Plaza<br />
-                            Near Kedarnath Temple Road<br />
-                            Rudraprayag, Uttarakhand 246445
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <div className="p-2 bg-primary-light/20 rounded-full mr-4">
-                          <Clock className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-800">Business Hours</h3>
-                          <p className="text-gray-600">
-                            Monday - Saturday: 9:00 AM - 8:00 PM<br />
-                            Sunday: 10:00 AM - 6:00 PM<br />
-                            Emergency Support: 24/7
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border-2 border-gray-100 hover:border-primary/30 transition-all hover:shadow-lg">
+                  <div className="bg-gradient-to-br from-primary/10 to-primary/5 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Phone className="w-7 h-7 text-primary" />
                   </div>
+                  <h3 className="font-bold text-lg mb-2 text-gray-900">Phone Support</h3>
+                  <p className="text-primary font-semibold text-lg mb-1">+91 98765 43210</p>
+                  <p className="text-gray-500 text-sm">Mon-Sat, 9AM - 8PM</p>
                 </div>
 
-                {/* Contact Form */}
-                <div className="lg:col-span-2">
-                  <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-6">Send Us a Message</h2>
-                    
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                            Your Name *
-                          </label>
-                          <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                            placeholder="John Doe"
-                          />
-                        </div>
-
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            Email Address *
-                          </label>
-                          <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                            placeholder="john@example.com"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
-                          </label>
-                          <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                            placeholder="+91 98765 43210"
-                          />
-                        </div>
-
-                        <div>
-                          <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                            Subject *
-                          </label>
-                          <select
-                            id="subject"
-                            name="subject"
-                            value={formData.subject}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                          >
-                            <option value="">Select a subject</option>
-                            <option value="booking">Booking Inquiry</option>
-                            <option value="support">Customer Support</option>
-                            <option value="feedback">Feedback</option>
-                            <option value="partnership">Business Partnership</option>
-                            <option value="other">Other</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                          Your Message *
-                        </label>
-                        <textarea
-                          id="message"
-                          name="message"
-                          value={formData.message}
-                          onChange={handleChange}
-                          required
-                          rows={6}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                          placeholder="How can we help you?"
-                        ></textarea>
-                      </div>
-
-                      {submitStatus.type && (
-                        <div
-                          className={`p-4 rounded-md ${
-                            submitStatus.type === "success"
-                              ? "bg-green-50 text-green-800"
-                              : "bg-red-50 text-red-800"
-                          }`}
-                        >
-                          {submitStatus.message}
-                        </div>
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={`w-full md:w-auto px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duration-300 flex items-center justify-center ${
-                          isSubmitting ? "opacity-75 cursor-not-allowed" : ""
-                        }`}
-                      >
-                        {isSubmitting ? (
-                          "Sending..."
-                        ) : (
-                          <>
-                            Send Message
-                            <Send className="w-4 h-4 ml-2" />
-                          </>
-                        )}
-                      </button>
-                    </form>
+                <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border-2 border-gray-100 hover:border-primary/30 transition-all hover:shadow-lg">
+                  <div className="bg-gradient-to-br from-primary/10 to-primary/5 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Mail className="w-7 h-7 text-primary" />
                   </div>
+                  <h3 className="font-bold text-lg mb-2 text-gray-900">Email Us</h3>
+                  <p className="text-primary font-semibold text-base mb-1">support@staykedar.com</p>
+                  <p className="text-gray-500 text-sm">Response within 24 hours</p>
+                </div>
+
+                <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border-2 border-gray-100 hover:border-primary/30 transition-all hover:shadow-lg">
+                  <div className="bg-gradient-to-br from-primary/10 to-primary/5 w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <MapPin className="w-7 h-7 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2 text-gray-900">Visit Us</h3>
+                  <p className="text-gray-700 font-medium mb-1">Rudraprayag, Uttarakhand</p>
+                  <p className="text-gray-500 text-sm">Main Office</p>
                 </div>
               </div>
             </Container>
-          </div>
+          </section>
         </main>
-        
+
         <Footer />
       </div>
     </>
   );
 };
 
-export default ContactUs; 
+export default ContactUs;

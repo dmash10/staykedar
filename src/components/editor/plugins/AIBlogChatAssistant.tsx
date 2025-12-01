@@ -1,15 +1,15 @@
 ﻿import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Sparkles, Loader2, Globe, Send, Lightbulb } from 'lucide-react';
+import { Sparkles, Loader2, Globe, Send, Lightbulb, Bot, User } from 'lucide-react';
 import { Editor } from '@tiptap/react';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -39,7 +39,7 @@ export function AIBlogChatAssistant({ editor, onMetadataGenerated }: AIBlogChatA
         if (isOpen && messages.length === 0) {
             setMessages([{
                 role: 'assistant',
-                content: "Hi! I am your AI writing assistant. I can help you brainstorm topics, get latest news, and generate complete blogs. Just chat with me or click Generate Blog Now when ready!",
+                content: "Hi! I'm your AI blogging partner. I can help you brainstorm ideas, research topics, and write engaging posts. Try asking for 'blog ideas about Kedarnath' or 'write an intro about winter trekking'.",
                 timestamp: Date.now()
             }]);
         }
@@ -47,7 +47,15 @@ export function AIBlogChatAssistant({ editor, onMetadataGenerated }: AIBlogChatA
 
     useEffect(() => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            // Use requestAnimationFrame for smoother scroll
+            requestAnimationFrame(() => {
+                if (scrollRef.current) {
+                    scrollRef.current.scrollTo({
+                        top: scrollRef.current.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            });
         }
     }, [messages]);
 
@@ -83,7 +91,20 @@ export function AIBlogChatAssistant({ editor, onMetadataGenerated }: AIBlogChatA
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: c,
-                systemInstruction: { parts: [{ text: 'You are a helpful travel blog assistant. Suggest topics, share news. Be concise. Tell user to click Generate Blog Now button when ready. Never output JSON in chat.' }] },
+                systemInstruction: {
+                    parts: [{
+                        text: `You are a helpful travel blog assistant. 
+You can help brainstorm topics, share news, and generate content.
+
+CAPABILITIES:
+- Generate complete blogs (Click "Generate Blog Now")
+- Suggest topics and titles
+- Answer questions about travel/policies
+
+If asked "what can you do?" or "list actions", LIST all the capabilities above.
+Tell user to click "Generate Blog Now" button when ready for full generation.
+Never output JSON in chat.` }]
+                },
                 tools: isSearchEnabled ? [{ googleSearch: {} }] : undefined,
                 generationConfig: { temperature: 0.8, maxOutputTokens: 1024 }
             })
@@ -276,74 +297,103 @@ Now generate the blog post as JSON:`;
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 border-none">
                     <Sparkles className="h-4 w-4" />
                     AI Assistant
                 </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] h-[650px] flex flex-col p-0 pr-12">
-                <DialogHeader className="px-6 pt-4 pb-4 border-b">
-                    <div className="flex flex-col gap-3">
-                        <DialogTitle className="flex items-center gap-2">
+            </SheetTrigger>
+            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-0">
+                <SheetHeader className="px-6 pt-6 pb-4 border-b">
+                    <div className="flex flex-col gap-2">
+                        <SheetTitle className="flex items-center gap-2 text-xl">
                             <Sparkles className="h-5 w-5 text-purple-500" />
                             AI Writing Assistant
-                        </DialogTitle>
-                        <div className="flex items-center gap-3">
-                            <Globe className={isSearchEnabled ? 'text-green-500 h-4 w-4' : 'text-gray-400 h-4 w-4'} />
-                            <Switch checked={isSearchEnabled} onCheckedChange={setIsSearchEnabled} />
-                            <span className="text-sm font-medium">{isSearchEnabled ? 'Web Search: ON' : 'Web Search: OFF'}</span>
+                        </SheetTitle>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Blog ideas, drafts & research</span>
+                            <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1">
+                                <Globe className={isSearchEnabled ? 'text-green-500 h-3 w-3' : 'text-gray-400 h-3 w-3'} />
+                                <Switch
+                                    checked={isSearchEnabled}
+                                    onCheckedChange={setIsSearchEnabled}
+                                    className="scale-75"
+                                />
+                                <span className="text-xs font-medium text-slate-600">{isSearchEnabled ? 'Web' : 'Local'}</span>
+                            </div>
                         </div>
                     </div>
-                </DialogHeader>
+                </SheetHeader>
 
-                <ScrollArea className="flex-1 px-6 py-4" ref={scrollRef}>
-                    <div className="space-y-4">
+                <ScrollArea className="flex-1 px-6 py-4 bg-slate-50/50" ref={scrollRef}>
+                    <div className="space-y-6">
                         {messages.map((m, i) => (
-                            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[80%] rounded-lg px-4 py-2 ${m.role === 'user' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
-                                    <p className="text-sm whitespace-pre-wrap">{m.content}</p>
+                            <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-purple-100' : 'bg-white border shadow-sm'}`}>
+                                    {m.role === 'user' ? <User className="h-4 w-4 text-purple-600" /> : <Bot className="h-4 w-4 text-purple-500" />}
+                                </div>
+                                <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${m.role === 'user'
+                                    ? 'bg-purple-600 text-white rounded-tr-none'
+                                    : 'bg-white border text-slate-700 rounded-tl-none'
+                                    }`}>
+                                    <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                                 </div>
                             </div>
                         ))}
                         {isGenerating && (
-                            <div className="flex justify-start">
-                                <div className="bg-slate-100 rounded-lg px-4 py-2">
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                            <div className="flex gap-3">
+                                <div className="h-8 w-8 rounded-full bg-white border shadow-sm flex items-center justify-center shrink-0">
+                                    <Bot className="h-4 w-4 text-purple-500" />
+                                </div>
+                                <div className="bg-white border rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                                    <div className="flex gap-1">
+                                        <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                        <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                        <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    </div>
                                 </div>
                             </div>
                         )}
                     </div>
                 </ScrollArea>
 
-                <div className="p-4 border-t">
-                    <Button
-                        onClick={() => sendMessage(true)}
-                        disabled={isGenerating || messages.length < 3}
-                        className="w-full mb-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 font-bold"
-                        size="lg"
-                    >
-                        {isGenerating ? (<><Loader2 className="mr-2 animate-spin" />Generating...</>) : (<><Sparkles className="mr-2" />Generate Blog Now</>)}
-                    </Button>
-
-                    <div className="flex gap-2">
-                        <Input value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())} placeholder="Type message..." disabled={isGenerating} className="flex-1" />
-                        <Button onClick={() => sendMessage()} disabled={isGenerating || !input.trim()} className="bg-purple-600 hover:bg-purple-700">
-                            {isGenerating ? <Loader2 className="animate-spin" /> : <Send className="h-4 w-4" />}
+                <div className="p-4 border-t bg-white">
+                    <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-hide">
+                        <Button variant="outline" size="sm" onClick={() => setInput("Give me 5 blog topic ideas")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
+                            <Lightbulb className="h-3 w-3 mr-1.5" />Topic Ideas
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setInput("Find latest news on Char Dham")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
+                            <Globe className="h-3 w-3 mr-1.5" />Latest News
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setInput("Generate blog now")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100">
+                            <Sparkles className="h-3 w-3 mr-1.5" />Generate Full Blog
                         </Button>
                     </div>
 
-                    <div className="mt-2 flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => setInput("Topic ideas")} disabled={isGenerating} className="flex-1 text-xs">
-                            <Lightbulb className="h-3 w-3 mr-1" />Topics
+                    <div className="relative">
+                        <Input
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
+                            placeholder="Ask AI to write, research, or brainstorm..."
+                            disabled={isGenerating}
+                            className="pr-12 py-6 rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-purple-500"
+                        />
+                        <Button
+                            onClick={() => sendMessage()}
+                            disabled={isGenerating || !input.trim()}
+                            size="icon"
+                            className="absolute right-1.5 top-1.5 h-9 w-9 bg-purple-600 hover:bg-purple-700 rounded-lg transition-all"
+                        >
+                            {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setInput("Latest news")} disabled={isGenerating} className="flex-1 text-xs">
-                            <Globe className="h-3 w-3 mr-1" />News
-                        </Button>
+                    </div>
+                    <div className="text-center mt-2">
+                        <span className="text-[10px] text-slate-400">AI can make mistakes. Review generated content.</span>
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </SheetContent>
+        </Sheet>
     );
 }

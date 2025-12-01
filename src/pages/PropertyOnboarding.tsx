@@ -2,20 +2,30 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Building2, MapPin, FileText, Bed, CheckCircle, ChevronRight, ChevronLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
+import {
+    Building2,
+    MapPin,
+    FileText,
+    Bed,
+    CheckCircle,
+    ChevronRight,
+    ChevronLeft,
+    Plus,
+    Trash2,
+    Loader2
+} from "lucide-react";
+import stayService from "@/api/stayService";
+import imageCompression from 'browser-image-compression';
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Container from "@/components/Container";
-import { useAuth } from "@/contexts/SupabaseAuthContext";
-import { useToast } from "@/hooks/use-toast";
-import stayService from "@/api/stayService";
 
 // Schema for step 1: Property Basics
 const step1Schema = z.object({
@@ -57,7 +67,7 @@ const PropertyOnboarding = () => {
     // Step 2 state
     const [description, setDescription] = useState("");
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-    const [imageUrls, setImageUrls] = useState<string[]>([""]);
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
 
     // Step 3 state
     const [rooms, setRooms] = useState<RoomInventory[]>([]);
@@ -117,7 +127,83 @@ const PropertyOnboarding = () => {
         );
     };
 
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (!files) return;
+
+        setIsUploading(true);
+        const newImageUrls: string[] = [];
+
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                // Compression options
+                const options = {
+                    maxSizeMB: 1,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true
+                };
+
+                try {
+                    const compressedFile = await imageCompression(file, options);
+
+                    // Generate unique filename
+                    const fileExt = compressedFile.name.split('.').pop();
+                    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+                    const filePath = `${fileName}`;
+
+                    // Upload to Supabase
+                    const { error: uploadError } = await supabase.storage
+                        .from('property-images')
+                        .upload(filePath, compressedFile);
+
+                    if (uploadError) {
+                        throw uploadError;
+                    }
+
+                    // Get public URL
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('property-images')
+                        .getPublicUrl(filePath);
+
+                    newImageUrls.push(publicUrl);
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    toast({
+                        title: "Upload Failed",
+                        description: `Failed to upload ${file.name}`,
+                        variant: "destructive"
+                    });
+                }
+            }
+
+            setImageUrls(prev => [...prev, ...newImageUrls]);
+            toast({
+                title: "Images Uploaded",
+                description: `Successfully uploaded ${newImageUrls.length} images.`,
+            });
+        } catch (error) {
+            console.error('Error in upload process:', error);
+            toast({
+                title: "Error",
+                description: "Something went wrong during image upload.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsUploading(false);
+            // Reset input
+            event.target.value = '';
+        }
+    };
+
     const addImageUrl = () => {
+        // This function is kept for backward compatibility if needed, 
+        // but the UI now primarily uses the file input.
+        // We can repurpose it or remove it if we only want file uploads.
+        // For now, let's just add an empty string as a placeholder if manually invoked.
         setImageUrls([...imageUrls, ""]);
     };
 
@@ -231,20 +317,20 @@ const PropertyOnboarding = () => {
                                     <div className="flex flex-col items-center flex-1">
                                         <div
                                             className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${currentStep >= step.number
-                                                ? "bg-[#0071c2] border-[#0071c2] text-white"
+                                                ? "bg-[#003580] border-[#003580] text-white"
                                                 : "bg-white border-gray-300 text-gray-400"
                                                 }`}
                                         >
                                             <step.icon className="w-6 h-6" />
                                         </div>
                                         <div className="text-sm font-medium mt-2 text-center">
-                                            <div className={currentStep >= step.number ? "text-[#0071c2]" : "text-gray-500"}>
+                                            <div className={currentStep >= step.number ? "text-[#003580]" : "text-gray-500"}>
                                                 {step.title}
                                             </div>
                                         </div>
                                     </div>
                                     {index < steps.length - 1 && (
-                                        <div className={`h-1 flex-1 mx-2 ${currentStep > step.number ? "bg-[#0071c2]" : "bg-gray-300"}`}></div>
+                                        <div className={`h-1 flex-1 mx-2 ${currentStep > step.number ? "bg-[#003580]" : "bg-gray-300"}`}></div>
                                     )}
                                 </div>
                             ))}
@@ -276,7 +362,7 @@ const PropertyOnboarding = () => {
                                         <select
                                             value={propertyType}
                                             onChange={(e) => setPropertyType(e.target.value)}
-                                            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0071c2]"
+                                            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#003580]"
                                         >
                                             <option value="">Select property type</option>
                                             {propertyTypes.map(type => (
@@ -334,25 +420,40 @@ const PropertyOnboarding = () => {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Property Images *</label>
-                                        <p className="text-sm text-gray-500 mb-3">Add image URLs (we'll support uploads soon)</p>
-                                        {imageUrls.map((url, index) => (
-                                            <div key={index} className="flex gap-2 mb-2">
-                                                <Input
-                                                    placeholder="https://example.com/image.jpg"
-                                                    value={url}
-                                                    onChange={(e) => updateImageUrl(index, e.target.value)}
-                                                />
-                                                {imageUrls.length > 1 && (
-                                                    <Button variant="outline" onClick={() => removeImageUrl(index)}>
+                                        <p className="text-sm text-gray-500 mb-3">Upload high-quality images of your property.</p>
+
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                                            {imageUrls.map((url, index) => (
+                                                <div key={index} className="relative group aspect-video rounded-lg overflow-hidden border border-gray-200">
+                                                    <img src={url} alt={`Property ${index + 1}`} className="w-full h-full object-cover" />
+                                                    <button
+                                                        onClick={() => removeImageUrl(index)}
+                                                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
                                                         <Trash2 className="w-4 h-4" />
-                                                    </Button>
+                                                    </button>
+                                                </div>
+                                            ))}
+
+                                            <label className="flex flex-col items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                                {isUploading ? (
+                                                    <Loader2 className="w-8 h-8 text-[#003580] animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        <Plus className="w-8 h-8 text-gray-400 mb-2" />
+                                                        <span className="text-sm text-gray-500">Add Image</span>
+                                                    </>
                                                 )}
-                                            </div>
-                                        ))}
-                                        <Button type="button" variant="outline" onClick={addImageUrl} className="mt-2">
-                                            <Plus className="w-4 h-4 mr-2" />
-                                            Add Another Image
-                                        </Button>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    multiple
+                                                    className="hidden"
+                                                    onChange={handleImageUpload}
+                                                    disabled={isUploading}
+                                                />
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -366,7 +467,7 @@ const PropertyOnboarding = () => {
                                         <h2 className="text-2xl font-bold text-gray-900 mb-2">Room Configuration</h2>
                                         <p className="text-gray-600">Define your room types and inventory</p>
                                     </div>
-                                    <Button onClick={addRoom} className="bg-[#0071c2] hover:bg-[#005a9c]">
+                                    <Button onClick={addRoom} className="bg-[#003580] hover:bg-[#002a66]">
                                         <Plus className="w-4 h-4 mr-2" />
                                         Add Room Type
                                     </Button>
@@ -376,7 +477,7 @@ const PropertyOnboarding = () => {
                                     <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
                                         <Bed className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                                         <p className="text-gray-600 mb-4">No rooms added yet</p>
-                                        <Button onClick={addRoom} className="bg-[#0071c2] hover:bg-[#005a9c]">
+                                        <Button onClick={addRoom} className="bg-[#003580] hover:bg-[#002a66]">
                                             <Plus className="w-4 h-4 mr-2" />
                                             Add Your First Room Type
                                         </Button>
@@ -522,7 +623,7 @@ const PropertyOnboarding = () => {
                             </Button>
 
                             {currentStep < 4 ? (
-                                <Button onClick={handleNextStep} className="bg-[#0071c2] hover:bg-[#005a9c]">
+                                <Button onClick={handleNextStep} className="bg-[#003580] hover:bg-[#002a66]">
                                     Next
                                     <ChevronRight className="w-4 h-4 ml-2" />
                                 </Button>

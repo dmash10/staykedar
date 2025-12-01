@@ -36,7 +36,7 @@ const UserBookings: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const userBookings = await stayService.getBookings(user.id);
+        const userBookings = await stayService.getBookingsForCustomer(user.id);
 
         const bookingsWithDetails = await Promise.all(
           userBookings.map(async (booking) => {
@@ -161,43 +161,31 @@ Status: ${booking.status}
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case BOOKING_STATUSES.CONFIRMED:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Confirmed
-          </span>
-        );
-      case BOOKING_STATUSES.PENDING:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            Pending
-          </span>
-        );
-      case BOOKING_STATUSES.CANCELLED:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            <XCircle className="w-3 h-3 mr-1" />
-            Cancelled
-          </span>
-        );
-      case BOOKING_STATUSES.COMPLETED:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Completed
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            <Info className="w-3 h-3 mr-1" />
-            {status}
-          </span>
-        );
-    }
+    const styles = {
+      [BOOKING_STATUSES.CONFIRMED]: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      [BOOKING_STATUSES.PENDING]: "bg-amber-100 text-amber-700 border-amber-200",
+      [BOOKING_STATUSES.CANCELLED]: "bg-rose-100 text-rose-700 border-rose-200",
+      [BOOKING_STATUSES.CHECKED_IN]: "bg-indigo-100 text-indigo-700 border-indigo-200",
+      [BOOKING_STATUSES.CHECKED_OUT]: "bg-slate-100 text-slate-700 border-slate-200",
+    };
+
+    const icons = {
+      [BOOKING_STATUSES.CONFIRMED]: CheckCircle,
+      [BOOKING_STATUSES.PENDING]: AlertTriangle,
+      [BOOKING_STATUSES.CANCELLED]: XCircle,
+      [BOOKING_STATUSES.CHECKED_IN]: MapPin,
+      [BOOKING_STATUSES.CHECKED_OUT]: CheckCircle,
+    };
+
+    const Icon = icons[status] || Info;
+    const style = styles[status] || "bg-gray-100 text-gray-700 border-gray-200";
+
+    return (
+      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${style}`}>
+        <Icon className="w-3.5 h-3.5 mr-1.5" />
+        {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
+      </span>
+    );
   };
 
   if (!user) {
@@ -207,172 +195,183 @@ Status: ${booking.status}
   return (
     <>
       <Nav />
-      <main className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-slate-50 py-12">
         <Container>
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold">My Bookings</h1>
-            <p className="text-gray-600">View and manage your stay bookings</p>
-          </div>
-
-          <div className="flex border-b border-gray-200 mb-6">
-            <button
-              className={`px-4 py-2 font-medium text-sm ${activeTab === 'upcoming'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-                }`}
-              onClick={() => setActiveTab('upcoming')}
-            >
-              Upcoming
-            </button>
-            <button
-              className={`px-4 py-2 font-medium text-sm ${activeTab === 'past'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-                }`}
-              onClick={() => setActiveTab('past')}
-            >
-              Past
-            </button>
-            <button
-              className={`px-4 py-2 font-medium text-sm ${activeTab === 'canceled'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
-                }`}
-              onClick={() => setActiveTab('canceled')}
-            >
-              Cancelled
-            </button>
-          </div>
-
-          {loading && (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <div className="max-w-5xl mx-auto">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-slate-900">My Bookings</h1>
+              <p className="text-slate-500 mt-2">Manage your upcoming stays and view booking history</p>
             </div>
-          )}
 
-          {!loading && error && (
-            <div className="bg-red-100 p-4 rounded-lg text-red-700">
-              {error}
-            </div>
-          )}
-
-          {!loading && !error && getFilteredBookings().length === 0 && (
-            <div className="bg-white rounded-lg shadow p-6 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No bookings found</h3>
-              <p className="text-gray-500 mb-4">
-                {activeTab === 'upcoming' && "You don't have any upcoming bookings."}
-                {activeTab === 'past' && "You don't have any past bookings."}
-                {activeTab === 'canceled' && "You don't have any cancelled bookings."}
-              </p>
-              <button
-                onClick={() => navigate('/stays')}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-              >
-                Browse Stays
-              </button>
-            </div>
-          )}
-
-          {!loading && !error && getFilteredBookings().length > 0 && (
-            <div className="space-y-6">
-              {getFilteredBookings().map((booking) => (
-                <div key={booking.id} className="bg-white rounded-lg shadow overflow-hidden">
-                  <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <div className="flex items-center mb-2">
-                        {getStatusBadge(booking.status)}
-                        <span className="ml-3 text-sm text-gray-500">Booking ID: {booking.id.slice(0, 8)}</span>
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-900">
-                        {booking.room?.name || 'Room'} at {booking.property?.name || 'Unknown Property'}
-                      </h3>
-                      {booking.property?.address && (
-                        <div className="flex items-center text-sm text-gray-500 mt-1">
-                          <MapPin className="h-4 w-4 text-gray-400 mr-1" />
-                          <span>{booking.property.address}</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-4 sm:mt-0">
-                      <div className="text-xl font-bold text-[#0071c2]">
-                        {formatPrice(booking.total_price)}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="px-4 py-4 sm:px-6 sm:py-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500 mb-2">Stay Details</h4>
-                      <div className="flex items-start">
-                        <Calendar className="h-5 w-5 text-gray-400 mr-2 mt-0.5" />
-                        <div>
-                          <div className="text-sm mb-1">
-                            <span className="font-medium">Check-in:</span> {format(parseISO(booking.check_in_date), 'EEEE, dd MMM yyyy')}
-                          </div>
-                          <div className="text-sm">
-                            <span className="font-medium">Check-out:</span> {format(parseISO(booking.check_out_date), 'EEEE, dd MMM yyyy')}
-                          </div>
-                        </div>
-                      </div>
-
-                      {booking.special_requests && (
-                        <div className="mt-4">
-                          <h4 className="text-sm font-medium text-gray-500 mb-1">Special Requests</h4>
-                          <p className="text-sm text-gray-700">{booking.special_requests}</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      {booking.room && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-500 mb-2">Room Information</h4>
-                          <p className="text-sm text-gray-700">
-                            {booking.room.room_type.charAt(0).toUpperCase() + booking.room.room_type.slice(1)} room
-                          </p>
-                          <p className="text-sm text-gray-700">
-                            Accommodates up to {booking.room.capacity} guests
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap space-x-2">
-                        {booking.status === BOOKING_STATUSES.CONFIRMED &&
-                          activeTab === 'upcoming' && (
-                            <button
-                              onClick={() => handleCancelBooking(booking.id)}
-                              className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100"
-                            >
-                              <XCircle className="h-3.5 w-3.5 mr-1" />
-                              Cancel
-                            </button>
-                          )}
-
-                        <button
-                          onClick={() => booking.room && navigate(`/stays/${booking.room.id}`)}
-                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100"
-                        >
-                          <Info className="h-3.5 w-3.5 mr-1" />
-                          View Room
-                        </button>
-
-                        <button
-                          onClick={() => copyBookingDetails(booking)}
-                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-gray-700 bg-gray-50 hover:bg-gray-100"
-                        >
-                          <Copy className="h-3.5 w-3.5 mr-1" />
-                          Copy Details
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            {/* Tabs */}
+            <div className="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200 inline-flex mb-8">
+              {(['upcoming', 'past', 'canceled'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === tab
+                    ? 'bg-slate-900 text-white shadow-md'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
               ))}
             </div>
-          )}
+
+            {loading && (
+              <div className="flex flex-col items-center justify-center h-64">
+                <Loader2 className="h-10 w-10 animate-spin text-blue-600 mb-4" />
+                <p className="text-slate-500 animate-pulse">Loading your bookings...</p>
+              </div>
+            )}
+
+            {!loading && error && (
+              <div className="bg-red-50 border border-red-200 p-6 rounded-2xl text-center">
+                <AlertTriangle className="h-10 w-10 text-red-500 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-red-900 mb-1">Unable to load bookings</h3>
+                <p className="text-red-600 mb-4">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="text-sm font-medium text-red-700 hover:text-red-800 underline"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {!loading && !error && getFilteredBookings().length === 0 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Calendar className="h-10 w-10 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">No bookings found</h3>
+                <p className="text-slate-500 mb-8 max-w-md mx-auto">
+                  {activeTab === 'upcoming' && "You don't have any upcoming trips planned. Time to explore?"}
+                  {activeTab === 'past' && "Your travel history is empty. Start making memories!"}
+                  {activeTab === 'canceled' && "No cancelled bookings to show."}
+                </p>
+                <button
+                  onClick={() => navigate('/stays')}
+                  className="inline-flex items-center px-6 py-3 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                >
+                  Explore Stays
+                </button>
+              </div>
+            )}
+
+            {!loading && !error && getFilteredBookings().length > 0 && (
+              <div className="space-y-6">
+                {getFilteredBookings().map((booking) => (
+                  <div
+                    key={booking.id}
+                    className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow duration-300 group"
+                  >
+                    <div className="flex flex-col md:flex-row">
+                      {/* Image Section */}
+                      <div className="md:w-72 h-48 md:h-auto relative bg-slate-100 shrink-0">
+                        {booking.property?.images?.[0] ? (
+                          <img
+                            src={booking.property.images[0]}
+                            alt={booking.property.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-400">
+                            <MapPin className="h-10 w-10 opacity-20" />
+                          </div>
+                        )}
+                        <div className="absolute top-4 left-4">
+                          {getStatusBadge(booking.status)}
+                        </div>
+                      </div>
+
+                      {/* Content Section */}
+                      <div className="flex-1 p-6 flex flex-col justify-between">
+                        <div>
+                          <div className="flex justify-between items-start mb-4">
+                            <div>
+                              <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                {booking.property?.name || 'Unknown Property'}
+                              </h3>
+                              <div className="flex items-center text-slate-500 text-sm mt-1">
+                                <MapPin className="h-4 w-4 mr-1.5 shrink-0" />
+                                <span className="line-clamp-1">{booking.property?.address || 'Address not available'}</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-slate-900">
+                                {formatPrice(booking.total_price)}
+                              </div>
+                              <div className="text-xs text-slate-500 font-medium uppercase tracking-wide mt-1">Total Amount</div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-6 mb-6">
+                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                              <div className="text-xs text-slate-500 font-medium uppercase mb-1">Check-in</div>
+                              <div className="font-semibold text-slate-900 flex items-center">
+                                <Calendar className="h-4 w-4 mr-2 text-blue-500" />
+                                {format(parseISO(booking.check_in_date), 'EEE, dd MMM yyyy')}
+                              </div>
+                            </div>
+                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                              <div className="text-xs text-slate-500 font-medium uppercase mb-1">Check-out</div>
+                              <div className="font-semibold text-slate-900 flex items-center">
+                                <Calendar className="h-4 w-4 mr-2 text-blue-500" />
+                                {format(parseISO(booking.check_out_date), 'EEE, dd MMM yyyy')}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2 text-sm text-slate-600">
+                            {booking.room && (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>
+                                {booking.room.room_type} Room
+                              </span>
+                            )}
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-2"></span>
+                              {booking.room?.capacity || 2} Guests
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-between gap-4">
+                          <div className="flex gap-3">
+                            <button
+                              onClick={() => booking.room && navigate(`/stays/${booking.room.id}`)}
+                              className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                            >
+                              View Property
+                            </button>
+                            <span className="text-slate-300">|</span>
+                            <button
+                              onClick={() => copyBookingDetails(booking)}
+                              className="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center"
+                            >
+                              <Copy className="h-3.5 w-3.5 mr-1.5" />
+                              Copy Details
+                            </button>
+                          </div>
+
+                          {booking.status === BOOKING_STATUSES.CONFIRMED && activeTab === 'upcoming' && (
+                            <button
+                              onClick={() => handleCancelBooking(booking.id)}
+                              className="text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors"
+                            >
+                              Cancel Booking
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </Container>
       </main>
       <Footer />

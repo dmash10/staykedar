@@ -1,21 +1,30 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 const WhatsAppButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState("Hi, I'm interested in booking a stay in Kedarnath.");
   const phoneNumber = "919876543210"; // Replace with your actual phone number
+  const location = useLocation();
+
+  //Hide WhatsApp button on admin pages
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   useEffect(() => {
-    // Show WhatsApp button immediately
-    setIsVisible(true);
-  }, []);
+    // Show WhatsApp button immediately (unless on admin page)
+    setIsVisible(!isAdminPage);
+  }, [isAdminPage]);
 
   const handleSendMessage = () => {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
+
+  if (isAdminPage) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 sm:bottom-8 sm:right-8 flex flex-col items-end">
@@ -36,18 +45,18 @@ const WhatsAppButton = () => {
                 </span>
                 <h3 className="text-lg font-semibold text-gray-800">WhatsApp Us</h3>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <X size={18} />
               </button>
             </div>
-            
+
             <p className="text-sm text-gray-600 mb-3">
               Chat with us directly on WhatsApp for quick assistance with your Kedarnath trip planning!
             </p>
-            
+
             <div className="mb-3">
               <textarea
                 value={message}
@@ -57,13 +66,13 @@ const WhatsAppButton = () => {
                 placeholder="Type your message here..."
               />
             </div>
-            
+
             <button
               onClick={handleSendMessage}
               className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-300"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white" className="flex-shrink-0">
-                <path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/>
+                <path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z" />
               </svg>
               Send on WhatsApp
             </button>

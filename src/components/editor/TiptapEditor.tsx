@@ -39,6 +39,7 @@ import { LineHeight } from './extensions/LineHeight';
 import { ResizableImage } from './extensions/ResizableImage';
 import { CustomCard } from './extensions/CustomCard';
 import { AIBlogChatAssistant } from './plugins/AIBlogChatAssistant';
+import { FontSize } from './extensions/FontSize';
 
 const lowlight = createLowlight();
 lowlight.register('javascript', javascript);
@@ -107,6 +108,7 @@ export default function TiptapEditor({ content, onChange, placeholder, onAIMetad
             Subscript,
             Superscript,
             ResizableYoutube,
+            FontSize,
         ],
         editorProps: {},
         content,

@@ -12,13 +12,11 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, MoreHorizontal, Plus, MapPin, Star, Loader2 } from 'lucide-react';
+import { Search, Plus, MapPin, Edit, Trash2, Eye, MoreVertical, Building2, Bed } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQuery } from '@tanstack/react-query';
@@ -36,9 +34,7 @@ export default function PropertiesPage() {
                 .from('properties')
                 .select(`
                     *,
-                    customer_details (
-                        name
-                    ),
+                    customer_details (name),
                     rooms (count)
                 `)
                 .order('created_at', { ascending: false });
@@ -48,39 +44,85 @@ export default function PropertiesPage() {
         }
     });
 
-    const getStatusBadge = (status: string) => {
-        // Assuming status is not currently in the DB schema based on types.ts, 
-        // but we'll default to 'Active' for now or use a placeholder if we add it later.
-        // For now, let's assume all properties are active as there's no status column in the schema provided.
-        return <Badge className="bg-green-500 hover:bg-green-600">Active</Badge>;
-    };
-
     const filteredProperties = properties?.filter(property =>
         property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         property.address?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
+    const stats = {
+        total: properties?.length || 0,
+        active: properties?.length || 0, // Assuming all are active for now
+        pending: 0,
+    };
+
     return (
         <AdminLayout title="Property Management">
-            <Card className="bg-slate-900 border-slate-800">
-                <CardHeader className="pb-4 border-b border-slate-800">
-                    <div className="flex items-center justify-between">
-                        <CardTitle className="text-slate-200 text-lg font-medium">All Properties</CardTitle>
-                        <div className="flex gap-2">
-                            <div className="relative">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <Card className="bg-gradient-to-br from-purple-600 to-purple-700 border-none text-white">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-purple-100 text-sm font-medium mb-1">Total Properties</p>
+                                <h3 className="text-3xl font-bold">{stats.total}</h3>
+                            </div>
+                            <div className="bg-white/20 p-3 rounded-lg">
+                                <Building2 className="w-6 h-6" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-[#111111] border-[#2A2A2A]">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-400 text-sm font-medium mb-1">Active</p>
+                                <h3 className="text-3xl font-bold text-white">{stats.active}</h3>
+                            </div>
+                            <div className="bg-green-500/10 p-3 rounded-lg">
+                                <Building2 className="w-6 h-6 text-green-400" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-[#111111] border-[#2A2A2A]">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-400 text-sm font-medium mb-1">Pending Approval</p>
+                                <h3 className="text-3xl font-bold text-white">{stats.pending}</h3>
+                            </div>
+                            <div className="bg-amber-500/10 p-3 rounded-lg">
+                                <Building2 className="w-6 h-6 text-amber-400" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Properties Table */}
+            <Card className="bg-[#111111] border-[#2A2A2A]">
+                <CardHeader className="border-b border-[#2A2A2A]">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <CardTitle className="text-white text-xl font-semibold">All Properties</CardTitle>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <div className="relative flex-1 md:w-80">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
                                 <Input
                                     placeholder="Search properties..."
-                                    className="pl-9 bg-slate-800 border-slate-700 text-slate-200 w-[250px]"
+                                    className="pl-10 bg-[#0A0A0A] border-[#2A2A2A] text-white placeholder:text-gray-500 focus:border-blue-500"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
                             <Button
                                 className="bg-blue-600 hover:bg-blue-700 text-white"
-                                onClick={() => navigate('/property/new')}
+                                onClick={() => navigate('/dashboard/list-property')}
                             >
-                                <Plus className="h-4 w-4 mr-2" /> Add Property
+                                <Plus className="w-4 h-4 mr-2" />
+                                Add Property
                             </Button>
                         </div>
                     </div>
@@ -88,78 +130,98 @@ export default function PropertiesPage() {
                 <CardContent className="p-0">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader className="bg-slate-900">
-                                <TableRow className="border-slate-800 hover:bg-slate-900">
-                                    <TableHead className="text-slate-400">Property Name</TableHead>
-                                    <TableHead className="text-slate-400">Location</TableHead>
-                                    <TableHead className="text-slate-400">Owner</TableHead>
-                                    <TableHead className="text-slate-400">Rooms</TableHead>
-                                    <TableHead className="text-slate-400">Status</TableHead>
-                                    <TableHead className="text-slate-400 text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredProperties.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="text-center text-slate-400 py-8">
-                                            No properties found
-                                        </TableCell>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-[#2A2A2A] hover:bg-[#0A0A0A]">
+                                        <TableHead className="text-gray-400 font-semibold">Property</TableHead>
+                                        <TableHead className="text-gray-400 font-semibold">Location</TableHead>
+                                        <TableHead className="text-gray-400 font-semibold">Owner</TableHead>
+                                        <TableHead className="text-gray-400 font-semibold">Rooms</TableHead>
+                                        <TableHead className="text-gray-400 font-semibold">Status</TableHead>
+                                        <TableHead className="text-gray-400 font-semibold text-right">Actions</TableHead>
                                     </TableRow>
-                                ) : (
-                                    filteredProperties.map((property) => (
-                                        <TableRow key={property.id} className="border-slate-800 hover:bg-slate-800/50">
-                                            <TableCell className="font-medium text-slate-200">
-                                                <div className="flex flex-col">
-                                                    <span>{property.name}</span>
-                                                    <span className="text-xs text-slate-500">ID: {property.id.slice(0, 8)}...</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-slate-300">
-                                                <div className="flex items-center">
-                                                    <MapPin className="h-3 w-3 mr-1 text-slate-500" />
-                                                    {property.address || 'No address'}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-slate-300">
-                                                {property.customer_details?.name || 'Unknown'}
-                                            </TableCell>
-                                            <TableCell className="text-slate-300">
-                                                {property.rooms?.[0]?.count || 0}
-                                            </TableCell>
-                                            <TableCell>{getStatusBadge('active')}</TableCell>
-                                            <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-slate-200">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="bg-slate-900 border-slate-800 text-slate-200">
-                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                        <DropdownMenuItem
-                                                            className="hover:bg-slate-800 cursor-pointer"
-                                                            onClick={() => navigate(`/property/edit/${property.id}`)}
-                                                        >
-                                                            Edit Details
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer">Manage Rooms</DropdownMenuItem>
-                                                        <DropdownMenuSeparator className="bg-slate-800" />
-                                                        <DropdownMenuItem className="hover:bg-slate-800 cursor-pointer text-red-500">
-                                                            Deactivate
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredProperties.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center text-gray-400 py-12">
+                                                <Building2 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                                <p>No properties found</p>
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                                    ) : (
+                                        filteredProperties.map((property) => (
+                                            <TableRow key={property.id} className="border-[#2A2A2A] hover:bg-[#0A0A0A] transition">
+                                                <TableCell>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                            <Building2 className="w-6 h-6 text-white" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-semibold text-white">{property.name}</p>
+                                                            <p className="text-xs text-gray-400">ID: {property.id.slice(0, 8)}...</p>
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center text-gray-300">
+                                                        <MapPin className="w-4 h-4 mr-1.5 text-gray-500 flex-shrink-0" />
+                                                        <span className="truncate max-w-xs">{property.address || 'No address'}</span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-gray-300">
+                                                    {property.customer_details?.name || 'Unknown'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center text-gray-300">
+                                                        <Bed className="w-4 h-4 mr-1.5 text-gray-500" />
+                                                        {property.rooms?.[0]?.count || 0}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge className="bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20">
+                                                        Active
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-[#1A1A1A]">
+                                                                <MoreVertical className="w-4 h-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="bg-[#1A1A1A] border-[#2A2A2A]">
+                                                            <DropdownMenuItem
+                                                                className="text-gray-300 hover:text-white hover:bg-[#2A2A2A] cursor-pointer"
+                                                                onSelect={() => navigate(`/stays/${property.id}`)}
+                                                            >
+                                                                <Eye className="w-4 h-4 mr-2" />
+                                                                View Details
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                className="text-gray-300 hover:text-white hover:bg-[#2A2A2A] cursor-pointer"
+                                                                onSelect={() => navigate(`/property/edit/${property.id}`)}
+                                                            >
+                                                                <Edit className="w-4 h-4 mr-2" />
+                                                                Edit Property
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem className="text-red-400 hover:text-red-300 hover:bg-[#2A2A2A] cursor-pointer">
+                                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                                Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     )}
                 </CardContent>
             </Card>

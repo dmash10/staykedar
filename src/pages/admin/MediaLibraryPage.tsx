@@ -30,8 +30,7 @@ export default function MediaLibraryPage() {
   const loadFiles = async () => {
     try {
       setIsLoading(true);
-      // List all files in the 'blog-images' bucket (or a general 'media' bucket if preferred)
-      // For now we'll assume a 'media' bucket or use 'blog-images' as a default
+      // List all files in the 'blog-images' bucket
       const { data, error } = await supabase
         .storage
         .from('blog-images')
@@ -136,9 +135,9 @@ export default function MediaLibraryPage() {
 
   return (
     <AdminLayout title="Media Library">
-      <Card className="bg-slate-900 border-slate-800">
-        <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-slate-800">
-          <CardTitle className="text-slate-200 text-lg font-medium">Media Files</CardTitle>
+      <Card className="bg-[#111111] border-[#2A2A2A]">
+        <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-[#2A2A2A]">
+          <CardTitle className="text-white text-lg font-medium">Media Files</CardTitle>
           <div>
             <Input
               type="file"
@@ -180,7 +179,7 @@ export default function MediaLibraryPage() {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {files.map((file) => (
-                <div key={file.id} className="group relative bg-slate-800 rounded-lg overflow-hidden border border-slate-700 aspect-square">
+                <div key={file.id} className="group relative bg-[#1A1A1A] rounded-lg overflow-hidden border border-[#2A2A2A] aspect-square">
                   <img
                     src={file.url}
                     alt={file.name}

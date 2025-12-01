@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Building, Bed, Calendar, TrendingUp, Loader2, Eye, Edit, Trash2, BarChart3, Settings as SettingsIcon, List } from 'lucide-react';
+import { Plus, Building, Bed, Calendar, TrendingUp, Loader2, Eye, Edit, Trash2, BarChart3, List } from 'lucide-react';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -128,7 +128,7 @@ const PropertyManagement: React.FC = () => {
       <Nav />
       <main className="min-h-screen bg-gray-50">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-[#0071c2] to-[#005a9c] text-white py-12">
+        <div className="bg-[#003580] text-white py-12">
           <Container>
             <div className="flex justify-between items-center">
               <div>

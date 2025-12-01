@@ -20,7 +20,7 @@ import ContentCreator from "./pages/ContentCreator";
 import PartnerWithUs from "./pages/PartnerWithUs";
 import Auth from "./pages/Auth";
 import Dashboard from './pages/Dashboard'; // Customer dashboard
-import AdminDashboard from './pages/admin/Dashboard'; // Admin dashboard
+import AdminDashboard from '@/pages/admin/Dashboard'; // Admin dashboard
 import Packages from "./pages/Packages";
 import PackageDetail from "./pages/PackageDetail";
 import { Helmet } from "react-helmet";
@@ -29,15 +29,24 @@ import { AdminToolbar } from "./components/admin/AdminToolbar";
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import AuthCallback from "./pages/AuthCallback";
-import AdminBlogList from './pages/admin/AdminBlogList';
-import AdminBlogEditor from './pages/admin/AdminBlogEditor';
-import UsersPage from './pages/admin/UsersPage';
-import BookingsPage from './pages/admin/BookingsPage';
-import PropertiesPage from './pages/admin/PropertiesPage';
-import PackagesPage from './pages/admin/PackagesPage';
-import MediaLibraryPage from './pages/admin/MediaLibraryPage';
-import SettingsPage from './pages/admin/SettingsPage';
-import PluginsPage from './pages/admin/PluginsPage';
+import AdminBlogList from '@/pages/admin/AdminBlogList';
+import AdminBlogEditor from '@/pages/admin/AdminBlogEditor';
+import AdminArticleList from '@/pages/admin/AdminArticleList';
+import AdminArticleEditor from '@/pages/admin/AdminArticleEditor';
+import UsersPage from '@/pages/admin/UsersPage';
+import BookingsPage from '@/pages/admin/BookingsPage';
+import PropertiesPage from '@/pages/admin/PropertiesPage';
+import PackagesPage from '@/pages/admin/PackagesPage';
+import MediaLibraryPage from '@/pages/admin/MediaLibraryPage';
+import SettingsPage from '@/pages/admin/SettingsPage';
+import RevenuePage from '@/pages/admin/RevenuePage';
+import ReviewsPage from '@/pages/admin/ReviewsPage';
+import SupportTicketsPage from '@/pages/admin/SupportTicketsPage';
+import AdminTicketDetail from '@/pages/admin/AdminTicketDetail';
+import NotificationsPage from '@/pages/admin/NotificationsPage';
+import ReportsPage from '@/pages/admin/ReportsPage';
+import ActivityLogsPage from '@/pages/admin/ActivityLogsPage';
+import PluginsPage from '@/pages/admin/PluginsPage';
 import PluginDemo from './pages/PluginDemo';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -47,6 +56,8 @@ import ContactUs from './pages/ContactUs';
 import StayListing from './pages/StayListing';
 import PropertyDetail from './pages/PropertyDetail';
 import UserBookings from './pages/UserBookings';
+import UserTickets from './pages/user/UserTickets';
+import TicketDetail from './pages/user/TicketDetail';
 import PropertyOnboarding from "./pages/PropertyOnboarding";
 import PropertyManagement from './pages/PropertyManagement';
 import PropertyEdit from './pages/PropertyEdit';
@@ -55,6 +66,12 @@ import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import PropertyOwnerSignup from './pages/PropertyOwnerSignup';
 import EmailVerification from './pages/EmailVerification';
+import RaiseTicket from './pages/support/RaiseTicket';
+import TrackTicket from './pages/support/TrackTicket';
+import PublicTicketDetail from './pages/support/PublicTicketDetail';
+import HelpHome from './pages/help/HelpHome';
+import HelpCategory from './pages/help/HelpCategory';
+import HelpArticle from './pages/help/HelpArticle';
 
 const queryClient = new QueryClient();
 
@@ -107,6 +124,16 @@ const App = () => {
                     <Route path="/become-a-host" element={<PropertyOwnerSignup />} />
                     <Route path="/email-verification" element={<EmailVerification />} />
 
+                    {/* Support Routes */}
+                    <Route path="/support/raise" element={<RaiseTicket />} />
+                    <Route path="/support/track" element={<TrackTicket />} />
+                    <Route path="/support/view" element={<PublicTicketDetail />} />
+
+                    {/* Help Center Routes */}
+                    <Route path="/help" element={<HelpHome />} />
+                    <Route path="/help/categories/:categorySlug" element={<HelpCategory />} />
+                    <Route path="/help/article/:slug" element={<HelpArticle />} />
+
                     {/* Customer routes - Use CUSTOMER Dashboard */}
                     <Route path="/dashboard" element={
                       <CustomerRoute>
@@ -118,11 +145,26 @@ const App = () => {
                         <UserBookings />
                       </CustomerRoute>
                     } />
+                    <Route path="/dashboard/tickets" element={
+                      <CustomerRoute>
+                        <UserTickets />
+                      </CustomerRoute>
+                    } />
+                    <Route path="/dashboard/tickets/:ticketId" element={
+                      <CustomerRoute>
+                        <TicketDetail />
+                      </CustomerRoute>
+                    } />
 
                     {/* Property owner routes */}
                     <Route path="/dashboard/properties" element={
                       <PropertyOwnerRoute>
                         <PropertyManagement />
+                      </PropertyOwnerRoute>
+                    } />
+                    <Route path="/dashboard/list-property" element={
+                      <PropertyOwnerRoute>
+                        <PropertyOnboarding />
                       </PropertyOwnerRoute>
                     } />
                     <Route path="/dashboard/properties/:propertyId/edit" element={
@@ -140,12 +182,21 @@ const App = () => {
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/blog" element={<AdminBlogList />} />
                     <Route path="/admin/blog/:postId" element={<AdminBlogEditor />} />
+                    <Route path="/admin/help/articles" element={<AdminArticleList />} />
+                    <Route path="/admin/help/articles/:articleId" element={<AdminArticleEditor />} />
                     <Route path="/admin/users" element={<UsersPage />} />
                     <Route path="/admin/bookings" element={<BookingsPage />} />
                     <Route path="/admin/properties" element={<PropertiesPage />} />
                     <Route path="/admin/packages" element={<PackagesPage />} />
                     <Route path="/admin/media" element={<MediaLibraryPage />} />
                     <Route path="/admin/settings" element={<SettingsPage />} />
+                    <Route path="/admin/revenue" element={<RevenuePage />} />
+                    <Route path="/admin/reviews" element={<ReviewsPage />} />
+                    <Route path="/admin/tickets" element={<SupportTicketsPage />} />
+                    <Route path="/admin/tickets/:ticketId" element={<AdminTicketDetail />} />
+                    <Route path="/admin/notifications" element={<NotificationsPage />} />
+                    <Route path="/admin/reports" element={<ReportsPage />} />
+                    <Route path="/admin/logs" element={<ActivityLogsPage />} />
                     <Route path="/admin/plugins" element={<PluginsPage />} />
 
                     <Route path="*" element={<NotFound />} />
