@@ -101,7 +101,7 @@ const ExploreStays = () => {
   return (
     <section className="py-20 bg-white">
       <Container size="xl">
-        <motion.div 
+        <motion.div
           className="flex justify-between items-center mb-10"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -119,15 +119,15 @@ const ExploreStays = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-2">
-            <button 
-              onClick={handlePrev} 
+            <button
+              onClick={handlePrev}
               disabled={startIndex === 0 || isEditMode}
               className={`p-2 rounded-full ${startIndex === 0 ? 'text-muted-foreground bg-secondary/50' : 'text-white bg-primary hover:bg-primary/90'} transition-colors duration-300 border border-border`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button 
-              onClick={handleNext} 
+            <button
+              onClick={handleNext}
               disabled={startIndex >= totalItems - itemsPerPage || isEditMode}
               className={`p-2 rounded-full ${startIndex >= totalItems - itemsPerPage ? 'text-muted-foreground bg-secondary/50' : 'text-white bg-primary hover:bg-primary/90'} transition-colors duration-300 border border-border`}
             >
@@ -136,17 +136,17 @@ const ExploreStays = () => {
           </div>
         </motion.div>
 
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        <motion.div
+          className="flex overflow-x-auto snap-x md:grid md:grid-cols-3 gap-4 md:gap-8 pb-4 md:pb-0 px-4 md:px-0 -mx-4 md:mx-0 scrollbar-hide"
           variants={container}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
         >
-          {visibleStays.map((stay) => (
-            <motion.div 
+          {(typeof window !== 'undefined' && window.innerWidth < 768 ? stays : visibleStays).map((stay) => (
+            <motion.div
               key={stay.id}
-              className="bg-white rounded-xl p-6 shadow-sm border border-border hover:shadow-md hover:bg-blue-50/70 transition-all duration-300 flex flex-col h-full"
+              className="bg-white rounded-xl p-6 shadow-sm border border-border hover:shadow-md hover:bg-blue-50/70 transition-all duration-300 flex flex-col h-full min-w-[280px] snap-center md:min-w-0"
               variants={item}
               onHoverStart={() => setHoveredId(stay.id)}
               onHoverEnd={() => setHoveredId(null)}
@@ -167,7 +167,7 @@ const ExploreStays = () => {
                 defaultValue={stay.name}
                 className="text-xl font-semibold mb-2 text-foreground"
               />
-              
+
               <div className="flex items-center mb-4">
                 <EditableText
                   section="exploreStays"
@@ -177,7 +177,7 @@ const ExploreStays = () => {
                 />
                 <span className="text-xs text-muted-foreground ml-1">per night</span>
               </div>
-              
+
               <div className="flex items-center gap-2 mb-4">
                 {stay.amenities.map((amenity, index) => (
                   <div key={index} className="text-muted-foreground">
@@ -185,10 +185,10 @@ const ExploreStays = () => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-auto">
-                <Link 
-                  to={`/stays/${stay.id}`} 
+                <Link
+                  to={`/stays/${stay.id}`}
                   className="w-full block"
                   onClick={handleLinkClick}
                 >
@@ -203,27 +203,27 @@ const ExploreStays = () => {
             </motion.div>
           ))}
         </motion.div>
-        
-        <div className="mt-10 flex md:hidden justify-center items-center space-x-4">
-          <button 
-            onClick={handlePrev} 
+
+        <div className="hidden mt-10 md:hidden justify-center items-center space-x-4">
+          <button
+            onClick={handlePrev}
             disabled={startIndex === 0 || isEditMode}
             className={`p-2 rounded-full ${startIndex === 0 ? 'text-muted-foreground bg-secondary/50' : 'text-white bg-primary hover:bg-primary/90'} transition-colors duration-300 border border-border`}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button 
-            onClick={handleNext} 
+          <button
+            onClick={handleNext}
             disabled={startIndex >= totalItems - itemsPerPage || isEditMode}
             className={`p-2 rounded-full ${startIndex >= totalItems - itemsPerPage ? 'text-muted-foreground bg-secondary/50' : 'text-white bg-primary hover:bg-primary/90'} transition-colors duration-300 border border-border`}
           >
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-        
+
         <div className="mt-12 text-center">
-          <Link 
-            to="/stays" 
+          <Link
+            to="/stays"
             className="inline-block"
             onClick={handleLinkClick}
           >

@@ -45,7 +45,9 @@ const Nav = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [showNavFade, setShowNavFade] = useState(true);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -137,6 +139,35 @@ const Nav = () => {
     setMobileMenuOpen(false);
   }, [location]);
 
+  // Setup scroll listener for fade effect (only once)
+  useEffect(() => {
+    const handleNavScroll = () => {
+      if (mobileNavRef.current) {
+        const isScrolled = mobileNavRef.current.scrollLeft > 10;
+        setShowNavFade(!isScrolled);
+      }
+    };
+
+    const navElement = mobileNavRef.current;
+    if (navElement) {
+      navElement.addEventListener('scroll', handleNavScroll);
+      return () => {
+        navElement.removeEventListener('scroll', handleNavScroll);
+      };
+    }
+  }, []);
+
+  // Auto-scroll to active item when route changes
+  useEffect(() => {
+    if (mobileNavRef.current) {
+      const activeLink = mobileNavRef.current.querySelector('.bg-white\\/20');
+      if (activeLink) {
+        // Use instant scroll to prevent visible jump
+        activeLink.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [location]);
+
   // Function to check if a path is active
   const isActivePath = (path: string) => {
     return location.pathname === path ||
@@ -167,7 +198,7 @@ const Nav = () => {
         <Container>
           <div className="py-4 flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="text-2xl font-bold">
+            <Link to="/" className="text-lg md:text-2xl font-bold">
               StayKedarnath.in
             </Link>
 
@@ -177,7 +208,7 @@ const Nav = () => {
               {!user && (
                 <Link
                   to="/become-a-host"
-                  className="inline-flex items-center justify-center rounded-md bg-transparent border border-white px-3 py-2 text-white font-medium hover:bg-white hover:text-[#003580] transition-colors"
+                  className="hidden lg:inline-flex items-center justify-center rounded-md bg-transparent border border-white px-3 py-2 text-white font-medium hover:bg-white hover:text-[#003580] transition-colors"
                 >
                   <span className="text-sm font-semibold">List your property</span>
                 </Link>
@@ -185,7 +216,7 @@ const Nav = () => {
 
               {/* Button Group - Show only when not logged in */}
               {!user ? (
-                <div className="flex">
+                <div className="hidden md:flex">
                   <Link to="/auth">
                     <Button className="bg-white text-[#003580] hover:bg-gray-100 rounded-l-lg rounded-r-none border-r border-gray-300">
                       Register
@@ -246,7 +277,74 @@ const Nav = () => {
                   )}
                 </div>
               )}
+
+              {/* Mobile Menu Button + Profile Icon */}
+              <div className="md:hidden flex items-center gap-2">
+                {/* Profile Icon for Mobile */}
+                {!user ? (
+                  <Link to="/auth">
+                    <div className="p-2 rounded-full border-2 border-white hover:bg-white/10 transition-colors">
+                      <User className="h-5 w-5" />
+                    </div>
+                  </Link>
+                ) : (
+                  <div
+                    className="p-2 rounded-full border-2 border-white hover:bg-white/10 transition-colors cursor-pointer"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                  >
+                    <User className="h-5 w-5" />
+                  </div>
+                )}
+
+                {/* Hamburger Menu */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="text-white p-2"
+                >
+                  {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </button>
+              </div>
             </div>
+          </div>
+
+          {/* Horizontal Navigation Tabs (Mobile) */}
+          <div className="md:hidden relative">
+            <div
+              ref={mobileNavRef}
+              className="overflow-x-auto snap-x snap-mandatory pt-2 pb-4"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              <style>{`
+                .overflow-x-auto::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
+              <div className="flex gap-2 px-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-full text-white transition duration-200 whitespace-nowrap flex-shrink-0 snap-start",
+                      isActivePath(link.path)
+                        ? "bg-white/20 border-2 border-white"
+                        : "hover:bg-white/10 border border-white/50"
+                    )}
+                  >
+                    {link.icon}
+                    <span className="font-medium text-sm">{link.name}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            {/* Fade gradient overlay on right - only show when not scrolled */}
+            {showNavFade && (
+              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#003580] to-transparent pointer-events-none transition-opacity duration-300" />
+            )}
           </div>
 
           {/* Bottom Navigation (Desktop) */}
@@ -264,17 +362,6 @@ const Nav = () => {
                 <span className="font-medium">{link.name}</span>
               </Link>
             ))}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center py-2">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-white p-2"
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-            <span className="ml-2 font-medium">Menu</span>
           </div>
         </Container>
 

@@ -179,7 +179,7 @@ const FeaturedDestinations = () => {
                             <Link
                                 key={destination.id}
                                 to={destination.link}
-                                className="flex-shrink-0 w-[160px]  group/card"
+                                className="flex-shrink-0 w-[240px] md:w-[280px] group/card"
                             >
                                 <motion.div
                                     whileHover={{ y: -4 }}

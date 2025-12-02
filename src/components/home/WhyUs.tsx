@@ -58,7 +58,7 @@ const WhyUs = () => {
     ];
 
     return (
-        <section className="pt-24 pb-12 bg-gray-50">
+        <section className="pt-48 md:pt-24 pb-12 bg-gray-50">
             <Container>
                 <motion.h2
                     className="text-2xl md:text-3xl font-bold text-gray-900 mb-8"
@@ -70,23 +70,23 @@ const WhyUs = () => {
                     Why StayKedarnath?
                 </motion.h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                     {benefits.map((benefit, index) => (
                         <motion.div
                             key={benefit.id}
-                            className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
+                            className="bg-white rounded-lg p-4 md:p-6 shadow-sm hover:shadow-md transition-shadow duration-300"
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: index * 0.1 }}
                         >
-                            <div className="w-12 h-12 mb-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 mb-3 md:mb-4">
                                 {benefit.icon}
                             </div>
-                            <h3 className="font-bold text-base text-gray-900 mb-2">
+                            <h3 className="font-bold text-sm md:text-base text-gray-900 mb-1 md:mb-2">
                                 {benefit.title}
                             </h3>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-xs md:text-sm text-gray-600">
                                 {benefit.description}
                             </p>
                         </motion.div>

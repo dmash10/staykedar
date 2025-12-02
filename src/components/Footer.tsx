@@ -25,69 +25,69 @@ const Footer = () => {
   const { isEditMode } = useEdit();
 
   return (
-    <footer className="bg-primary-deep/10 pt-10 pb-6">
+    <footer className="bg-primary-deep/10 pt-8 pb-6">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-4">
           {/* Support */}
           <div>
-            <h3 className="text-lg font-semibold text-indigo-deep mb-3">Support</h3>
-            <ul className="space-y-1">
+            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Support</h3>
+            <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/help" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <HelpCircle className="w-3.5 h-3.5" />
+                <Link to="/help" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <HelpCircle className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="help_center_link"
                     defaultValue="Help Center"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/support/raise" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <FileText className="w-3.5 h-3.5" />
+                <Link to="/support/raise" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <FileText className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="raise_ticket_link"
                     defaultValue="Raise a Ticket"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/support/track" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Truck className="w-3.5 h-3.5" />
+                <Link to="/support/track" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Truck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="track_ticket_link"
                     defaultValue="Track Status"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/shipping" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Truck className="w-3.5 h-3.5" />
+                <Link to="/shipping" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Truck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="shipping_link"
                     defaultValue="Shipping Policy"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/cancellation" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <FileWarning className="w-3.5 h-3.5" />
+                <Link to="/cancellation" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <FileWarning className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="cancellation_link"
                     defaultValue="Cancellation & Refunds"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
@@ -97,40 +97,40 @@ const Footer = () => {
 
           {/* Discover */}
           <div>
-            <h3 className="text-lg font-semibold text-indigo-deep mb-3">Discover</h3>
-            <ul className="space-y-1">
+            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Discover</h3>
+            <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Book className="w-3.5 h-3.5" />
+                <Link to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Book className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="blog_link"
                     defaultValue="Blog"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/attractions" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <MapPin className="w-3.5 h-3.5" />
+                <Link to="/attractions" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="attractions_link"
                     defaultValue="Attractions"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/weather" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Clock className="w-3.5 h-3.5" />
+                <Link to="/weather" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="weather_link"
                     defaultValue="Weather Updates"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
@@ -140,28 +140,28 @@ const Footer = () => {
 
           {/* Terms and settings */}
           <div>
-            <h3 className="text-lg font-semibold text-indigo-deep mb-3">Terms and settings</h3>
-            <ul className="space-y-1">
+            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Terms and settings</h3>
+            <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <FileCheck className="w-3.5 h-3.5" />
+                <Link to="/terms" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <FileCheck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="terms_link"
                     defaultValue="Terms & Conditions"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Shield className="w-3.5 h-3.5" />
+                <Link to="/privacy" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Shield className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="privacy_link"
                     defaultValue="Privacy Policy"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
@@ -171,28 +171,28 @@ const Footer = () => {
 
           {/* Partners */}
           <div>
-            <h3 className="text-lg font-semibold text-indigo-deep mb-3">Partners</h3>
-            <ul className="space-y-1">
+            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Partners</h3>
+            <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/partner-with-us#property" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Home className="w-3.5 h-3.5" />
+                <Link to="/partner-with-us#property" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="list_property_link"
                     defaultValue="List Your Property"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
               </li>
               <li>
-                <Link to="/content-creator" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Camera className="w-3.5 h-3.5" />
+                <Link to="/content-creator" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Camera className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
                     contentKey="content_creator_link"
                     defaultValue="Content Creator Program"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-sm"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
                 </Link>
@@ -201,36 +201,36 @@ const Footer = () => {
           </div>
 
           {/* About */}
-          <div>
-            <h3 className="text-lg font-semibold text-indigo-deep mb-3">About</h3>
+          <div className="col-span-2 md:col-span-2 lg:col-span-1">
+            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">About</h3>
             <div className="space-y-2">
               <EditableText
                 section="footer"
                 contentKey="company_description"
                 defaultValue="Your trusted partner for a seamless and spiritual Kedarnath journey. We provide accommodation, travel services, and complete pilgrimage packages."
-                className="text-xs text-muted-foreground"
+                className="text-xs text-muted-foreground leading-relaxed"
               />
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Mail className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                <Mail className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                 <EditableButton
                   section="footer"
                   contentKey="company_email"
                   defaultValue="dmworkforash@gmail.com"
-                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-sm"
+                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-xs md:text-sm"
                   variant="ghost"
                 />
               </div>
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Phone className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                <Phone className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                 <EditableButton
                   section="footer"
                   contentKey="company_phone"
                   defaultValue="+91 9027475942"
-                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-sm"
+                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-xs md:text-sm"
                   variant="ghost"
                 />
               </div>
-              <div className="flex space-x-4 pt-2">
+              <div className="flex space-x-3 md:space-x-4 pt-2">
                 <a
                   href="https://instagram.com"
                   target="_blank"

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, Users, MapPin, Plus, Minus, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface MainSearchBarProps {
@@ -19,6 +20,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
     onSearch,
     className = ""
 }) => {
+    const navigate = useNavigate();
     const [location, setLocation] = useState(initialLocation);
     const [checkIn, setCheckIn] = useState<Date | null>(initialCheckIn);
     const [checkOut, setCheckOut] = useState<Date | null>(initialCheckOut);
@@ -106,9 +108,30 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Call onSearch callback if provided
         if (onSearch) {
             onSearch({ location, checkIn, checkOut, guests: { adults, children, rooms } });
         }
+
+        // Build query parameters for navigation
+        const params = new URLSearchParams();
+        params.set('location', location);
+
+        if (checkIn) {
+            params.set('checkIn', checkIn.toISOString());
+        }
+
+        if (checkOut) {
+            params.set('checkOut', checkOut.toISOString());
+        }
+
+        params.set('adults', adults.toString());
+        params.set('children', children.toString());
+        params.set('rooms', rooms.toString());
+
+        // Navigate to stays page with search parameters
+        navigate(`/stays?${params.toString()}`);
     };
 
     const handleDateSelection = (day: number, monthIndex: number, year: number) => {
@@ -189,7 +212,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
             <div className="border-4 border-yellow-500 rounded-lg overflow-hidden mx-auto bg-white">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
                     {/* Location */}
-                    <div className="md:col-span-3 bg-white py-2 px-4 flex items-center relative border-b md:border-b-0 md:border-r border-gray-200">
+                    <div className="md:col-span-3 bg-white py-3 px-4 flex items-center relative border-b md:border-b-0 md:border-r border-gray-200 h-16 md:h-auto">
                         <div className="flex-shrink-0">
                             <MapPin className="h-6 w-6 text-gray-500" />
                         </div>
@@ -197,7 +220,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                             <label className="block text-xs text-gray-600">Where are you going?</label>
                             <button
                                 type="button"
-                                className="cursor-pointer flex items-center font-medium bg-transparent border-0 p-0 text-left w-full focus:outline-none"
+                                className="cursor-pointer flex items-center font-medium bg-transparent border-0 p-0 text-left w-full focus:outline-none h-8"
                                 onClick={() => {
                                     setShowLocationDropdown(!showLocationDropdown);
                                     setShowCalendar(false);
@@ -205,7 +228,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                 }}
                             >
                                 <div className="flex items-center justify-between w-full">
-                                    <span className="text-gray-800 truncate">{locations.find(loc => loc.value === location)?.label || location}</span>
+                                    <span className="text-gray-800 truncate text-sm md:text-base">{locations.find(loc => loc.value === location)?.label || location}</span>
                                     <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
                                 </div>
                             </button>
@@ -213,15 +236,15 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                     </div>
 
                     {/* Dates */}
-                    <div className="md:col-span-3 bg-white py-2 px-4 flex items-center relative border-b md:border-b-0 md:border-r border-gray-200">
+                    <div className="md:col-span-3 bg-white py-3 px-4 flex items-center relative border-b md:border-b-0 md:border-r border-gray-200 h-16 md:h-auto">
                         <div className="flex-shrink-0">
                             <Calendar className="h-6 w-6 text-gray-500" />
                         </div>
                         <div className="ml-2 flex-grow">
-                            <label className="block text-xs text-gray-600">Check-in date — Check-out date</label>
+                            <label className="block text-xs text-gray-600">Check-in — Check-out</label>
                             <button
                                 type="button"
-                                className="cursor-pointer flex items-center font-medium bg-transparent border-0 p-0 text-left w-full focus:outline-none"
+                                className="cursor-pointer flex items-center font-medium bg-transparent border-0 p-0 text-left w-full focus:outline-none h-8"
                                 onClick={() => {
                                     setShowCalendar(!showCalendar);
                                     setShowGuestModal(false);
@@ -229,7 +252,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                 }}
                             >
                                 <div className="flex items-center justify-between w-full">
-                                    <span className="truncate">
+                                    <span className="truncate text-sm md:text-base">
                                         {checkIn && checkOut
                                             ? `${formatDate(checkIn)} — ${formatDate(checkOut)}`
                                             : "Select dates"}
@@ -241,7 +264,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                     </div>
 
                     {/* Guests */}
-                    <div className="md:col-span-4 bg-white py-2 px-4 flex items-center relative">
+                    <div className="md:col-span-4 bg-white py-3 px-4 flex items-center relative h-16 md:h-auto">
                         <div className="flex-shrink-0">
                             <Users className="h-6 w-6 text-gray-500" />
                         </div>
@@ -249,7 +272,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                             <label className="block text-xs text-gray-600">Guests</label>
                             <button
                                 type="button"
-                                className="cursor-pointer flex items-center font-medium bg-transparent border-0 p-0 text-left w-full focus:outline-none"
+                                className="cursor-pointer flex items-center font-medium bg-transparent border-0 p-0 text-left w-full focus:outline-none h-8"
                                 onClick={() => {
                                     setShowGuestModal(!showGuestModal);
                                     setShowCalendar(false);
@@ -257,7 +280,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                 }}
                             >
                                 <div className="flex items-center justify-between w-full">
-                                    <span className="whitespace-nowrap truncate">{adults} adults · {children} children · {rooms} room</span>
+                                    <span className="whitespace-nowrap truncate text-sm md:text-base">{adults} adults · {children} children · {rooms} room</span>
                                     <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0 ml-1" />
                                 </div>
                             </button>
@@ -265,10 +288,10 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                     </div>
 
                     {/* Search Button */}
-                    <div className="md:col-span-2 bg-[#0071c2] hover:bg-[#00487a] cursor-pointer transition-colors">
+                    <div className="md:col-span-2 bg-[#0071c2] hover:bg-[#00487a] cursor-pointer transition-colors h-16 md:h-auto">
                         <button
                             type="submit"
-                            className="w-full h-full flex items-center justify-center text-white font-bold py-4"
+                            className="w-full h-full flex items-center justify-center text-white font-bold text-lg md:text-base"
                         >
                             Search
                         </button>

@@ -89,7 +89,7 @@ const CuratedPackages = () => {
 
                 {/* Packages Grid */}
                 <motion.div
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                    className="flex overflow-x-auto snap-x md:grid md:grid-cols-3 gap-4 md:gap-8 pb-4 md:pb-0 px-4 md:px-0 -mx-4 md:mx-0 scrollbar-hide"
                     variants={container}
                     initial="hidden"
                     whileInView="show"
@@ -100,7 +100,7 @@ const CuratedPackages = () => {
                             key={pkg.id}
                             variants={item}
                             whileHover={{ y: -8 }}
-                            className="group relative"
+                            className="group relative min-w-[280px] snap-center md:min-w-0"
                         >
                             {/* Popular Badge */}
                             {pkg.popular && (
@@ -109,7 +109,7 @@ const CuratedPackages = () => {
                                 </div>
                             )}
 
-                            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
+                            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 h-full flex flex-col">
                                 {/* Package Image */}
                                 <div className="relative aspect-[4/3] overflow-hidden">
                                     <img
@@ -136,13 +136,13 @@ const CuratedPackages = () => {
                                 </div>
 
                                 {/* Package Content */}
-                                <div className="p-6">
+                                <div className="p-6 flex flex-col flex-grow">
                                     <h3 className="text-2xl font-bold text-gray-900 mb-4">
                                         {pkg.name}
                                     </h3>
 
                                     {/* Inclusions */}
-                                    <ul className="space-y-3 mb-6">
+                                    <ul className="space-y-3 mb-6 flex-grow">
                                         {pkg.inclusions.map((inclusion, index) => (
                                             <li key={index} className="flex items-start gap-2 text-gray-700">
                                                 <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -152,7 +152,7 @@ const CuratedPackages = () => {
                                     </ul>
 
                                     {/* CTA Button */}
-                                    <Link to={pkg.link}>
+                                    <Link to={pkg.link} className="mt-auto">
                                         <motion.button
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}

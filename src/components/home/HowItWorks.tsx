@@ -60,7 +60,7 @@ const HowItWorks = () => {
 
                 {/* Steps Grid */}
                 <motion.div
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12"
+                    className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12"
                     variants={container}
                     initial="hidden"
                     whileInView="show"
@@ -70,7 +70,7 @@ const HowItWorks = () => {
                         <motion.div
                             key={step.number}
                             variants={item}
-                            className="relative text-center"
+                            className="relative flex md:block items-center md:items-start text-left md:text-center gap-4 md:gap-0"
                         >
                             {/* Connecting Line (Desktop only) */}
                             {index < steps.length - 1 && (
@@ -79,25 +79,29 @@ const HowItWorks = () => {
 
                             {/* Step Number Circle */}
                             <motion.div
-                                className="inline-flex items-center justify-center w-28 h-28 rounded-full bg-gradient-to-br from-[#0071c2] to-[#005a9c] text-white mb-6 shadow-xl relative z-10"
+                                className="inline-flex items-center justify-center w-16 h-16 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-[#0071c2] to-[#005a9c] text-white mb-0 md:mb-6 shadow-xl relative z-10 flex-shrink-0"
                                 whileHover={{ scale: 1.1, rotate: 5 }}
                                 transition={{ type: "spring", stiffness: 300 }}
                             >
                                 <div className="relative">
-                                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center text-[#0071c2] font-bold text-lg shadow-md">
+                                    <div className="absolute -top-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center text-[#0071c2] font-bold text-sm md:text-lg shadow-md">
                                         {step.number}
                                     </div>
-                                    {step.icon}
+                                    <div className="transform scale-75 md:scale-100">
+                                        {step.icon}
+                                    </div>
                                 </div>
                             </motion.div>
 
                             {/* Step Content */}
-                            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                                {step.title}
-                            </h3>
-                            <p className="text-gray-600 max-w-xs mx-auto">
-                                {step.description}
-                            </p>
+                            <div className="flex-grow">
+                                <h3 className="text-lg md:text-2xl font-bold text-gray-900 mb-1 md:mb-3">
+                                    {step.title}
+                                </h3>
+                                <p className="text-sm md:text-base text-gray-600 max-w-none md:max-w-xs mx-auto">
+                                    {step.description}
+                                </p>
+                            </div>
                         </motion.div>
                     ))}
                 </motion.div>
