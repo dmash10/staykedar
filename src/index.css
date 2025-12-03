@@ -94,6 +94,30 @@
     background: rgba(148, 163, 184, 0.8) !important;
   }
 
+  /* Remove blue outline from all inputs */
+  input:focus,
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="search"]:focus,
+  input[type="password"]:focus,
+  input[type="tel"]:focus,
+  textarea:focus,
+  select:focus,
+  [role="combobox"]:focus,
+  button[role="combobox"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Remove ring from Shadcn UI components */
+  .focus-visible\:ring-0:focus-visible,
+  .focus\:ring-0:focus,
+  [data-state="open"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: none !important;
+  }
+
   /* Firefox support */
   html {
     scrollbar-width: thin;

@@ -21,52 +21,50 @@ import { format, subDays } from 'date-fns';
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  // Fetch comprehensive dashboard stats
+  // Fetch comprehensive dashboard stats - OPTIMIZED with parallel queries
   const { data: stats, isLoading } = useQuery({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
-      // Users
-      const { count: usersCount, error: usersError } = await supabase
-        .from('customer_details')
-        .select('*', { count: 'exact', head: true });
-      if (usersError) throw usersError;
-
-      // Properties
-      const { count: propertiesCount, error: propertiesError } = await supabase
-        .from('properties')
-        .select('*', { count: 'exact', head: true });
-      if (propertiesError) throw propertiesError;
-
-      // Bookings with details
-      const { data: bookings, error: bookingsError } = await supabase
-        .from('bookings')
-        .select(`
+      // Run all queries in PARALLEL for faster loading
+      const [usersResult, propertiesResult, bookingsResult, recentBookingsResult] = await Promise.all([
+        // Users count
+        supabase.from('customer_details').select('*', { count: 'exact', head: true }),
+        // Properties count
+        supabase.from('properties').select('*', { count: 'exact', head: true }),
+        // All bookings for stats (only needed fields)
+        supabase.from('bookings').select('id, status, total_price, created_at').order('created_at', { ascending: false }),
+        // Recent bookings with details (only 5)
+        supabase.from('bookings').select(`
           *,
           customer_details (name),
           rooms (
             name,
             properties (name)
           )
-        `)
-        .order('created_at', { ascending: false });
-      if (bookingsError) throw bookingsError;
+        `).order('created_at', { ascending: false }).limit(5)
+      ]);
 
-      const totalRevenue = bookings?.reduce((sum, b) => sum + (b.total_price || 0), 0) || 0;
+      const usersCount = usersResult.count || 0;
+      const propertiesCount = propertiesResult.count || 0;
+      const bookings = bookingsResult.data || [];
+      const recentBookings = recentBookingsResult.data || [];
+
+      const totalRevenue = bookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
 
       // Status breakdown
       const statusBreakdown = {
-        confirmed: bookings?.filter(b => b.status === 'confirmed').length || 0,
-        pending: bookings?.filter(b => b.status === 'pending').length || 0,
-        cancelled: bookings?.filter(b => b.status === 'cancelled').length || 0,
-        completed: bookings?.filter(b => b.status === 'completed').length || 0,
+        confirmed: bookings.filter(b => b.status === 'confirmed').length,
+        pending: bookings.filter(b => b.status === 'pending').length,
+        cancelled: bookings.filter(b => b.status === 'cancelled').length,
+        completed: bookings.filter(b => b.status === 'completed').length,
       };
 
       // Revenue trend (last 7 days)
       const revenueTrend = Array.from({ length: 7 }, (_, i) => {
         const date = subDays(new Date(), 6 - i);
-        const dayBookings = bookings?.filter(b =>
+        const dayBookings = bookings.filter(b =>
           format(new Date(b.created_at), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-        ) || [];
+        );
         const revenue = dayBookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
         return {
           date: format(date, 'MMM dd'),
@@ -77,15 +75,17 @@ export default function Dashboard() {
 
       return {
         totalRevenue,
-        totalBookings: bookings?.length || 0,
-        totalUsers: usersCount || 0,
-        totalProperties: propertiesCount || 0,
+        totalBookings: bookings.length,
+        totalUsers: usersCount,
+        totalProperties: propertiesCount,
         statusBreakdown,
         revenueTrend,
-        recentBookings: bookings?.slice(0, 5) || [],
-        avgBookingValue: totalRevenue / (bookings?.length || 1)
+        recentBookings,
+        avgBookingValue: totalRevenue / (bookings.length || 1)
       };
-    }
+    },
+    staleTime: 30000, // Cache for 30 seconds - prevents refetching on navigation
+    refetchOnWindowFocus: false // Don't refetch when window regains focus
   });
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];

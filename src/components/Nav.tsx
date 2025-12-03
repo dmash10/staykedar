@@ -139,6 +139,42 @@ const Nav = () => {
     setMobileMenuOpen(false);
   }, [location]);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      
+      // Lock body scroll
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Get the scroll position before unlocking
+      const scrollY = document.body.style.top;
+      
+      // Unlock body scroll
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      
+      // Restore scroll position
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+
+    // Cleanup function to ensure overflow is reset
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   // Setup scroll listener for fade effect (only once)
   useEffect(() => {
     const handleNavScroll = () => {
@@ -367,8 +403,8 @@ const Nav = () => {
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-[#003580] border-t border-[#004cb8] py-4 px-4 animate-fade-in">
-            <div className="flex flex-col space-y-2">
+          <div className="md:hidden fixed inset-0 top-[72px] bg-[#003580] z-50 overflow-y-auto">
+            <div className="flex flex-col space-y-2 py-4 px-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}

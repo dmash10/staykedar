@@ -299,7 +299,7 @@ Now generate the blog post as JSON:`;
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 border-none">
+                <Button variant="outline" size="sm" className="gap-2 bg-[#111111] text-white hover:bg-[#1a1a1a] border-[#333333]">
                     <Sparkles className="h-4 w-4" />
                     AI Assistant
                 </Button>

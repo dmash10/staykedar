@@ -7,6 +7,7 @@ import FeaturedDestinations from "../components/home/FeaturedDestinations";
 import CuratedPackages from "../components/home/CuratedPackages";
 import HowItWorks from "../components/home/HowItWorks";
 import TrustSignals from "../components/home/TrustSignals";
+import PromoBanner from "../components/home/PromoBanner";
 import PluginRenderer from "../components/plugins/PluginRenderer";
 
 const Index = () => {
@@ -19,6 +20,9 @@ const Index = () => {
 
       <div className="min-h-screen flex flex-col">
         <Nav />
+        
+        {/* Promotional Banner Strip */}
+        <PromoBanner position="homepage" />
 
         <main className="flex-grow">
           <Hero />
@@ -35,6 +39,9 @@ const Index = () => {
         </main>
 
         <Footer />
+        
+        {/* Popup Banner (shows after delay) */}
+        <PromoBanner position="popup" />
       </div>
     </>
   );

@@ -241,46 +241,46 @@ export default function TiptapEditor({ content, onChange, placeholder, onAIMetad
     };
 
     return (
-        <div className="border border-gray-300 rounded-lg overflow-hidden bg-white" >
-            <div className="flex flex-wrap gap-1 p-2 border-b bg-gray-100">
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBold().run()} className={editor.isActive('bold') ? 'bg-gray-300' : ''} title="Bold"><Bold className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleItalic().run()} className={editor.isActive('italic') ? 'bg-gray-300' : ''} title="Italic"><Italic className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleUnderline().run()} className={editor.isActive('underline') ? 'bg-gray-300' : ''} title="Underline"><UnderlineIcon className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleStrike().run()} className={editor.isActive('strike') ? 'bg-gray-300' : ''} title="Strike"><Strikethrough className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleCode().run()} className={editor.isActive('code') ? 'bg-gray-300' : ''} title="Code"><Code className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleSubscript().run()} className={editor.isActive('subscript') ? 'bg-gray-300' : ''} title="Subscript"><SubscriptIcon className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleSuperscript().run()} className={editor.isActive('superscript') ? 'bg-gray-300' : ''} title="Superscript"><SuperscriptIcon className="h-4 w-4 text-gray-700" /></Button>
+        <div className="border border-[#2a2a2a] rounded-lg overflow-hidden bg-[#0a0a0a]" >
+            <div className="flex flex-wrap gap-1 p-2 border-b border-[#2a2a2a] bg-[#111111]">
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBold().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('bold') ? 'bg-[#222222]' : ''}`} title="Bold"><Bold className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleItalic().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('italic') ? 'bg-[#222222]' : ''}`} title="Italic"><Italic className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleUnderline().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('underline') ? 'bg-[#222222]' : ''}`} title="Underline"><UnderlineIcon className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleStrike().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('strike') ? 'bg-[#222222]' : ''}`} title="Strike"><Strikethrough className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleCode().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('code') ? 'bg-[#222222]' : ''}`} title="Code"><Code className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleSubscript().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('subscript') ? 'bg-[#222222]' : ''}`} title="Subscript"><SubscriptIcon className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleSuperscript().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('superscript') ? 'bg-[#222222]' : ''}`} title="Superscript"><SuperscriptIcon className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
                 <div className="relative">
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setShowColorPicker(!showColorPicker)} title="Color"><Palette className="h-4 w-4 text-gray-700" /></Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setShowColorPicker(!showColorPicker)} className="hover:bg-[#1a1a1a] text-white" title="Color"><Palette className="h-4 w-4" /></Button>
                     {showColorPicker && (
-                        <div className="absolute top-full left-0 mt-1 p-3 bg-white border-2 border-gray-400 rounded-lg shadow-2xl z-[9999] w-72">
-                            <div className="text-xs font-semibold mb-2">Choose Color:</div>
+                        <div className="absolute top-full left-0 mt-1 p-3 bg-[#1a1a1a] border-2 border-[#333333] rounded-lg shadow-2xl z-[9999] w-72">
+                            <div className="text-xs font-semibold mb-2 text-white">Choose Color:</div>
                             <div className="grid grid-cols-10 gap-1 mb-3 max-h-48 overflow-y-auto p-1">
                                 {presetColors.map((c) => (
-                                    <button key={c} type="button" className="w-6 h-6 rounded border-2 hover:scale-125 transition-all" style={{ backgroundColor: c }} onClick={() => applyColor(c)} title={c} />
+                                    <button key={c} type="button" className="w-6 h-6 rounded border-2 border-[#333333] hover:scale-125 transition-all" style={{ backgroundColor: c }} onClick={() => applyColor(c)} title={c} />
                                 ))}
                             </div>
-                            <div className="border-t pt-2">
-                                <div className="text-xs font-semibold mb-1">Custom:</div>
-                                <input type="color" value={currentColor} onChange={(e) => applyColor(e.target.value)} className="w-full h-10 cursor-pointer rounded border" />
+                            <div className="border-t border-[#333333] pt-2">
+                                <div className="text-xs font-semibold mb-1 text-white">Custom:</div>
+                                <input type="color" value={currentColor} onChange={(e) => applyColor(e.target.value)} className="w-full h-10 cursor-pointer rounded border border-[#333333] bg-[#2a2a2a]" />
                             </div>
-                            <button type="button" onClick={() => setShowColorPicker(false)} className="mt-2 w-full text-xs bg-gray-200 hover:bg-gray-300 py-1 rounded">Close</button>
+                            <button type="button" onClick={() => setShowColorPicker(false)} className="mt-2 w-full text-xs bg-[#2a2a2a] hover:bg-[#222222] text-white py-1 rounded">Close</button>
                         </div>
                     )}
                 </div>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
                 <div className="relative">
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setShowLineHeight(!showLineHeight)} title="Line Height"><ArrowUpDown className="h-4 w-4 text-gray-700" /></Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setShowLineHeight(!showLineHeight)} className="hover:bg-[#1a1a1a] text-white" title="Line Height"><ArrowUpDown className="h-4 w-4" /></Button>
                     {showLineHeight && (
-                        <div className="absolute top-full left-0 mt-1 p-2 bg-white border border-gray-300 rounded-lg shadow-xl z-[9999] w-32 flex flex-col gap-1">
-                            <div className="text-xs font-semibold mb-1 px-1">Line Height:</div>
+                        <div className="absolute top-full left-0 mt-1 p-2 bg-[#1a1a1a] border border-[#333333] rounded-lg shadow-xl z-[9999] w-32 flex flex-col gap-1">
+                            <div className="text-xs font-semibold mb-1 px-1 text-white">Line Height:</div>
                             {['1.0', '1.15', '1.5', '2.0', '2.5', '3.0'].map((h) => (
-                                <button key={h} type="button" onClick={() => applyLineHeight(h)} className="text-left px-2 py-1 text-sm hover:bg-gray-100 rounded">
+                                <button key={h} type="button" onClick={() => applyLineHeight(h)} className="text-left px-2 py-1 text-sm text-white hover:bg-[#222222] rounded">
                                     {h}
                                 </button>
                             ))}
@@ -288,70 +288,70 @@ export default function TiptapEditor({ content, onChange, placeholder, onAIMetad
                     )}
                 </div>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
                 <div className="relative">
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setShowCardMenu(!showCardMenu)} title="Insert Card"><PlusSquare className="h-4 w-4 text-gray-700" /></Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setShowCardMenu(!showCardMenu)} className="hover:bg-[#1a1a1a] text-white" title="Insert Card"><PlusSquare className="h-4 w-4" /></Button>
                     {showCardMenu && (
-                        <div className="absolute top-full left-0 mt-1 p-2 bg-white border border-gray-300 rounded-lg shadow-xl z-[9999] w-48 flex flex-col gap-1">
-                            <div className="text-xs font-semibold mb-1 px-1">Insert Card:</div>
-                            <button onClick={() => insertCard('info')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-blue-50 text-blue-700 rounded"><Info className="w-4 h-4" /> Information</button>
-                            <button onClick={() => insertCard('warning')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-amber-50 text-amber-700 rounded"><AlertTriangle className="w-4 h-4" /> Warning</button>
-                            <button onClick={() => insertCard('tip')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-green-50 text-green-700 rounded"><Lightbulb className="w-4 h-4" /> Pro Tip</button>
-                            <button onClick={() => insertCard('weather')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-sky-50 text-sky-700 rounded"><CloudSun className="w-4 h-4" /> Weather</button>
-                            <button onClick={() => insertCard('route')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-indigo-50 text-indigo-700 rounded"><Map className="w-4 h-4" /> Route</button>
+                        <div className="absolute top-full left-0 mt-1 p-2 bg-[#1a1a1a] border border-[#333333] rounded-lg shadow-xl z-[9999] w-48 flex flex-col gap-1">
+                            <div className="text-xs font-semibold mb-1 px-1 text-white">Insert Card:</div>
+                            <button onClick={() => insertCard('info')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-[#222222] text-blue-400 rounded"><Info className="w-4 h-4" /> Information</button>
+                            <button onClick={() => insertCard('warning')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-[#222222] text-amber-400 rounded"><AlertTriangle className="w-4 h-4" /> Warning</button>
+                            <button onClick={() => insertCard('tip')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-[#222222] text-green-400 rounded"><Lightbulb className="w-4 h-4" /> Pro Tip</button>
+                            <button onClick={() => insertCard('weather')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-[#222222] text-sky-400 rounded"><CloudSun className="w-4 h-4" /> Weather</button>
+                            <button onClick={() => insertCard('route')} className="flex items-center gap-2 px-2 py-1.5 text-sm hover:bg-[#222222] text-indigo-400 rounded"><Map className="w-4 h-4" /> Route</button>
                         </div>
                     )}
                 </div>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
                 <AIBlogChatAssistant editor={editor} onMetadataGenerated={onAIMetadataGenerated} />
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={setCodeBlock} className={editor.isActive('codeBlock') ? 'bg-gray-300' : ''} title="Code Block"><FileCode className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={setCodeBlock} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('codeBlock') ? 'bg-[#222222]' : ''}`} title="Code Block"><FileCode className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={editor.isActive('heading', { level: 2 }) ? 'bg-gray-300' : ''} title="H2"><Heading2 className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={editor.isActive('heading', { level: 3 }) ? 'bg-gray-300' : ''} title="H3"><Heading3 className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('heading', { level: 2 }) ? 'bg-[#222222]' : ''}`} title="H2"><Heading2 className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('heading', { level: 3 }) ? 'bg-[#222222]' : ''}`} title="H3"><Heading3 className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('left').run()} className={editor.isActive({ textAlign: 'left' }) ? 'bg-gray-300' : ''} title="Left"><AlignLeft className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('center').run()} className={editor.isActive({ textAlign: 'center' }) ? 'bg-gray-300' : ''} title="Center"><AlignCenter className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('right').run()} className={editor.isActive({ textAlign: 'right' }) ? 'bg-gray-300' : ''} title="Right"><AlignRight className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('justify').run()} className={editor.isActive({ textAlign: 'justify' }) ? 'bg-gray-300' : ''} title="Justify"><AlignJustify className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('left').run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive({ textAlign: 'left' }) ? 'bg-[#222222]' : ''}`} title="Left"><AlignLeft className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('center').run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive({ textAlign: 'center' }) ? 'bg-[#222222]' : ''}`} title="Center"><AlignCenter className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('right').run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive({ textAlign: 'right' }) ? 'bg-[#222222]' : ''}`} title="Right"><AlignRight className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setTextAlign('justify').run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive({ textAlign: 'justify' }) ? 'bg-[#222222]' : ''}`} title="Justify"><AlignJustify className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBulletList().run()} className={editor.isActive('bulletList') ? 'bg-gray-300' : ''} title="Bullets"><List className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={editor.isActive('orderedList') ? 'bg-gray-300' : ''} title="Numbers"><ListOrdered className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={editor.isActive('blockquote') ? 'bg-gray-300' : ''} title="Quote"><Quote className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBulletList().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('bulletList') ? 'bg-[#222222]' : ''}`} title="Bullets"><List className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('orderedList') ? 'bg-[#222222]' : ''}`} title="Numbers"><ListOrdered className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('blockquote') ? 'bg-[#222222]' : ''}`} title="Quote"><Quote className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={addLink} className={editor.isActive('link') ? 'bg-gray-300' : ''} title="Link"><LinkIcon className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={addImage} title="Image (Resizable)"><ImageIcon className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={addYoutubeVideo} title="YouTube (Resizable)"><Video className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={addLink} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('link') ? 'bg-[#222222]' : ''}`} title="Link"><LinkIcon className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={addImage} className="hover:bg-[#1a1a1a] text-white" title="Image (Resizable)"><ImageIcon className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={addYoutubeVideo} className="hover:bg-[#1a1a1a] text-white" title="YouTube (Resizable)"><Video className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} title="Table"><TableIcon className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} className="hover:bg-[#1a1a1a] text-white" title="Table"><TableIcon className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHighlight().run()} className={editor.isActive('highlight') ? 'bg-gray-300' : ''} title="Highlight"><Highlighter className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setHorizontalRule().run()} title="Line"><Minus className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHighlight().run()} className={`hover:bg-[#1a1a1a] text-white ${editor.isActive('highlight') ? 'bg-[#222222]' : ''}`} title="Highlight"><Highlighter className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().setHorizontalRule().run()} className="hover:bg-[#1a1a1a] text-white" title="Line"><Minus className="h-4 w-4" /></Button>
 
-                <div className="w-px h-6 bg-gray-400 mx-1" />
+                <div className="w-px h-6 bg-[#222222] mx-1" />
 
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo"><Undo className="h-4 w-4 text-gray-700" /></Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} title="Redo"><Redo className="h-4 w-4 text-gray-700" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} className="hover:bg-[#1a1a1a] text-white disabled:opacity-50" title="Undo"><Undo className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} className="hover:bg-[#1a1a1a] text-white disabled:opacity-50" title="Redo"><Redo className="h-4 w-4" /></Button>
             </div>
 
-            <EditorContent editor={editor} />
+            <EditorContent editor={editor} className="dark-editor" />
         </div >
     );
 }

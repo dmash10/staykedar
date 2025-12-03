@@ -1,6 +1,53 @@
 /* Tiptap Editor Styles - Using Regular CSS */
 
-/* Editor Container */
+/* Editor Container - Dark Theme */
+.dark-editor .ProseMirror {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 0 0 0.5rem 0.5rem;
+    padding: 1rem;
+    min-height: 500px;
+}
+
+.dark-editor .ProseMirror:focus {
+    outline: none;
+}
+
+/* Placeholder - Dark Theme */
+.dark-editor .ProseMirror p.is-editor-empty:first-child::before {
+    color: #666666;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
+
+/* Headings - Light for Dark Editor */
+.dark-editor .ProseMirror h1 {
+    font-size: 2.25rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.dark-editor .ProseMirror h2 {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.dark-editor .ProseMirror h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Regular Light Theme (for article display) */
 .ProseMirror {
     background-color: #ffffff;
     color: #1f2937;
@@ -72,7 +119,33 @@
     font-size: 1.25rem;
 }
 
-/* Paragraph and Text */
+/* Paragraph and Text - Dark Theme */
+.dark-editor .ProseMirror p {
+    color: #e5e5e5;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+}
+
+.dark-editor .ProseMirror strong {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.dark-editor .ProseMirror em {
+    font-style: italic;
+    color: #cccccc;
+}
+
+.dark-editor .ProseMirror code {
+    background-color: #1a1a1a;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #60a5fa;
+    font-family: 'Courier New', monospace;
+}
+
+/* Paragraph and Text - Light Theme */
 .ProseMirror p,
 .article-content p {
     color: #374151;
@@ -105,7 +178,54 @@
     text-decoration: underline;
 }
 
-/* Lists */
+/* Lists - Dark Theme */
+.dark-editor .ProseMirror ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: #e5e5e5;
+}
+
+.dark-editor .ProseMirror ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: #e5e5e5;
+}
+
+.dark-editor .ProseMirror li {
+    margin-bottom: 0.5rem;
+}
+
+.dark-editor .ProseMirror li p {
+    margin: 0;
+}
+
+/* Blockquote - Dark Theme */
+.dark-editor .ProseMirror blockquote {
+    border-left: 4px solid #444444;
+    background-color: #1a1a1a;
+    padding-left: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    color: #cccccc;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Links - Dark Theme */
+.dark-editor .ProseMirror a {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+.dark-editor .ProseMirror a:hover {
+    color: #93c5fd;
+}
+
+/* Lists - Light Theme */
 .ProseMirror ul,
 .article-content ul {
     list-style-type: disc;
@@ -194,7 +314,39 @@
     padding: 0;
 }
 
-/* Tables */
+/* Tables - Dark Theme */
+.dark-editor .ProseMirror table {
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    border: 1px solid #333333;
+}
+
+.dark-editor .ProseMirror th {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 0.75rem;
+    text-align: left;
+    border: 1px solid #333333;
+}
+
+.dark-editor .ProseMirror td {
+    padding: 0.75rem;
+    border: 1px solid #333333;
+    color: #e5e5e5;
+}
+
+.dark-editor .ProseMirror tr:nth-child(even) {
+    background-color: #111111;
+}
+
+.dark-editor .ProseMirror tr:hover {
+    background-color: #1a1a1a;
+}
+
+/* Tables - Light Theme */
 .ProseMirror table {
     border-collapse: collapse;
     margin-top: 1.5rem;
@@ -384,7 +536,17 @@
     font-weight: 600;
 }
 
-/* Selection */
+/* Selection - Dark Theme */
+.dark-editor .ProseMirror ::selection {
+    background-color: #333333;
+}
+
+/* Focus styles - Dark Theme */
+.dark-editor .ProseMirror:focus-visible {
+    outline: none;
+}
+
+/* Selection - Light Theme */
 .ProseMirror ::selection {
     background-color: #bfdbfe;
 }

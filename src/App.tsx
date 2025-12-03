@@ -15,6 +15,7 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import Weather from "./pages/Weather";
 import Attractions from "./pages/Attractions";
+import AttractionDetail from "./pages/AttractionDetail";
 import NotFound from "./pages/NotFound";
 import ContentCreator from "./pages/ContentCreator";
 import PartnerWithUs from "./pages/PartnerWithUs";
@@ -47,6 +48,21 @@ import NotificationsPage from '@/pages/admin/NotificationsPage';
 import ReportsPage from '@/pages/admin/ReportsPage';
 import ActivityLogsPage from '@/pages/admin/ActivityLogsPage';
 import PluginsPage from '@/pages/admin/PluginsPage';
+import AttractionsPage from '@/pages/admin/AttractionsPage';
+import PromoCodesPage from '@/pages/admin/PromoCodesPage';
+import SystemHealthPage from '@/pages/admin/SystemHealthPage';
+import FAQPage from '@/pages/admin/FAQPage';
+import TestimonialsPage from '@/pages/admin/TestimonialsPage';
+import RolesPage from '@/pages/admin/RolesPage';
+import EmailTemplatesPage from '@/pages/admin/EmailTemplatesPage';
+import BannersPage from '@/pages/admin/BannersPage';
+import UserManagementPage from '@/pages/admin/UserManagementPage';
+import HomepageEditorPage from '@/pages/admin/HomepageEditorPage';
+import ErrorLogsPage from '@/pages/admin/ErrorLogsPage';
+import EmailCampaignsPage from '@/pages/admin/EmailCampaignsPage';
+import ReferralProgramPage from '@/pages/admin/ReferralProgramPage';
+import PushNotificationsPage from '@/pages/admin/PushNotificationsPage';
+import CacheManagementPage from '@/pages/admin/CacheManagementPage';
 import PluginDemo from './pages/PluginDemo';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -72,6 +88,8 @@ import PublicTicketDetail from './pages/support/PublicTicketDetail';
 import HelpHome from './pages/help/HelpHome';
 import HelpCategory from './pages/help/HelpCategory';
 import HelpArticle from './pages/help/HelpArticle';
+import PublicFAQPage from './pages/help/FAQPage';
+import HelpSearchResults from './pages/help/HelpSearchResults';
 
 const queryClient = new QueryClient();
 
@@ -105,6 +123,7 @@ const App = () => {
                     <Route path="/about" element={<About />} />
                     <Route path="/weather" element={<Weather />} />
                     <Route path="/attractions" element={<Attractions />} />
+                    <Route path="/attractions/:id" element={<AttractionDetail />} />
                     <Route path="/content-creator" element={<ContentCreator />} />
                     <Route path="/partner-with-us" element={<PartnerWithUs />} />
                     <Route path="/auth" element={<Auth />} />
@@ -128,9 +147,12 @@ const App = () => {
                     <Route path="/support/raise" element={<RaiseTicket />} />
                     <Route path="/support/track" element={<TrackTicket />} />
                     <Route path="/support/view" element={<PublicTicketDetail />} />
+                    <Route path="/support/ticket/:ticketNumber" element={<PublicTicketDetail />} />
 
                     {/* Help Center Routes */}
                     <Route path="/help" element={<HelpHome />} />
+                    <Route path="/help/search" element={<HelpSearchResults />} />
+                    <Route path="/help/faq" element={<PublicFAQPage />} />
                     <Route path="/help/categories/:categorySlug" element={<HelpCategory />} />
                     <Route path="/help/article/:slug" element={<HelpArticle />} />
 
@@ -193,11 +215,26 @@ const App = () => {
                     <Route path="/admin/revenue" element={<RevenuePage />} />
                     <Route path="/admin/reviews" element={<ReviewsPage />} />
                     <Route path="/admin/tickets" element={<SupportTicketsPage />} />
-                    <Route path="/admin/tickets/:ticketId" element={<AdminTicketDetail />} />
+                    <Route path="/admin/tickets/:ticketNumber" element={<AdminTicketDetail />} />
                     <Route path="/admin/notifications" element={<NotificationsPage />} />
                     <Route path="/admin/reports" element={<ReportsPage />} />
                     <Route path="/admin/logs" element={<ActivityLogsPage />} />
                     <Route path="/admin/plugins" element={<PluginsPage />} />
+                    <Route path="/admin/attractions" element={<AttractionsPage />} />
+                    <Route path="/admin/promo-codes" element={<PromoCodesPage />} />
+                    <Route path="/admin/system-health" element={<SystemHealthPage />} />
+                    <Route path="/admin/faq" element={<FAQPage />} />
+                    <Route path="/admin/testimonials" element={<TestimonialsPage />} />
+                    <Route path="/admin/roles" element={<RolesPage />} />
+                    <Route path="/admin/email-templates" element={<EmailTemplatesPage />} />
+                    <Route path="/admin/banners" element={<BannersPage />} />
+                    <Route path="/admin/user-management" element={<UserManagementPage />} />
+                    <Route path="/admin/homepage-editor" element={<HomepageEditorPage />} />
+                    <Route path="/admin/error-logs" element={<ErrorLogsPage />} />
+                    <Route path="/admin/email-campaigns" element={<EmailCampaignsPage />} />
+                    <Route path="/admin/referral-program" element={<ReferralProgramPage />} />
+                    <Route path="/admin/push-notifications" element={<PushNotificationsPage />} />
+                    <Route path="/admin/cache" element={<CacheManagementPage />} />
 
                     <Route path="*" element={<NotFound />} />
                   </Routes>

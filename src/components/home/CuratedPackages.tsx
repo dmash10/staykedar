@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Package, Check, ArrowRight, Calendar, Users, Hotel } from "lucide-react";
+import { Check, ArrowRight, Calendar, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import Container from "../Container";
 
@@ -7,184 +7,175 @@ const packages = [
     {
         id: 1,
         name: "Kedarnath Express",
-        duration: "3 Days / 2 Nights",
-        price: "₹12,999",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-        inclusions: [
-            "Helicopter to Kedarnath",
-            "2 Nights accommodation",
-            "VIP Darshan tickets",
-            "Meals included"
-        ],
-        link: "/packages/kedarnath-express"
+        duration: "3D/2N",
+        price: "12,999",
+        originalPrice: "15,999",
+        image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80",
+        rating: 4.8,
+        reviews: 234,
+        inclusions: ["Helicopter ride", "2N stay", "VIP Darshan"],
+        highlight: "Helicopter",
+        slug: "kedarnath-express"
     },
     {
         id: 2,
         name: "Do Dham Yatra",
-        duration: "5 Days / 4 Nights",
-        price: "₹19,999",
-        image: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800&q=80",
-        inclusions: [
-            "Kedarnath + Badrinath",
-            "4 Nights hotel stay",
-            "All transportation",
-            "Guided tours"
-        ],
+        duration: "5D/4N",
+        price: "19,999",
+        originalPrice: "24,999",
+        image: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=600&q=80",
+        rating: 4.9,
+        reviews: 412,
+        inclusions: ["Kedarnath + Badrinath", "4N hotel", "Transport"],
         popular: true,
-        link: "/packages/do-dham-yatra"
+        highlight: "Popular",
+        slug: "do-dham-yatra"
     },
     {
         id: 3,
         name: "Budget Pilgrim",
-        duration: "4 Days / 3 Nights",
-        price: "₹8,999",
-        image: "https://images.unsplash.com/photo-1486216736640-1a72cb1c53fa?w=800&q=80",
-        inclusions: [
-            "Budget-friendly stays",
-            "Shared transportation",
-            "Temple visits",
-            "Basic meals"
-        ],
-        link: "/packages/budget-pilgrim"
+        duration: "4D/3N",
+        price: "8,999",
+        originalPrice: "11,999",
+        image: "https://images.unsplash.com/photo-1486216736640-1a72cb1c53fa?w=600&q=80",
+        rating: 4.6,
+        reviews: 189,
+        inclusions: ["Budget stays", "Shared cab", "Meals"],
+        highlight: "Value",
+        slug: "budget-pilgrim"
+    },
+    {
+        id: 4,
+        name: "Char Dham Complete",
+        duration: "10D/9N",
+        price: "35,999",
+        originalPrice: "42,999",
+        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+        rating: 4.9,
+        reviews: 156,
+        inclusions: ["All 4 Dhams", "9N hotel", "All meals"],
+        highlight: "Premium",
+        slug: "char-dham-complete"
     }
 ];
 
 const CuratedPackages = () => {
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.15
-            }
-        }
-    };
-
-    const item = {
-        hidden: { opacity: 0, y: 30 },
-        show: { opacity: 1, y: 0 }
-    };
-
     return (
-        <section className="py-20 bg-white">
+        <section className="py-8 md:py-12 bg-white">
             <Container>
                 {/* Section Header */}
                 <motion.div
-                    className="text-center mb-12"
+                    className="flex items-end justify-between gap-4 mb-5"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.5 }}
                 >
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-4">
-                        <Package className="w-8 h-8 text-amber-600" />
+                    <div>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+                            Yatra Packages
+                        </h2>
+                        <p className="text-gray-500 text-sm hidden md:block">
+                            Hassle-free pilgrimage experiences
+                        </p>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                        Popular Yatra Packages
-                    </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Thoughtfully curated packages for a seamless and divine pilgrimage experience
-                    </p>
+                    <Link
+                        to="/packages"
+                        className="inline-flex items-center gap-1 text-[#0071c2] font-medium hover:gap-2 transition-all text-sm flex-shrink-0"
+                    >
+                        View all
+                        <ArrowRight className="w-4 h-4" />
+                    </Link>
                 </motion.div>
 
-                {/* Packages Grid */}
-                <motion.div
-                    className="flex overflow-x-auto snap-x md:grid md:grid-cols-3 gap-4 md:gap-8 pb-4 md:pb-0 px-4 md:px-0 -mx-4 md:mx-0 scrollbar-hide"
-                    variants={container}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true }}
-                >
-                    {packages.map((pkg) => (
+                {/* Horizontal Scrollable Packages */}
+                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+                    {packages.map((pkg, index) => (
                         <motion.div
                             key={pkg.id}
-                            variants={item}
-                            whileHover={{ y: -8 }}
-                            className="group relative min-w-[280px] snap-center md:min-w-0"
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.3, delay: index * 0.1 }}
+                            className="flex-shrink-0 w-[240px]"
                         >
-                            {/* Popular Badge */}
-                            {pkg.popular && (
-                                <div className="absolute -top-3 right-6 z-10 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
-                                    Most Popular
-                                </div>
-                            )}
-
-                            <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 h-full flex flex-col">
-                                {/* Package Image */}
-                                <div className="relative aspect-[4/3] overflow-hidden">
+                            <div className={`bg-white rounded-xl overflow-hidden border h-full flex flex-col ${pkg.popular ? 'border-[#0071c2] shadow-md' : 'border-gray-200'}`}>
+                                {/* Image - Fixed height */}
+                                <div className="relative h-[140px] overflow-hidden">
                                     <img
                                         src={pkg.image}
                                         alt={pkg.name}
                                         loading="lazy"
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className="w-full h-full object-cover"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-                                    {/* Duration & Price Overlay */}
-                                    <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                                        <div className="text-white">
-                                            <div className="flex items-center gap-2 text-sm mb-1">
-                                                <Calendar className="w-4 h-4" />
-                                                <span>{pkg.duration}</span>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-sm text-gray-200">Starting from</div>
-                                            <div className="text-2xl font-bold text-white">{pkg.price}</div>
-                                        </div>
+                                    
+                                    {/* Badge */}
+                                    <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                        pkg.popular 
+                                            ? 'bg-[#0071c2] text-white' 
+                                            : 'bg-white/90 text-gray-700'
+                                    }`}>
+                                        {pkg.highlight}
+                                    </div>
+                                    
+                                    {/* Price */}
+                                    <div className="absolute bottom-2 right-2 text-right">
+                                        <div className="text-white/70 text-[10px] line-through">₹{pkg.originalPrice}</div>
+                                        <div className="text-white font-bold text-base">₹{pkg.price}</div>
                                     </div>
                                 </div>
 
-                                {/* Package Content */}
-                                <div className="p-6 flex flex-col flex-grow">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                                        {pkg.name}
-                                    </h3>
+                                {/* Content - Fixed structure */}
+                                <div className="p-3 flex flex-col flex-grow">
+                                    {/* Title & Rating */}
+                                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                                        <h3 className="font-semibold text-gray-900 text-sm leading-tight">{pkg.name}</h3>
+                                        <div className="flex items-center gap-0.5 text-xs flex-shrink-0">
+                                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                            <span className="font-medium">{pkg.rating}</span>
+                                        </div>
+                                    </div>
 
-                                    {/* Inclusions */}
-                                    <ul className="space-y-3 mb-6 flex-grow">
-                                        {pkg.inclusions.map((inclusion, index) => (
-                                            <li key={index} className="flex items-start gap-2 text-gray-700">
-                                                <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                                <span className="text-sm">{inclusion}</span>
-                                            </li>
+                                    {/* Duration */}
+                                    <div className="flex items-center gap-1.5 text-gray-500 text-xs mb-2">
+                                        <Calendar className="w-3 h-3" />
+                                        <span>{pkg.duration}</span>
+                                    </div>
+
+                                    {/* Inclusions - Fixed height */}
+                                    <div className="flex flex-wrap gap-1 mb-3 flex-grow">
+                                        {pkg.inclusions.slice(0, 3).map((item, idx) => (
+                                            <span key={idx} className="inline-flex items-center gap-0.5 text-[10px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                                                <Check className="w-2.5 h-2.5 text-green-500" />
+                                                {item}
+                                            </span>
                                         ))}
-                                    </ul>
+                                    </div>
 
-                                    {/* CTA Button */}
-                                    <Link to={pkg.link} className="mt-auto">
-                                        <motion.button
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="w-full bg-[#0071c2] hover:bg-[#005a9c] text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors duration-300"
-                                        >
-                                            View Package
-                                            <ArrowRight className="w-5 h-5" />
-                                        </motion.button>
+                                    {/* View Details Button */}
+                                    <Link 
+                                        to={`/packages/${pkg.slug}`}
+                                        className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-center transition-colors bg-[#0071c2] text-white hover:bg-[#005999]"
+                                    >
+                                        View Details
                                     </Link>
                                 </div>
                             </div>
                         </motion.div>
                     ))}
-                </motion.div>
-
-                {/* View All Packages */}
-                <motion.div
-                    className="text-center mt-12"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 }}
-                >
-                    <Link
-                        to="/packages"
-                        className="inline-flex items-center gap-2 text-[#0071c2] font-semibold text-lg hover:gap-3 transition-all duration-300 border-2 border-[#0071c2] px-6 py-3 rounded-lg hover:bg-[#0071c2] hover:text-white"
-                    >
-                        View All Packages
-                        <ArrowRight className="w-5 h-5" />
-                    </Link>
-                </motion.div>
+                </div>
             </Container>
+
+            <style>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
         </section>
     );
 };

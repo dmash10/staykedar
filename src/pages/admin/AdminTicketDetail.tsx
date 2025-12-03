@@ -1,233 +1,510 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import AdminLayout from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
+import AdminLayout from "@/components/admin/AdminLayout";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-    ArrowLeft,
-    Send,
-    User,
-    Mail,
-    Phone,
-    Calendar,
-    MessageSquare,
-    Clock,
-    AlertTriangle,
-    CheckCircle,
-    FileText,
-    Zap,
-    StickyNote,
-    Paperclip
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
-import { Separator } from '@/components/ui/separator';
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { 
+    ArrowLeft, Send, Loader2, User, Headphones, 
+    Clock, CheckCircle2, AlertCircle,
+    MessageSquare, Mail, Phone, Calendar, Check, CheckCheck
+} from "lucide-react";
+
+interface TicketData {
+    id: string;
+    ticket_number: string;
+    subject: string;
+    description?: string;
+    status: string;
+    priority: string;
+    category?: string;
+    created_at: string;
+    updated_at: string;
+    user_id: string | null;
+    guest_email: string | null;
+    guest_name: string | null;
+    guest_phone?: string | null;
+}
+
+interface Message {
+    id: string;
+    ticket_id?: string;
+    message: string;
+    sender_type: string;
+    sender_id: string | null;
+    is_admin: boolean;
+    created_at: string;
+}
+
+const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
+    open: { label: "Open", color: "text-blue-400", bgColor: "bg-blue-500/20" },
+    in_progress: { label: "In Progress", color: "text-amber-400", bgColor: "bg-amber-500/20" },
+    waiting_customer: { label: "Awaiting Reply", color: "text-orange-400", bgColor: "bg-orange-500/20" },
+    resolved: { label: "Resolved", color: "text-green-400", bgColor: "bg-green-500/20" },
+    closed: { label: "Closed", color: "text-gray-400", bgColor: "bg-gray-500/20" },
+};
+
+const priorityConfig: Record<string, { label: string; color: string; bgColor: string }> = {
+    low: { label: "Low", color: "text-gray-400", bgColor: "bg-gray-500/20" },
+    medium: { label: "Medium", color: "text-blue-400", bgColor: "bg-blue-500/20" },
+    high: { label: "High", color: "text-orange-400", bgColor: "bg-orange-500/20" },
+    urgent: { label: "Urgent", color: "text-red-400", bgColor: "bg-red-500/20" },
+    critical: { label: "Critical", color: "text-red-500", bgColor: "bg-red-600/20" },
+};
 
 export default function AdminTicketDetail() {
-    const { ticketId } = useParams();
+    const { ticketNumber } = useParams<{ ticketNumber: string }>();
+    const { user } = useAuth();
+    const { toast } = useToast();
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
-    const [message, setMessage] = useState('');
-    const [internalNote, setInternalNote] = useState('');
-    const [showNoteInput, setShowNoteInput] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // Fetch ticket details
-    const { data: ticket, isLoading: isTicketLoading } = useQuery({
-        queryKey: ['admin-ticket', ticketId],
-        queryFn: async () => {
-            const isTicketNumber = ticketId?.startsWith('TKT-');
+    const [ticket, setTicket] = useState<TicketData | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [newMessage, setNewMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSending, setIsSending] = useState(false);
+    const [isCustomerTyping, setIsCustomerTyping] = useState(false);
+    const [customerLastReadAt, setCustomerLastReadAt] = useState<string | null>(null);
+    const typingChannelRef = useRef<any>(null);
 
-            if (isTicketNumber) {
-                const { data, error } = await supabase.rpc('get_ticket_by_number', {
-                    p_ticket_number: ticketId
-                });
-                if (error) throw error;
-                return data?.[0];
-            } else {
-                const { data, error } = await supabase
-                    .from('support_tickets')
-                    .select('*')
-                    .eq('id', ticketId)
+    // Check if user is at bottom of chat
+    const isAtBottom = useCallback(() => {
+        if (!messagesContainerRef.current) return true;
+        const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+        // Consider "at bottom" if within 100px of the bottom
+        return scrollHeight - scrollTop - clientHeight < 100;
+    }, []);
+
+    // Scroll to bottom of messages (only if already at bottom or forced)
+    const scrollToBottom = useCallback((force = false) => {
+        if (messagesContainerRef.current && (force || isAtBottom())) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+    }, [isAtBottom]);
+
+    // Fetch ticket and set up real-time subscription
+    useEffect(() => {
+        if (!ticketNumber) return;
+
+        let messagesSubscription: any;
+        let ticketSubscription: any;
+
+        const fetchTicketData = async () => {
+            setIsLoading(true);
+            try {
+                const { data: ticketData, error: ticketError } = await supabase
+                    .from("support_tickets")
+                    .select("*")
+                    .eq("ticket_number", ticketNumber)
                     .single();
-                if (error) throw error;
-                return data;
+
+                if (ticketError || !ticketData) {
+                    console.error("Ticket fetch error:", ticketError);
+                    toast({
+                        title: "Error",
+                        description: "Ticket not found",
+                        variant: "destructive",
+                    });
+                    navigate("/admin/tickets");
+                    return;
+                }
+
+                setTicket(ticketData);
+
+                const { data: messagesData, error: messagesError } = await supabase
+                    .from("ticket_messages")
+                    .select("*")
+                    .eq("ticket_id", ticketData.id)
+                    .order("created_at", { ascending: true });
+
+                if (messagesError) {
+                    console.error("Messages fetch error:", messagesError);
+                }
+
+                setMessages(messagesData || []);
+                setIsLoading(false);
+                
+                // Scroll after messages load
+                setTimeout(scrollToBottom, 100);
+
+                // Set up real-time subscription for new messages
+                messagesSubscription = supabase
+                    .channel(`admin-ticket-messages-${ticketData.id}`)
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'INSERT',
+                            schema: 'public',
+                            table: 'ticket_messages',
+                            filter: `ticket_id=eq.${ticketData.id}`
+                        },
+                        (payload) => {
+                            console.log("New message received:", payload);
+                            const newMsg = payload.new as Message;
+                            // Only add if not already in the list
+                            setMessages(prev => {
+                                const exists = prev.some(m => m.id === newMsg.id);
+                                if (exists) return prev;
+                                return [...prev, newMsg];
+                            });
+                            // Scroll if at bottom OR if it's our own message
+                            const isOwnMessage = newMsg.is_admin;
+                            setTimeout(() => scrollToBottom(isOwnMessage), 50);
+                        }
+                    )
+                    .subscribe();
+
+                // Set up real-time subscription for ticket changes
+                ticketSubscription = supabase
+                    .channel(`admin-ticket-status-${ticketData.id}`)
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'support_tickets',
+                            filter: `id=eq.${ticketData.id}`
+                        },
+                        (payload) => {
+                            console.log("Ticket updated:", payload);
+                            setTicket(prev => prev ? { ...prev, ...payload.new } : null);
+                        }
+                    )
+                    .subscribe();
+
+                // Subscribe to customer typing indicator and read receipts
+                let typingTimeout: NodeJS.Timeout | null = null;
+                const typingChannel = supabase.channel(`typing-${ticketData.id}`);
+                typingChannel
+                    .on('broadcast', { event: 'typing' }, (payload) => {
+                        if (!payload.payload?.is_admin) {
+                            setIsCustomerTyping(true);
+                            // Only scroll if already at bottom (like WhatsApp)
+                            setTimeout(() => scrollToBottom(false), 50);
+                            // Auto-hide after 2 seconds if no new typing event
+                            if (typingTimeout) clearTimeout(typingTimeout);
+                            typingTimeout = setTimeout(() => setIsCustomerTyping(false), 2000);
+                        }
+                    })
+                    .on('broadcast', { event: 'read' }, (payload) => {
+                        if (!payload.payload?.is_admin && payload.payload?.timestamp) {
+                            // Customer has read messages up to this timestamp
+                            setCustomerLastReadAt(payload.payload.timestamp);
+                        }
+                    })
+                    .on('broadcast', { event: 'message_sent' }, () => {
+                        // New message arrived, stop typing indicator immediately
+                        if (typingTimeout) clearTimeout(typingTimeout);
+                        setIsCustomerTyping(false);
+                    })
+                    .subscribe();
+                typingChannelRef.current = typingChannel;
+                
+                // Broadcast that admin is viewing (to mark customer messages as read)
+                // Only send when tab is visible and focused (like WhatsApp)
+                const sendReadReceipt = () => {
+                    // Only send if document is visible (not in background tab)
+                    if (document.visibilityState === 'visible' && document.hasFocus()) {
+                        typingChannel.send({
+                            type: 'broadcast',
+                            event: 'read',
+                            payload: { is_admin: true, timestamp: new Date().toISOString() }
+                        });
+                    }
+                };
+                
+                // Send read receipt when tab becomes visible
+                const handleVisibilityChange = () => {
+                    if (document.visibilityState === 'visible') {
+                        sendReadReceipt();
+                    }
+                };
+                
+                // Send read receipt when window gains focus
+                const handleFocus = () => sendReadReceipt();
+                
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+                window.addEventListener('focus', handleFocus);
+                
+                // Send initial read receipt if already visible
+                if (document.visibilityState === 'visible' && document.hasFocus()) {
+                    setTimeout(sendReadReceipt, 1000);
+                }
+                
+                // Store cleanup functions
+                (window as any).readReceiptCleanup = () => {
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    window.removeEventListener('focus', handleFocus);
+                };
+
+                // Polling fallback
+                const pollInterval = setInterval(async () => {
+                    const { data: newMessages } = await supabase
+                        .from("ticket_messages")
+                        .select("*")
+                        .eq("ticket_id", ticketData.id)
+                        .order("created_at", { ascending: true });
+                    
+                    if (newMessages) {
+                        setMessages(prev => {
+                            if (JSON.stringify(prev) !== JSON.stringify(newMessages)) {
+                                return newMessages;
+                            }
+                            return prev;
+                        });
+                    }
+
+                    const { data: updatedTicket } = await supabase
+                        .from("support_tickets")
+                        .select("*")
+                        .eq("id", ticketData.id)
+                        .single();
+                        
+                    if (updatedTicket) {
+                        setTicket(prev => {
+                            if (JSON.stringify(prev) !== JSON.stringify(updatedTicket)) {
+                                return updatedTicket;
+                            }
+                            return prev;
+                        });
+                    }
+                }, 5000);
+
+                // Store interval ID to clear it later
+                (window as any).pollInterval = pollInterval;
+
+            } catch (error) {
+                console.error("Error fetching ticket:", error);
+                setIsLoading(false);
             }
-        },
-        enabled: !!ticketId,
-    });
+        };
 
-    // Fetch user profile for registered users
-    const { data: userProfile } = useQuery({
-        queryKey: ['user-profile', ticket?.user_id],
-        queryFn: async () => {
-            if (!ticket?.user_id) return null;
-            const { data, error } = await supabase
-                .from('customer_details')
-                .select('*')
-                .eq('id', ticket.user_id)
+        fetchTicketData();
+
+        // Cleanup subscriptions on unmount
+        return () => {
+            if (messagesSubscription) messagesSubscription.unsubscribe();
+            if (ticketSubscription) ticketSubscription.unsubscribe();
+            if (typingChannelRef.current) typingChannelRef.current.unsubscribe();
+            if ((window as any).pollInterval) clearInterval((window as any).pollInterval);
+            if ((window as any).readReceiptCleanup) (window as any).readReceiptCleanup();
+        };
+    }, [ticketNumber, navigate, toast, scrollToBottom]);
+
+    // Scroll when messages change
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages, scrollToBottom]);
+
+    // Broadcast typing indicator when admin types (debounced)
+    const lastTypingBroadcast = useRef<number>(0);
+    const broadcastTyping = useCallback(() => {
+        const now = Date.now();
+        // Only broadcast every 1.5 seconds to avoid spam
+        if (typingChannelRef.current && ticket && now - lastTypingBroadcast.current > 1500) {
+            lastTypingBroadcast.current = now;
+            typingChannelRef.current.send({
+                type: 'broadcast',
+                event: 'typing',
+                payload: { is_admin: true }
+            });
+        }
+    }, [ticket]);
+
+    const handleSendMessage = async () => {
+        if (!newMessage.trim() || !ticket) return;
+
+        const messageText = newMessage.trim();
+        setIsSending(true);
+        
+        // Optimistically add message to UI immediately
+        const optimisticMessage: Message = {
+            id: `temp-${Date.now()}`,
+            ticket_id: ticket.id,
+            sender_type: "admin",
+            message: messageText,
+            is_admin: true,
+            sender_id: user?.id || null,
+            created_at: new Date().toISOString(),
+        };
+        
+        setMessages(prev => [...prev, optimisticMessage]);
+        setNewMessage("");
+        
+        // Scroll to bottom after adding message
+        setTimeout(scrollToBottom, 50);
+
+        try {
+            const insertData: any = {
+                ticket_id: ticket.id,
+                sender_type: "admin",
+                message: messageText,
+                is_admin: true,
+            };
+
+            // Only add sender_id if user exists
+            if (user?.id) {
+                insertData.sender_id = user.id;
+            }
+
+            const { data: newMsg, error: messageError } = await supabase
+                .from("ticket_messages")
+                .insert(insertData)
+                .select()
                 .single();
-            if (error) throw error;
-            return data;
-        },
-        enabled: !!ticket?.user_id,
-    });
 
-    // Fetch messages
-    const { data: messages, isLoading: isMessagesLoading } = useQuery({
-        queryKey: ['ticket-messages', ticketId],
-        queryFn: async () => {
-            if (!ticket?.id) return [];
-            const { data, error } = await supabase
-                .from('ticket_messages')
-                .select('*')
-                .eq('ticket_id', ticket.id)
-                .order('created_at', { ascending: true });
-            if (error) throw error;
-            return data;
-        },
-        enabled: !!ticket?.id,
-        refetchInterval: 5000,
-    });
+            if (messageError) {
+                // Remove optimistic message on error
+                setMessages(prev => prev.filter(m => m.id !== optimisticMessage.id));
+                console.error("Message insert error:", messageError);
+                throw messageError;
+            }
 
-    // Fetch internal notes
-    const { data: internalNotes } = useQuery({
-        queryKey: ['internal-notes', ticket?.id],
-        queryFn: async () => {
-            if (!ticket?.id) return [];
-            const { data, error } = await supabase.rpc('get_internal_notes', {
-                p_ticket_id: ticket.id
+            // Replace optimistic message with real one
+            if (newMsg) {
+                setMessages(prev => prev.map(m => 
+                    m.id === optimisticMessage.id ? newMsg : m
+                ));
+            }
+            
+            // Broadcast that message was sent (to stop typing indicator on user side)
+            if (typingChannelRef.current) {
+                typingChannelRef.current.send({
+                    type: 'broadcast',
+                    event: 'message_sent',
+                    payload: {}
+                });
+            }
+
+            // Update ticket status locally
+            setTicket(prev => prev ? { ...prev, status: "waiting_customer" } : null);
+
+            // Update in database
+            await supabase
+                .from("support_tickets")
+                .update({
+                    status: "waiting_customer",
+                    updated_at: new Date().toISOString(),
+                })
+                .eq("id", ticket.id);
+        } catch (error: any) {
+            console.error("Error sending message:", error);
+            toast({
+                title: "Error",
+                description: error?.message || "Failed to send message",
+                variant: "destructive",
             });
-            if (error) throw error;
-            return data;
-        },
-        enabled: !!ticket?.id,
-    });
-
-    // Fetch canned responses
-    const { data: cannedResponses } = useQuery({
-        queryKey: ['canned-responses'],
-        queryFn: async () => {
-            const { data, error } = await supabase.rpc('get_canned_responses', {
-                p_category: null
-            });
-            if (error) throw error;
-            return data;
-        },
-    });
-
-    // Send message mutation
-    const sendMessageMutation = useMutation({
-        mutationFn: async (content: string) => {
-            if (!ticket?.id) throw new Error('Ticket not found');
-
-            const { data, error } = await supabase.rpc('create_admin_message', {
-                p_ticket_id: ticket.id,
-                p_message: content
-            });
-
-            if (error) throw error;
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['ticket-messages'] });
-            setMessage('');
-            toast.success('Message sent');
-        },
-        onError: () => {
-            toast.error('Failed to send message');
+        } finally {
+            setIsSending(false);
         }
-    });
+    };
 
-    // Add internal note mutation
-    const addNoteMutation = useMutation({
-        mutationFn: async (note: string) => {
-            if (!ticket?.id) throw new Error('Ticket not found');
-
-            const { data, error } = await supabase.rpc('add_internal_note', {
-                p_ticket_id: ticket.id,
-                p_note: note
-            });
-
-            if (error) throw error;
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['internal-notes'] });
-            setInternalNote('');
-            setShowNoteInput(false);
-            toast.success('Internal note added');
-        },
-        onError: () => {
-            toast.error('Failed to add note');
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
         }
-    });
+    };
 
-    // Update status mutation
-    const updateStatusMutation = useMutation({
-        mutationFn: async (newStatus: string) => {
-            const { error } = await supabase.rpc('update_ticket_status', {
-                p_ticket_number: ticket?.ticket_number || ticketId!,
-                p_new_status: newStatus
+    const updateTicketStatus = async (newStatus: string) => {
+        if (!ticket) return;
+
+        // Update locally immediately
+        setTicket(prev => prev ? { ...prev, status: newStatus } : null);
+
+        try {
+            const { error } = await supabase
+                .from("support_tickets")
+                .update({ 
+                    status: newStatus,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq("id", ticket.id);
+
+            if (error) {
+                // Revert on error
+                setTicket(prev => prev ? { ...prev, status: ticket.status } : null);
+                throw error;
+            }
+
+            toast({
+                title: "Status Updated",
+                description: `Ticket marked as ${statusConfig[newStatus]?.label || newStatus}`,
             });
-            if (error) throw error;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-ticket'] });
-            toast.success('Status updated');
-        },
-        onError: () => {
-            toast.error('Failed to update status');
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error?.message || "Failed to update status",
+                variant: "destructive",
+            });
         }
-    });
-
-    const handleSendMessage = () => {
-        if (!message.trim()) return;
-        sendMessageMutation.mutate(message);
     };
 
-    const handleAddNote = () => {
-        if (!internalNote.trim()) return;
-        addNoteMutation.mutate(internalNote);
+    const updateTicketPriority = async (newPriority: string) => {
+        if (!ticket) return;
+
+        // Update locally immediately
+        setTicket(prev => prev ? { ...prev, priority: newPriority } : null);
+
+        try {
+            const { error } = await supabase
+                .from("support_tickets")
+                .update({ 
+                    priority: newPriority,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq("id", ticket.id);
+
+            if (error) {
+                // Revert on error
+                setTicket(prev => prev ? { ...prev, priority: ticket.priority } : null);
+                throw error;
+            }
+
+            toast({ title: "Priority Updated" });
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to update priority",
+                variant: "destructive",
+            });
+        }
     };
 
-    const insertCannedResponse = (content: string) => {
-        setMessage(content);
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
     };
 
-    const getInitials = (name: string | null) => {
-        if (!name) return '?';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const formatMessageTime = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) + 
+               " · " + date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
     };
 
-    const displayName = userProfile?.name || ticket?.guest_name || 'Guest User';
-    const displayEmail = userProfile?.email || ticket?.guest_email || 'N/A';
-    const displayPhone = userProfile?.phone_number || ticket?.guest_phone || 'N/A';
-
-    if (isTicketLoading) {
+    if (isLoading) {
         return (
             <AdminLayout title="Ticket Details">
-                <div className="flex items-center justify-center h-screen">
-                    <div className="text-slate-400">Loading ticket...</div>
+                <div className="flex items-center justify-center h-96">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#0071c2]" />
                 </div>
             </AdminLayout>
         );
@@ -236,427 +513,288 @@ export default function AdminTicketDetail() {
     if (!ticket) {
         return (
             <AdminLayout title="Ticket Details">
-                <div className="flex items-center justify-center h-screen">
-                    <div className="text-slate-400">Ticket not found</div>
+                <div className="p-6 text-center">
+                    <p className="text-gray-400">Ticket not found</p>
                 </div>
             </AdminLayout>
         );
     }
 
+    const status = statusConfig[ticket.status] || statusConfig.open;
+    const priority = priorityConfig[ticket.priority] || priorityConfig.medium;
+
     return (
-        <AdminLayout title="Ticket Details">
-            <div className="h-[calc(100vh-4rem)] flex flex-col">
+        <AdminLayout title={`Ticket ${ticket.ticket_number}`}>
+            <div className="p-4 md:p-6 max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="bg-slate-800/50 border-b border-slate-700 p-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => navigate('/admin/tickets')}
-                                className="text-slate-400 hover:text-slate-100"
-                            >
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Back to Tickets
-                            </Button>
-                            <Separator orientation="vertical" className="h-6 bg-slate-700" />
-                            <div>
-                                <h1 className="text-xl font-bold text-slate-100">
-                                    {ticket.ticket_number || `#${ticket.id.slice(0, 8)}`}
-                                </h1>
-                                <p className="text-sm text-slate-400">{ticket.subject}</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-slate-400 border-slate-600">
-                                {ticket.category}
-                            </Badge>
-                        </div>
+                <div className="mb-4">
+                    <button
+                        onClick={() => navigate("/admin/tickets")}
+                        className="flex items-center gap-2 text-[#0071c2] hover:text-[#005999] mb-3 text-sm font-medium"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Tickets
+                    </button>
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="font-mono text-xs text-gray-500 bg-[#1A1A1A] px-2 py-0.5 rounded">{ticket.ticket_number}</span>
+                        <Badge className={`${status.bgColor} ${status.color} border-0 text-xs`}>{status.label}</Badge>
+                        <Badge className={`${priority.bgColor} ${priority.color} border-0 text-xs`}>{priority.label}</Badge>
                     </div>
+                    <h1 className="text-lg font-semibold text-white">{ticket.subject}</h1>
                 </div>
 
-                {/* Main Content - 3 Column Layout */}
-                <div className="flex-1 grid grid-cols-12 gap-0 overflow-hidden">
-                    {/* Left Sidebar - User Profile */}
-                    <div className="col-span-3 bg-slate-800/30 border-r border-slate-700 overflow-y-auto">
-                        <div className="p-6 space-y-6">
-                            {/* User Avatar and Name */}
-                            <div className="text-center">
-                                <Avatar className="h-24 w-24 mx-auto mb-4 ring-2 ring-slate-700">
-                                    <AvatarImage src={userProfile?.avatar_url || undefined} />
-                                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-2xl">
-                                        {getInitials(displayName)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <h3 className="text-lg font-semibold text-slate-100">{displayName}</h3>
-                                <p className="text-sm text-slate-400 mt-1">
-                                    {ticket.user_id ? 'Registered User' : 'Guest'}
-                                </p>
-                            </div>
+                {/* Main Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-                            <Separator className="bg-slate-700" />
-
-                            {/* Contact Information */}
-                            <div className="space-y-4">
-                                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                    Contact Information
-                                </h4>
-
-                                <div className="space-y-3">
-                                    <div className="flex items-start gap-3">
-                                        <Mail className="h-4 w-4 text-slate-400 mt-0.5" />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-xs text-slate-400">Email</p>
-                                            <p className="text-sm text-slate-200 break-all">{displayEmail}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start gap-3">
-                                        <Phone className="h-4 w-4 text-slate-400 mt-0.5" />
-                                        <div className="flex-1">
-                                            <p className="text-xs text-slate-400">Phone</p>
-                                            <p className="text-sm text-slate-200">{displayPhone}</p>
-                                        </div>
-                                    </div>
-
-                                    {userProfile?.created_at && (
-                                        <div className="flex items-start gap-3">
-                                            <Calendar className="h-4 w-4 text-slate-400 mt-0.5" />
-                                            <div className="flex-1">
-                                                <p className="text-xs text-slate-400">Member Since</p>
-                                                <p className="text-sm text-slate-200">
-                                                    {format(new Date(userProfile.created_at), 'MMM dd, yyyy')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <Separator className="bg-slate-700" />
-
-                            {/* Quick Actions */}
-                            <div className="space-y-2">
-                                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                                    Quick Actions
-                                </h4>
-                                {displayEmail !== 'N/A' && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-full justify-start border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
-                                        onClick={() => window.open(`mailto:${displayEmail}`, '_blank')}
-                                    >
-                                        <Mail className="h-4 w-4 mr-2" />
-                                        Email Customer
-                                    </Button>
-                                )}
-                                {displayPhone !== 'N/A' && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-full justify-start border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
-                                        onClick={() => window.open(`tel:${displayPhone}`, '_blank')}
-                                    >
-                                        <Phone className="h-4 w-4 mr-2" />
-                                        Call Customer
-                                    </Button>
-                                )}
-                            </div>
+                    {/* Chat Box */}
+                    <div className="lg:col-span-2 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] overflow-hidden flex flex-col h-[500px]">
+                        {/* Chat Header */}
+                        <div className="px-4 py-2.5 border-b border-[#2A2A2A] bg-[#0F0F0F] flex items-center gap-2">
+                            <MessageSquare className="w-4 h-4 text-[#0071c2]" />
+                            <span className="font-medium text-white text-sm">Conversation</span>
+                            <span className="text-xs text-gray-500 bg-[#2A2A2A] px-1.5 py-0.5 rounded-full">{messages.length}</span>
                         </div>
-                    </div>
 
-                    {/* Center - Conversation */}
-                    <div className="col-span-6 flex flex-col bg-slate-900/30">
-                        {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                            {isMessagesLoading ? (
-                                <div className="text-center text-slate-400">Loading messages...</div>
-                            ) : (
-                                <>
-                                    {messages?.map((msg: any) => (
-                                        <div
-                                            key={msg.id}
-                                            className={`flex gap-3 ${msg.is_admin ? 'flex-row-reverse' : 'flex-row'}`}
-                                        >
-                                            <Avatar className="h-10 w-10 flex-shrink-0">
-                                                {msg.is_admin ? (
-                                                    <AvatarFallback className="bg-blue-500 text-white">
-                                                        <User className="h-5 w-5" />
-                                                    </AvatarFallback>
-                                                ) : (
-                                                    <>
-                                                        <AvatarImage src={userProfile?.avatar_url || undefined} />
-                                                        <AvatarFallback className="bg-slate-700 text-slate-300">
-                                                            {getInitials(displayName)}
-                                                        </AvatarFallback>
-                                                    </>
-                                                )}
-                                            </Avatar>
-                                            <div className={`flex-1 max-w-[70%] ${msg.is_admin ? 'items-end' : 'items-start'}`}>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    {msg.is_admin ? (
-                                                        <>
-                                                            <span className="text-xs text-slate-400">
-                                                                {msg.created_at ? format(new Date(msg.created_at), 'HH:mm') : ''}
-                                                            </span>
-                                                            <Badge className="bg-blue-500/20 text-blue-400 text-xs">
-                                                                Support Team
-                                                            </Badge>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className="text-sm font-medium text-slate-300">{displayName}</span>
-                                                            <span className="text-xs text-slate-400">
-                                                                {msg.created_at ? format(new Date(msg.created_at), 'HH:mm') : ''}
-                                                            </span>
-                                                        </>
-                                                    )}
-                                                </div>
+                        {/* Messages */}
+                        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#0A0A0A]">
+                                {messages.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                                        <MessageSquare className="w-10 h-10 mb-2 opacity-50" />
+                                        <p className="text-sm">No messages yet</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {messages.map((msg, index) => {
+                                            const isTemp = msg.id.startsWith('temp-');
+                                            // Check if customer has read this specific message:
+                                            // 1. They replied after this message, OR
+                                            // 2. They viewed the chat AFTER this message was sent
+                                            const hasReplyAfter = msg.is_admin && messages.slice(index + 1).some(m => !m.is_admin);
+                                            const wasReadByCustomer = msg.is_admin && !isTemp && customerLastReadAt && 
+                                                new Date(msg.created_at) <= new Date(customerLastReadAt);
+                                            const isRead = hasReplyAfter || wasReadByCustomer;
+                                            
+                                            return (
                                                 <div
-                                                    className={`rounded-2xl p-4 ${msg.is_admin
-                                                        ? 'bg-blue-500/20 border border-blue-500/30'
-                                                        : 'bg-slate-800/50 border border-slate-700'
-                                                        }`}
+                                                    key={msg.id}
+                                                    className={`flex gap-2 ${msg.is_admin ? "flex-row-reverse" : ""}`}
                                                 >
-                                                    <p className="text-sm text-slate-200 whitespace-pre-wrap">{msg.message}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    {/* Internal Notes */}
-                                    {internalNotes && internalNotes.length > 0 && (
-                                        <div className="space-y-3 mt-6">
-                                            <div className="flex items-center gap-2">
-                                                <StickyNote className="h-4 w-4 text-amber-400" />
-                                                <h4 className="text-sm font-semibold text-amber-400">Internal Notes</h4>
-                                            </div>
-                                            {internalNotes.map((note: any) => (
-                                                <div key={note.id} className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="text-xs font-medium text-amber-400">
-                                                            {note.admin_name || 'Admin'}
-                                                        </span>
-                                                        <span className="text-xs text-slate-400">
-                                                            {note.created_at ? format(new Date(note.created_at), 'MMM dd, HH:mm') : ''}
-                                                        </span>
+                                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                                        msg.is_admin 
+                                                            ? "bg-[#0071c2]" 
+                                                            : "bg-gray-600"
+                                                    }`}>
+                                                        {msg.is_admin ? (
+                                                            <Headphones className="w-3.5 h-3.5 text-white" />
+                                                        ) : (
+                                                            <User className="w-3.5 h-3.5 text-white" />
+                                                        )}
                                                     </div>
-                                                    <p className="text-sm text-slate-300 whitespace-pre-wrap">{note.note}</p>
+                                                    <div className={`max-w-[80%] ${msg.is_admin ? "text-right" : ""}`}>
+                                                        <div className={`inline-block px-3 py-1.5 rounded-2xl text-sm ${
+                                                            msg.is_admin 
+                                                                ? "bg-[#0071c2] text-white rounded-tr-sm" 
+                                                                : "bg-[#2A2A2A] text-gray-200 rounded-tl-sm"
+                                                        } ${isTemp ? "opacity-70" : ""}`}>
+                                                            <p className="whitespace-pre-wrap">{msg.message}</p>
+                                                        </div>
+                                                        {/* Time and read receipt */}
+                                                        <div className={`flex items-center gap-1 mt-0.5 ${msg.is_admin ? "justify-end" : "justify-start"}`}>
+                                                            <span className="text-[10px] text-gray-600">
+                                                                {formatMessageTime(msg.created_at)}
+                                                            </span>
+                                                            {msg.is_admin && (
+                                                                <span className="flex items-center">
+                                                                    {isTemp ? (
+                                                                        <Clock className="w-3 h-3 text-gray-500" />
+                                                                    ) : isRead ? (
+                                                                        <CheckCheck className="w-3.5 h-3.5 text-[#53bdeb]" />
+                                                                    ) : (
+                                                                        <CheckCheck className="w-3.5 h-3.5 text-gray-500" />
+                                                                    )}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </>
-                            )}
+                                            );
+                                        })}
+                                        
+                                        {/* Customer Typing Indicator */}
+                                        {isCustomerTyping && (
+                                            <div className="flex gap-2 items-end">
+                                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600">
+                                                    <User className="w-3 h-3 text-white" />
+                                                </div>
+                                                <div className="bg-[#2A2A2A] border border-[#3A3A3A] rounded-2xl rounded-tl-sm px-3 py-1.5">
+                                                    <div className="flex gap-0.5 items-center h-4">
+                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s' }}></span>
+                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s', animationDelay: '0.2s' }}></span>
+                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s', animationDelay: '0.4s' }}></span>
+                                                    </div>
+                                                </div>
+                                                <span className="text-[10px] text-gray-500 mb-0.5">typing...</span>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Message Input Area */}
-                        <div className="border-t border-slate-700 p-4 bg-slate-800/50 space-y-3">
-                            {/* Canned Responses */}
-                            <div className="flex gap-2">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
-                                        >
-                                            <Zap className="h-4 w-4 mr-2 text-yellow-500" />
-                                            Quick Replies
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="bg-slate-800 border-slate-700 w-64">
-                                        <DropdownMenuLabel className="text-slate-300">Canned Responses</DropdownMenuLabel>
-                                        <DropdownMenuSeparator className="bg-slate-700" />
-                                        {cannedResponses?.map((response: any) => (
-                                            <DropdownMenuItem
-                                                key={response.id}
-                                                onClick={() => insertCannedResponse(response.content)}
-                                                className="text-slate-300 focus:bg-slate-700 focus:text-white cursor-pointer hover:text-white"
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium">{response.title}</span>
-                                                    {response.shortcut && (
-                                                        <span className="text-xs text-slate-400">{response.shortcut}</span>
-                                                    )}
-                                                </div>
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setShowNoteInput(!showNoteInput)}
-                                    className="bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white"
-                                >
-                                    <StickyNote className="h-4 w-4 mr-2 text-amber-500" />
-                                    Internal Note
-                                </Button>
-
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => updateStatusMutation.mutate('closed')}
-                                    className="bg-slate-800 border border-slate-700 text-slate-300 hover:bg-green-900/30 hover:text-green-400 hover:border-green-500/50"
-                                >
-                                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                                    Resolve
-                                </Button>
-                            </div>
-
-                            {/* Internal Note Input */}
-                            {showNoteInput && (
-                                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg space-y-2">
-                                    <label className="text-xs font-medium text-amber-400">Add Internal Note (Admin Only)</label>
-                                    <Textarea
-                                        value={internalNote}
-                                        onChange={(e) => setInternalNote(e.target.value)}
-                                        placeholder="This note won't be visible to the customer..."
-                                        className="bg-slate-900/50 border-amber-500/30 text-slate-200 min-h-[60px]"
-                                    />
-                                    <div className="flex gap-2">
-                                        <Button
-                                            size="sm"
-                                            onClick={handleAddNote}
-                                            disabled={!internalNote.trim()}
-                                            className="bg-amber-500 hover:bg-amber-600"
-                                        >
-                                            Save Note
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => {
-                                                setShowNoteInput(false);
-                                                setInternalNote('');
-                                            }}
-                                            className="text-slate-400 hover:text-white hover:bg-slate-700"
-                                        >
-                                            Cancel
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Message Input */}
-                            <div className="flex gap-2">
-                                <Textarea
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Type your response..."
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
-                                            e.preventDefault();
-                                            handleSendMessage();
-                                        }
-                                    }}
-                                    className="bg-slate-900/50 border-slate-700 text-slate-200 min-h-[80px] resize-none"
-                                    disabled={ticket.status === 'closed'}
-                                />
-                                <div className="flex flex-col gap-2">
-                                    <Button
-                                        size="icon"
-                                        onClick={handleSendMessage}
-                                        disabled={!message.trim() || ticket.status === 'closed'}
-                                        className="bg-blue-500 hover:bg-blue-600"
+                        {/* Reply Box */}
+                        {ticket.status !== "closed" ? (
+                            <div className="border-t border-[#2A2A2A] p-3 bg-[#0F0F0F]">
+                                {/* Quick Actions */}
+                                <div className="flex gap-1.5 mb-2 flex-wrap">
+                                    <button
+                                        onClick={() => updateTicketStatus("resolved")}
+                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30"
                                     >
-                                        <Send className="h-4 w-4" />
+                                        <CheckCircle2 className="w-3 h-3" />
+                                        Resolve
+                                    </button>
+                                    <button
+                                        onClick={() => updateTicketStatus("closed")}
+                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-gray-500/20 text-gray-400 hover:bg-gray-500/30"
+                                    >
+                                        Close
+                                    </button>
+                                    <button
+                                        onClick={() => updateTicketPriority("urgent")}
+                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                                    >
+                                        Urgent
+                                    </button>
+                                    <button
+                                        onClick={() => updateTicketStatus("in_progress")}
+                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                                    >
+                                        In Progress
+                                    </button>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <Textarea
+                                        ref={textareaRef}
+                                        placeholder="Type your reply... (Enter to send)"
+                                        value={newMessage}
+                                        onChange={(e) => {
+                                            setNewMessage(e.target.value);
+                                            broadcastTyping();
+                                        }}
+                                        onKeyDown={handleKeyDown}
+                                        className="min-h-[50px] max-h-[100px] bg-[#1A1A1A] border-[#2A2A2A] text-white resize-none focus:border-[#0071c2] focus:ring-0 text-sm"
+                                    />
+                                    <Button
+                                        onClick={handleSendMessage}
+                                        disabled={!newMessage.trim() || isSending}
+                                        className="bg-[#0071c2] hover:bg-[#005999] text-white h-[50px] w-[50px] p-0 flex-shrink-0"
+                                    >
+                                        {isSending ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : (
+                                            <Send className="w-5 h-5" />
+                                        )}
                                     </Button>
                                 </div>
                             </div>
-                            <p className="text-xs text-slate-400">
-                                Press <kbd className="px-1 py-0.5 bg-slate-700 rounded text-xs">Enter</kbd> to send, <kbd className="px-1 py-0.5 bg-slate-700 rounded text-xs">Shift+Enter</kbd> for new line
-                            </p>
-                        </div>
+                        ) : (
+                            <div className="border-t border-[#2A2A2A] p-3 bg-[#0F0F0F] flex items-center justify-between">
+                                <p className="text-gray-500 text-xs">Ticket closed</p>
+                                <Button
+                                    onClick={() => updateTicketStatus("open")}
+                                    size="sm"
+                                    className="bg-[#0071c2] hover:bg-[#005999] text-white text-xs h-7"
+                                >
+                                    Reopen
+                                </Button>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Right Sidebar - Ticket Info & Actions */}
-                    <div className="col-span-3 bg-slate-800/30 border-l border-slate-700 overflow-y-auto">
-                        <div className="p-6 space-y-6">
-                            {/* Status & Priority */}
-                            <Card className="bg-slate-800/50 border-slate-700">
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm text-slate-300">Ticket Status</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div>
-                                        <label className="text-xs text-slate-400 mb-2 block">Status</label>
-                                        <Select
-                                            value={ticket.status}
-                                            onValueChange={(value) => updateStatusMutation.mutate(value)}
-                                        >
-                                            <SelectTrigger className="bg-slate-900/50 border-slate-700 text-slate-200">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-slate-800 border-slate-700">
-                                                <SelectItem value="open" className="text-blue-400 focus:text-white hover:text-white">Open</SelectItem>
-                                                <SelectItem value="in_progress" className="text-amber-400 focus:text-white hover:text-white">In Progress</SelectItem>
-                                                <SelectItem value="closed" className="text-green-400 focus:text-white hover:text-white">Closed</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs text-slate-400 mb-2 block">Priority</label>
-                                        <Badge variant="outline" className="w-full justify-center py-2 border-slate-600 text-slate-300">
-                                            {ticket.priority}
-                                        </Badge>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-xs text-slate-400 mb-2 block">Category</label>
-                                        <Badge variant="outline" className="w-full justify-center py-2 border-slate-600 text-slate-300">
-                                            {ticket.category}
-                                        </Badge>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Timeline */}
-                            <Card className="bg-slate-800/50 border-slate-700">
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm text-slate-300">Timeline</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <div className="flex items-start gap-3">
-                                        <div className="bg-blue-500/20 p-2 rounded">
-                                            <Clock className="h-4 w-4 text-blue-400" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-xs text-slate-400">Created</p>
-                                            <p className="text-sm text-slate-200">
-                                                {ticket.created_at ? format(new Date(ticket.created_at), 'MMM dd, yyyy HH:mm') : 'N/A'}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start gap-3">
-                                        <div className="bg-green-500/20 p-2 rounded">
-                                            <MessageSquare className="h-4 w-4 text-green-400" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-xs text-slate-400">Last Updated</p>
-                                            <p className="text-sm text-slate-200">
-                                                {ticket.updated_at ? format(new Date(ticket.updated_at), 'MMM dd, yyyy HH:mm') : 'N/A'}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-start gap-3">
-                                        <div className="bg-purple-500/20 p-2 rounded">
-                                            <FileText className="h-4 w-4 text-purple-400" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-xs text-slate-400">Total Messages</p>
-                                            <p className="text-sm text-slate-200">{messages?.length || 0}</p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                    {/* Sidebar */}
+                    <div className="space-y-4">
+                        {/* Customer Card */}
+                        <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+                            <h3 className="text-xs text-gray-500 uppercase mb-3">Customer</h3>
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0071c2] to-[#005999] flex items-center justify-center">
+                                    <span className="text-white font-bold">
+                                        {(ticket.guest_name || "U").charAt(0).toUpperCase()}
+                                    </span>
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="font-medium text-white text-sm truncate">
+                                        {ticket.guest_name || "Customer"}
+                                    </p>
+                                    <p className="text-xs text-gray-400">Customer</p>
+                                </div>
+                            </div>
+                            {ticket.guest_email && (
+                                <a href={`mailto:${ticket.guest_email}`} className="flex items-center gap-2 text-xs text-[#0071c2] hover:underline bg-[#0071c2]/10 rounded px-2 py-1.5">
+                                    <Mail className="w-3.5 h-3.5" />
+                                    <span className="truncate">{ticket.guest_email}</span>
+                                </a>
+                            )}
                         </div>
+
+                        {/* Ticket Details */}
+                        <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+                            <h3 className="text-xs text-gray-500 uppercase mb-3">Details</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Status</label>
+                                    <Select value={ticket.status} onValueChange={updateTicketStatus}>
+                                        <SelectTrigger className="bg-[#0A0A0A] border-[#2A2A2A] text-white h-8 text-xs">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                                            <SelectItem value="open" className="text-white text-xs">Open</SelectItem>
+                                            <SelectItem value="in_progress" className="text-white text-xs">In Progress</SelectItem>
+                                            <SelectItem value="waiting_customer" className="text-white text-xs">Awaiting Reply</SelectItem>
+                                            <SelectItem value="resolved" className="text-white text-xs">Resolved</SelectItem>
+                                            <SelectItem value="closed" className="text-white text-xs">Closed</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Priority</label>
+                                    <Select value={ticket.priority} onValueChange={updateTicketPriority}>
+                                        <SelectTrigger className="bg-[#0A0A0A] border-[#2A2A2A] text-white h-8 text-xs">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                                            <SelectItem value="low" className="text-white text-xs">Low</SelectItem>
+                                            <SelectItem value="medium" className="text-white text-xs">Medium</SelectItem>
+                                            <SelectItem value="high" className="text-white text-xs">High</SelectItem>
+                                            <SelectItem value="urgent" className="text-white text-xs">Urgent</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="pt-2 border-t border-[#2A2A2A] space-y-1.5 text-xs">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Category</span>
+                                        <span className="text-gray-300 capitalize">{ticket.category || "General"}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Created</span>
+                                        <span className="text-gray-400">{formatDate(ticket.created_at)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">Updated</span>
+                                        <span className="text-gray-400">{formatDate(ticket.updated_at)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        {ticket.description && (
+                            <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+                                <h3 className="text-xs text-gray-500 uppercase mb-2">Description</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
