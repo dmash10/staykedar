@@ -88,44 +88,60 @@ export default function HelpArticle() {
         e.preventDefault();
         const element = document.getElementById(id);
         if (element) {
-            const offset = 100;
-            const bodyRect = document.body.getBoundingClientRect().top;
-            const elementRect = element.getBoundingClientRect().top;
-            const elementPosition = elementRect - bodyRect;
-            const offsetPosition = elementPosition - offset;
+            // Use requestAnimationFrame to batch layout reads
+            requestAnimationFrame(() => {
+                const offset = 100;
+                const elementRect = element.getBoundingClientRect();
+                const offsetPosition = window.scrollY + elementRect.top - offset;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
             });
         }
     };
 
     // Hide sidebar when scrolled past article end
     useEffect(() => {
+        let rafId: number;
+
         const handleScroll = () => {
-            const articleColumn = document.querySelector('.lg\\:col-span-8');
-            const sidebar = document.querySelector('.fixed.top-24');
-
-            if (articleColumn && sidebar) {
-                const articleRect = articleColumn.getBoundingClientRect();
-                const articleBottom = articleRect.bottom;
-
-                // Hide sidebar when article bottom is above bottom of viewport
-                if (articleBottom < window.innerHeight - 100) {
-                    (sidebar as HTMLElement).style.opacity = '0';
-                    (sidebar as HTMLElement).style.pointerEvents = 'none';
-                } else {
-                    (sidebar as HTMLElement).style.opacity = '1';
-                    (sidebar as HTMLElement).style.pointerEvents = 'auto';
-                }
+            // Cancel previous frame if it hasn't run yet
+            if (rafId) {
+                cancelAnimationFrame(rafId);
             }
+
+            // Batch layout reads using requestAnimationFrame
+            rafId = requestAnimationFrame(() => {
+                const articleColumn = document.querySelector('.lg\\:col-span-8');
+                const sidebar = document.querySelector('.fixed.top-24');
+
+                if (articleColumn && sidebar) {
+                    const articleRect = articleColumn.getBoundingClientRect();
+                    const articleBottom = articleRect.bottom;
+
+                    // Hide sidebar when article bottom is above bottom of viewport
+                    if (articleBottom < window.innerHeight - 100) {
+                        (sidebar as HTMLElement).style.opacity = '0';
+                        (sidebar as HTMLElement).style.pointerEvents = 'none';
+                    } else {
+                        (sidebar as HTMLElement).style.opacity = '1';
+                        (sidebar as HTMLElement).style.pointerEvents = 'auto';
+                    }
+                }
+            });
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         handleScroll(); // Check on mount
 
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+            }
+        };
     }, [article]);
 
     if (isLoading) {

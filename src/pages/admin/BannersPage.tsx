@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -30,23 +31,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  ImageIcon, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import {
+  ImageIcon,
+  Plus,
+  Edit,
+  Trash2,
   Loader2,
   ExternalLink,
   Calendar,
   Eye,
-  EyeOff,
   GripVertical,
-  Link as LinkIcon
+  Link as LinkIcon,
+  LayoutTemplate,
+  BarChart3
 } from 'lucide-react';
 import { format, isPast, isFuture } from 'date-fns';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import BannerAnalytics from '@/components/admin/BannerAnalytics';
 
 interface Banner {
   id: string;
@@ -64,11 +67,17 @@ interface Banner {
 }
 
 const POSITIONS = [
-  { value: 'hero', label: 'Hero Section' },
-  { value: 'homepage', label: 'Homepage' },
-  { value: 'sidebar', label: 'Sidebar' },
-  { value: 'footer', label: 'Footer' },
-  { value: 'popup', label: 'Popup' },
+  { value: 'hero', label: 'Hero Section', description: 'Top of homepage' },
+  { value: 'homepage', label: 'Homepage Strip', description: 'Horizontal bar' },
+  { value: 'sidebar', label: 'Sidebar', description: 'Vertical banner' },
+  { value: 'footer', label: 'Footer', description: 'Bottom of page' },
+  { value: 'popup', label: 'Popup Modal', description: 'Center overlay' },
+  { value: 'inline', label: 'Inline Content', description: 'Within content' },
+  { value: 'search', label: 'Search Results', description: 'Above results' },
+  { value: 'package', label: 'Package Pages', description: 'On package details' },
+  { value: 'blog', label: 'Blog Posts', description: 'On blog articles' },
+  { value: 'destination', label: 'Destinations', description: 'Destination pages' },
+  { value: 'confirmation', label: 'Confirmation', description: 'Success page' },
 ];
 
 const DEFAULT_FORM: Partial<Banner> = {
@@ -172,10 +181,10 @@ export default function BannersPage() {
   };
 
   const getBannerStatus = (banner: Banner) => {
-    if (!banner.is_active) return { label: 'Inactive', color: 'bg-gray-500/20 text-gray-400' };
-    if (banner.end_date && isPast(new Date(banner.end_date))) return { label: 'Expired', color: 'bg-red-500/20 text-red-400' };
-    if (banner.start_date && isFuture(new Date(banner.start_date))) return { label: 'Scheduled', color: 'bg-blue-500/20 text-blue-400' };
-    return { label: 'Active', color: 'bg-green-500/20 text-green-400' };
+    if (!banner.is_active) return { label: 'Inactive', color: 'bg-gray-500/20 text-gray-400 border-gray-500/50' };
+    if (banner.end_date && isPast(new Date(banner.end_date))) return { label: 'Expired', color: 'bg-red-500/20 text-red-400 border-red-500/50' };
+    if (banner.start_date && isFuture(new Date(banner.start_date))) return { label: 'Scheduled', color: 'bg-blue-500/20 text-blue-400 border-blue-500/50' };
+    return { label: 'Active', color: 'bg-green-500/20 text-green-400 border-green-500/50' };
   };
 
   // Filter banners
@@ -209,17 +218,6 @@ export default function BannersPage() {
             <p className="text-sm text-gray-400">Manage promotional banners across your site</p>
           </div>
           <div className="flex items-center gap-3">
-            <Select value={filterPosition} onValueChange={setFilterPosition}>
-              <SelectTrigger className="w-40 bg-[#1A1A1A] border-[#2A2A2A] text-white">
-                <SelectValue placeholder="Position" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
-                <SelectItem value="all">All Positions</SelectItem>
-                {POSITIONS.map(pos => (
-                  <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <Button
               onClick={() => {
                 setSelectedBanner(null);
@@ -235,341 +233,383 @@ export default function BannersPage() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2.5 bg-blue-500/10 rounded-lg">
-                <ImageIcon className="w-5 h-5 text-blue-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Total</p>
-                <p className="text-xl font-bold text-white">{banners?.length || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2.5 bg-green-500/10 rounded-lg">
-                <Eye className="w-5 h-5 text-green-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Active</p>
-                <p className="text-xl font-bold text-white">{banners?.filter(b => b.is_active).length || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2.5 bg-purple-500/10 rounded-lg">
-                <Calendar className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Scheduled</p>
-                <p className="text-xl font-bold text-white">
-                  {banners?.filter(b => b.start_date && isFuture(new Date(b.start_date))).length || 0}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2.5 bg-amber-500/10 rounded-lg">
-                <LinkIcon className="w-5 h-5 text-amber-400" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">With Links</p>
-                <p className="text-xl font-bold text-white">{banners?.filter(b => b.link_url).length || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Tabs defaultValue="banners" className="space-y-4">
+          <TabsList className="bg-[#1A1A1A] border border-[#2A2A2A]">
+            <TabsTrigger value="banners" className="data-[state=active]:bg-[#2A2A2A]">
+              <LayoutTemplate className="w-4 h-4 mr-2" />
+              Banners
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-[#2A2A2A]">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Banners by Position */}
-        {POSITIONS.map(position => {
-          const positionBanners = bannersByPosition[position.value];
-          if (filterPosition !== 'all' && filterPosition !== position.value) return null;
-          
-          return (
-            <Card key={position.value} className="bg-[#111111] border-[#2A2A2A]">
-              <CardHeader className="border-b border-[#2A2A2A] py-4">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-white text-base flex items-center gap-2">
-                    {position.label}
-                    <Badge variant="outline" className="text-gray-400 border-gray-600 ml-2">
-                      {positionBanners.length}
-                    </Badge>
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4">
-                {positionBanners.length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-6">No banners in this position</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {positionBanners.map((banner) => {
-                      const status = getBannerStatus(banner);
-                      return (
-                        <div
-                          key={banner.id}
-                          className={`rounded-xl border overflow-hidden ${
-                            banner.is_active ? 'border-[#2A2A2A]' : 'border-[#2A2A2A] opacity-60'
-                          }`}
-                        >
-                          {/* Image Preview */}
-                          <div className="relative aspect-video bg-[#0A0A0A]">
-                            {banner.image_url ? (
-                              <img
-                                src={banner.image_url}
-                                alt={banner.title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <ImageIcon className="w-12 h-12 text-gray-600" />
-                              </div>
-                            )}
-                            <Badge className={`absolute top-2 right-2 ${status.color}`}>
-                              {status.label}
-                            </Badge>
-                          </div>
+          <TabsContent value="banners" className="space-y-6">
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="bg-[#111111] border-[#2A2A2A]">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2.5 bg-blue-500/10 rounded-lg">
+                    <ImageIcon className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Total</p>
+                    <p className="text-xl font-bold text-white">{banners?.length || 0}</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-[#111111] border-[#2A2A2A]">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2.5 bg-green-500/10 rounded-lg">
+                    <Eye className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Active</p>
+                    <p className="text-xl font-bold text-white">{banners?.filter(b => b.is_active).length || 0}</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-[#111111] border-[#2A2A2A]">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2.5 bg-purple-500/10 rounded-lg">
+                    <Calendar className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Scheduled</p>
+                    <p className="text-xl font-bold text-white">
+                      {banners?.filter(b => b.start_date && isFuture(new Date(b.start_date))).length || 0}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-[#111111] border-[#2A2A2A]">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="p-2.5 bg-amber-500/10 rounded-lg">
+                    <LinkIcon className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">With Links</p>
+                    <p className="text-xl font-bold text-white">{banners?.filter(b => b.link_url).length || 0}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-                          {/* Content */}
-                          <div className="p-4 bg-[#0A0A0A]">
-                            <h4 className="font-medium text-white text-sm line-clamp-1">{banner.title}</h4>
-                            {banner.subtitle && (
-                              <p className="text-xs text-gray-500 mt-1 line-clamp-1">{banner.subtitle}</p>
-                            )}
-                            
-                            {banner.link_url && (
-                              <a 
-                                href={banner.link_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-xs text-blue-400 mt-2 hover:text-blue-300"
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                                {banner.link_text || 'View Link'}
-                              </a>
-                            )}
+            {/* Filter */}
+            <div className="flex justify-end">
+              <Select value={filterPosition} onValueChange={setFilterPosition}>
+                <SelectTrigger className="w-40 bg-[#1A1A1A] border-[#2A2A2A] text-white">
+                  <SelectValue placeholder="Position" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                  <SelectItem value="all">All Positions</SelectItem>
+                  {POSITIONS.map(pos => (
+                    <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#2A2A2A]">
-                              <div className="flex items-center gap-1 text-xs text-gray-500">
-                                <GripVertical className="w-3 h-3" />
-                                Order: {banner.display_order}
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Switch
-                                  checked={banner.is_active}
-                                  onCheckedChange={(checked) => toggleActiveMutation.mutate({ id: banner.id, is_active: checked })}
+            {/* Banners by Position */}
+            {POSITIONS.map(position => {
+              const positionBanners = bannersByPosition[position.value];
+              if (filterPosition !== 'all' && filterPosition !== position.value) return null;
+              if (positionBanners.length === 0) return null;
+
+              return (
+                <Card key={position.value} className="bg-[#111111] border-[#2A2A2A]">
+                  <CardHeader className="border-b border-[#2A2A2A] py-3 px-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-white text-sm font-medium">
+                          {position.label}
+                        </CardTitle>
+                        <Badge variant="outline" className="text-xs text-gray-400 border-gray-700 px-1.5 py-0">
+                          {positionBanners.length}
+                        </Badge>
+                      </div>
+                      <span className="text-xs text-gray-500">{position.description}</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {positionBanners.map((banner) => {
+                        const status = getBannerStatus(banner);
+                        return (
+                          <div
+                            key={banner.id}
+                            className={`rounded-lg border bg-[#0A0A0A] overflow-hidden flex flex-col sm:flex-row ${banner.is_active ? 'border-[#2A2A2A] hover:border-[#333]' : 'border-[#2A2A2A] opacity-60'
+                              } transition-colors group`}
+                          >
+                            {/* Compact Image Preview */}
+                            <div className="relative w-full sm:w-32 h-24 sm:h-auto bg-[#111] flex-shrink-0">
+                              {banner.image_url ? (
+                                <img
+                                  src={banner.image_url}
+                                  alt={banner.title}
+                                  className="w-full h-full object-cover"
                                 />
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEdit(banner)}
-                                  className="text-gray-400 hover:text-white hover:bg-[#2A2A2A] h-8 w-8 p-0"
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDelete(banner)}
-                                  className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 h-8 w-8 p-0"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <ImageIcon className="w-6 h-6 text-gray-600" />
+                                </div>
+                              )}
+                              <Badge className={`absolute top-1.5 right-1.5 text-[10px] px-1.5 py-0 h-5 ${status.color} border`}>
+                                {status.label}
+                              </Badge>
+                            </div>
+
+                            {/* Compact Content */}
+                            <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
+                              <div>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="font-medium text-white text-sm truncate" title={banner.title}>
+                                      {banner.title}
+                                    </h4>
+                                    {banner.subtitle && (
+                                      <p className="text-xs text-gray-500 mt-0.5 truncate">{banner.subtitle}</p>
+                                    )}
+                                  </div>
+                                  <Switch
+                                    checked={banner.is_active}
+                                    onCheckedChange={(checked) => toggleActiveMutation.mutate({ id: banner.id, is_active: checked })}
+                                    className="scale-75 data-[state=checked]:bg-blue-600"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1A1A1A]">
+                                <div className="flex items-center gap-3 text-[10px] text-gray-500">
+                                  <span className="flex items-center gap-1 bg-[#1A1A1A] px-1.5 py-0.5 rounded">
+                                    <GripVertical className="w-3 h-3" />
+                                    {banner.display_order}
+                                  </span>
+                                  {banner.link_url && (
+                                    <a
+                                      href={banner.link_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-1 hover:text-blue-400 transition-colors truncate max-w-[150px]"
+                                    >
+                                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                                      {banner.link_text || 'Link'}
+                                    </a>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEdit(banner)}
+                                    className="h-7 w-7 p-0 text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
+                                  >
+                                    <Edit className="w-3.5 h-3.5" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDelete(banner)}
+                                    className="h-7 w-7 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <BannerAnalytics />
+          </TabsContent>
+        </Tabs>
+
+        {/* Create/Edit Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="bg-[#111111] border-[#2A2A2A] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-white flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-blue-400" />
+                {selectedBanner ? 'Edit Banner' : 'Create Banner'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              {/* Basic Info */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Title *</Label>
+                  <Input
+                    value={formData.title || ''}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                    placeholder="Banner title"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Position</Label>
+                  <Select
+                    value={formData.position || 'hero'}
+                    onValueChange={(v) => setFormData({ ...formData, position: v })}
+                  >
+                    <SelectTrigger className="bg-[#1A1A1A] border-[#2A2A2A] text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                      {POSITIONS.map(pos => (
+                        <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-gray-300">Subtitle</Label>
+                <Input
+                  value={formData.subtitle || ''}
+                  onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                  placeholder="Optional subtitle text"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-gray-300">Image URL *</Label>
+                <Input
+                  value={formData.image_url || ''}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                  placeholder="https://example.com/banner.jpg"
+                />
+                {formData.image_url && (
+                  <div className="mt-2 rounded-lg overflow-hidden border border-[#2A2A2A]">
+                    <img src={formData.image_url} alt="Preview" className="w-full h-32 object-cover" />
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+              </div>
 
-      {/* Create/Edit Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#111111] border-[#2A2A2A] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-blue-400" />
-              {selectedBanner ? 'Edit Banner' : 'Create Banner'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            {/* Basic Info */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-gray-300">Title *</Label>
-                <Input
-                  value={formData.title || ''}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                  placeholder="Banner title"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-gray-300">Position</Label>
-                <Select 
-                  value={formData.position || 'hero'} 
-                  onValueChange={(v) => setFormData({ ...formData, position: v })}
-                >
-                  <SelectTrigger className="bg-[#1A1A1A] border-[#2A2A2A] text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
-                    {POSITIONS.map(pos => (
-                      <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-gray-300">Subtitle</Label>
-              <Input
-                value={formData.subtitle || ''}
-                onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                placeholder="Optional subtitle text"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-gray-300">Image URL *</Label>
-              <Input
-                value={formData.image_url || ''}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                placeholder="https://example.com/banner.jpg"
-              />
-              {formData.image_url && (
-                <div className="mt-2 rounded-lg overflow-hidden border border-[#2A2A2A]">
-                  <img src={formData.image_url} alt="Preview" className="w-full h-32 object-cover" />
-                </div>
-              )}
-            </div>
-
-            {/* Link Settings */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-gray-300">Link URL</Label>
-                <Input
-                  value={formData.link_url || ''}
-                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
-                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                  placeholder="/packages or https://..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-gray-300">Link Text</Label>
-                <Input
-                  value={formData.link_text || ''}
-                  onChange={(e) => setFormData({ ...formData, link_text: e.target.value })}
-                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                  placeholder="Learn More"
-                />
-              </div>
-            </div>
-
-            {/* Schedule */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-gray-300">Start Date (optional)</Label>
-                <Input
-                  type="datetime-local"
-                  value={formData.start_date || ''}
-                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value || null })}
-                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-gray-300">End Date (optional)</Label>
-                <Input
-                  type="datetime-local"
-                  value={formData.end_date || ''}
-                  onChange={(e) => setFormData({ ...formData, end_date: e.target.value || null })}
-                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                />
-              </div>
-            </div>
-
-            {/* Display Order & Active */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-gray-300">Display Order</Label>
-                <Input
-                  type="number"
-                  value={formData.display_order || 0}
-                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
-                  className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-gray-300">Status</Label>
-                <div className="flex items-center gap-3 h-10">
-                  <Switch
-                    checked={formData.is_active}
-                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+              {/* Link Settings */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Link URL</Label>
+                  <Input
+                    value={formData.link_url || ''}
+                    onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                    className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                    placeholder="/packages or https://..."
                   />
-                  <span className="text-gray-400">{formData.is_active ? 'Active' : 'Inactive'}</span>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Link Text</Label>
+                  <Input
+                    value={formData.link_text || ''}
+                    onChange={(e) => setFormData({ ...formData, link_text: e.target.value })}
+                    className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                    placeholder="Learn More"
+                  />
+                </div>
+              </div>
+
+              {/* Schedule */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Start Date (optional)</Label>
+                  <Input
+                    type="datetime-local"
+                    value={formData.start_date || ''}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value || null })}
+                    className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">End Date (optional)</Label>
+                  <Input
+                    type="datetime-local"
+                    value={formData.end_date || ''}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value || null })}
+                    className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Display Order & Active */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Display Order</Label>
+                  <Input
+                    type="number"
+                    value={formData.display_order || 0}
+                    onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
+                    className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Status</Label>
+                  <div className="flex items-center gap-3 h-10">
+                    <Switch
+                      checked={formData.is_active}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                    />
+                    <span className="text-gray-400">{formData.is_active ? 'Active' : 'Inactive'}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsModalOpen(false)}
-              className="border-[#2A2A2A] text-gray-300 hover:bg-[#1A1A1A] w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => saveMutation.mutate(formData)}
-              className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
-              disabled={saveMutation.isPending || !formData.title || !formData.image_url}
-            >
-              {saveMutation.isPending ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
-              ) : (
-                selectedBanner ? 'Update Banner' : 'Create Banner'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                className="border-[#2A2A2A] text-gray-300 hover:bg-[#1A1A1A] w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => saveMutation.mutate(formData)}
+                className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+                disabled={saveMutation.isPending || !formData.title || !formData.image_url}
+              >
+                {saveMutation.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
+                ) : (
+                  selectedBanner ? 'Update Banner' : 'Create Banner'
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-      {/* Delete Confirmation */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[#111111] border-[#2A2A2A]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Delete Banner?</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
-              Are you sure you want to delete "{selectedBanner?.title}"? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-            <AlertDialogCancel className="border-[#2A2A2A] text-gray-300 hover:bg-[#1A1A1A] w-full sm:w-auto">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => selectedBanner && deleteMutation.mutate(selectedBanner.id)}
-              className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {/* Delete Confirmation */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent className="bg-[#111111] border-[#2A2A2A]">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-white">Delete Banner?</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-400">
+                Are you sure you want to delete "{selectedBanner?.title}"? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+              <AlertDialogCancel className="border-[#2A2A2A] text-gray-300 hover:bg-[#1A1A1A] w-full sm:w-auto">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => selectedBanner && deleteMutation.mutate(selectedBanner.id)}
+                className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </AdminLayout>
   );
 }
-

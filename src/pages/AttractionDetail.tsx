@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  MapPin, 
-  Clock, 
-  Calendar, 
-  Mountain, 
-  Star, 
-  ArrowLeft, 
+import {
+  MapPin,
+  Clock,
+  Calendar,
+  Mountain,
+  Star,
+  ArrowLeft,
   ArrowRight,
   Navigation,
   Camera,
@@ -35,6 +35,7 @@ import {
 import Container from "../components/Container";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import PromoBanner from "../components/home/PromoBanner";
 import { supabase } from "@/integrations/supabase/client";
 
 // Attraction data interface matching database
@@ -74,7 +75,7 @@ const AttractionDetail = () => {
   const [relatedAttractions, setRelatedAttractions] = useState<Attraction[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
-  
+
   // Image Gallery State
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -123,7 +124,7 @@ const AttractionDetail = () => {
   };
 
   // Get all images (main + gallery)
-  const allImages = attraction 
+  const allImages = attraction
     ? [attraction.main_image, ...(attraction.images || [])]
     : [];
 
@@ -207,23 +208,23 @@ const AttractionDetail = () => {
         <meta name="description" content={attraction.meta_description || `${attraction.short_description} Plan your visit to ${attraction.name} at ${attraction.elevation}. Best time: ${attraction.best_time}. ${attraction.difficulty} difficulty.`} />
         <meta name="keywords" content={`${attraction.name}, ${(attraction.tags || []).join(', ')}, Kedarnath attractions, Uttarakhand tourism, ${attraction.type}`} />
         <link rel="canonical" href={`https://staykedarnath.in/attractions/${attraction.slug}`} />
-        
+
         {/* Open Graph */}
         <meta property="og:title" content={`${attraction.name} | StayKedarnath`} />
         <meta property="og:description" content={attraction.short_description} />
         <meta property="og:image" content={attraction.main_image} />
         <meta property="og:url" content={`https://staykedarnath.in/attractions/${attraction.slug}`} />
         <meta property="og:type" content="article" />
-        
+
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${attraction.name} | StayKedarnath`} />
         <meta name="twitter:description" content={attraction.short_description} />
         <meta name="twitter:image" content={attraction.main_image} />
       </Helmet>
-      
+
       <Nav />
-      
+
       {/* Hero Section */}
       <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
         <img
@@ -233,7 +234,7 @@ const AttractionDetail = () => {
           onClick={() => openLightbox(0)}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-        
+
         {/* View Gallery Button */}
         {allImages.length > 1 && (
           <button
@@ -244,7 +245,7 @@ const AttractionDetail = () => {
             View {allImages.length} Photos
           </button>
         )}
-        
+
         {/* Back Button */}
         <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
           <button
@@ -256,7 +257,7 @@ const AttractionDetail = () => {
             <span className="sm:hidden">Back</span>
           </button>
         </div>
-        
+
         {/* Action Buttons */}
         <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex gap-2">
           <button
@@ -272,7 +273,7 @@ const AttractionDetail = () => {
             <Share2 className="w-5 h-5" />
           </button>
         </div>
-        
+
         {/* Hero Content */}
         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
           <Container>
@@ -284,7 +285,7 @@ const AttractionDetail = () => {
               <ChevronRight className="w-4 h-4" />
               <span className="text-white">{attraction.name}</span>
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <span className="px-3 py-1 bg-[#0071c2] text-white text-xs font-semibold rounded-full">
                 {attraction.type}
@@ -297,11 +298,11 @@ const AttractionDetail = () => {
                 <span className="text-white text-sm font-medium">{attraction.rating}</span>
               </div>
             </div>
-            
+
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">
               {attraction.name}
             </h1>
-            
+
             <div className="flex items-center gap-2 text-white/80">
               <MapPin className="w-4 h-4" />
               <span>{attraction.location}</span>
@@ -309,7 +310,10 @@ const AttractionDetail = () => {
           </Container>
         </div>
       </section>
-      
+
+      {/* Destination Banner */}
+      <PromoBanner position="destination" />
+
       {/* Quick Info Bar */}
       <section className="bg-white border-b sticky top-0 z-30">
         <Container>
@@ -336,7 +340,7 @@ const AttractionDetail = () => {
           </div>
         </Container>
       </section>
-      
+
       {/* Main Content */}
       <section className="py-8 md:py-12">
         <Container>
@@ -350,10 +354,17 @@ const AttractionDetail = () => {
                 className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"
               >
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">About {attraction.name}</h2>
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  {attraction.description}
-                </p>
-                
+                <div
+                  className="text-gray-600 leading-relaxed mb-6 prose prose-lg max-w-none
+                    prose-headings:text-gray-900 prose-headings:font-bold prose-headings:mb-3
+                    prose-h2:text-xl prose-h3:text-lg
+                    prose-p:mb-4 prose-p:leading-relaxed
+                    prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6
+                    prose-li:mb-2
+                    prose-strong:text-gray-900 prose-strong:font-semibold"
+                  dangerouslySetInnerHTML={{ __html: attraction.description }}
+                />
+
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2">
                   {(attraction.tags || []).map((tag) => (
@@ -376,7 +387,7 @@ const AttractionDetail = () => {
                     <h2 className="text-2xl font-bold text-gray-900">Photo Gallery</h2>
                     <span className="text-gray-500 text-sm">{allImages.length} photos</span>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {allImages.map((image, index) => (
                       <motion.div
@@ -403,7 +414,7 @@ const AttractionDetail = () => {
                   </div>
                 </motion.div>
               )}
-              
+
               {/* Key Information */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -435,7 +446,7 @@ const AttractionDetail = () => {
                   </div>
                 </div>
               </motion.div>
-              
+
               {/* Tips Section */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -486,7 +497,7 @@ const AttractionDetail = () => {
                 </div>
               </motion.div>
             </div>
-            
+
             {/* Right Sidebar */}
             <div className="space-y-6">
               {/* Book Stay CTA */}
@@ -515,7 +526,7 @@ const AttractionDetail = () => {
                   </button>
                 </Link>
               </motion.div>
-              
+
               {/* Package CTA */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -542,7 +553,7 @@ const AttractionDetail = () => {
                   </button>
                 </Link>
               </motion.div>
-              
+
               {/* Contact CTA */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -565,7 +576,7 @@ const AttractionDetail = () => {
                   </a>
                 </div>
               </motion.div>
-              
+
               {/* Map Placeholder */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -590,7 +601,7 @@ const AttractionDetail = () => {
           </div>
         </Container>
       </section>
-      
+
       {/* Related Attractions */}
       {relatedAttractions.length > 0 && (
         <section className="py-12 bg-white">
@@ -602,7 +613,7 @@ const AttractionDetail = () => {
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {relatedAttractions.map((item, index) => (
                 <motion.div
@@ -644,7 +655,7 @@ const AttractionDetail = () => {
           </Container>
         </section>
       )}
-      
+
       {/* Bottom CTA - Mobile */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 md:hidden z-40">
         <div className="flex gap-3">
@@ -662,10 +673,10 @@ const AttractionDetail = () => {
           </Link>
         </div>
       </div>
-      
+
       {/* Spacer for mobile bottom CTA */}
       <div className="h-20 md:hidden" />
-      
+
       {/* Image Lightbox */}
       <AnimatePresence>
         {lightboxOpen && (
@@ -683,12 +694,12 @@ const AttractionDetail = () => {
             >
               <X className="w-6 h-6" />
             </button>
-            
+
             {/* Image Counter */}
             <div className="absolute top-4 left-4 px-4 py-2 bg-white/10 rounded-full text-white text-sm">
               {currentImageIndex + 1} / {allImages.length}
             </div>
-            
+
             {/* Navigation Buttons */}
             {allImages.length > 1 && (
               <>
@@ -706,7 +717,7 @@ const AttractionDetail = () => {
                 </button>
               </>
             )}
-            
+
             {/* Main Image */}
             <motion.img
               key={currentImageIndex}
@@ -719,7 +730,7 @@ const AttractionDetail = () => {
               className="max-w-[90vw] max-h-[85vh] object-contain"
               onClick={(e) => e.stopPropagation()}
             />
-            
+
             {/* Thumbnail Strip */}
             {allImages.length > 1 && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 px-4 py-2 bg-black/50 rounded-full overflow-x-auto max-w-[90vw]">
@@ -727,9 +738,8 @@ const AttractionDetail = () => {
                   <button
                     key={index}
                     onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(index); }}
-                    className={`w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${
-                      index === currentImageIndex ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
+                    className={`w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${index === currentImageIndex ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'
+                      }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
@@ -739,7 +749,7 @@ const AttractionDetail = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       <Footer />
     </div>
   );

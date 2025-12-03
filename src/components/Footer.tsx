@@ -20,6 +20,7 @@ import {
 import Container from "./Container";
 import { EditableButton, EditableText } from "./editable";
 import { useEdit } from "@/contexts/EditContext";
+import PromoBanner from "./home/PromoBanner";
 
 const Footer = () => {
   const { isEditMode } = useEdit();
@@ -27,6 +28,11 @@ const Footer = () => {
   return (
     <footer className="bg-primary-deep/10 pt-8 pb-6">
       <Container>
+        {/* Footer Banner */}
+        <div className="mb-8">
+          <PromoBanner position="footer" />
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-4">
           {/* Support */}
           <div>
@@ -284,14 +290,14 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-          <p className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             <EditableText
               section="footer"
               contentKey="copyright"
               defaultValue="© 2025 StayKedar. All rights reserved."
               className="text-xs text-muted-foreground"
             />
-          </p>
+          </div>
         </div>
       </Container>
     </footer>

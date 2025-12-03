@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import PromoBanner from "@/components/home/PromoBanner";
 
 interface PackageDetail {
     id: string;
@@ -287,6 +288,9 @@ const PackageDetail = () => {
                             {/* Sidebar */}
                             <div className="lg:col-span-1">
                                 <div className="sticky top-24 space-y-6">
+                                    {/* Promo Banner */}
+                                    <PromoBanner position="sidebar" />
+
                                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                                         <div className="mb-6">
                                             <p className="text-sm text-gray-500 mb-1">Starting from</p>

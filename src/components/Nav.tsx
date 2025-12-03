@@ -121,17 +121,19 @@ const Nav = () => {
   const navLinks = [...publicNavLinks, ...(isAdmin ? adminNavLinks : [])];
 
   useEffect(() => {
+    let rafId: number;
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      const scrollY = window.scrollY;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        setScrolled(scrollY > 20);
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -144,7 +146,7 @@ const Nav = () => {
     if (mobileMenuOpen) {
       // Save current scroll position
       const scrollY = window.scrollY;
-      
+
       // Lock body scroll
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
@@ -153,13 +155,13 @@ const Nav = () => {
     } else {
       // Get the scroll position before unlocking
       const scrollY = document.body.style.top;
-      
+
       // Unlock body scroll
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
       document.body.style.overflow = '';
-      
+
       // Restore scroll position
       if (scrollY) {
         window.scrollTo(0, parseInt(scrollY || '0') * -1);
@@ -176,19 +178,26 @@ const Nav = () => {
   }, [mobileMenuOpen]);
 
   // Setup scroll listener for fade effect (only once)
+  // Setup scroll listener for fade effect (only once)
   useEffect(() => {
+    let rafId: number;
     const handleNavScroll = () => {
       if (mobileNavRef.current) {
-        const isScrolled = mobileNavRef.current.scrollLeft > 10;
-        setShowNavFade(!isScrolled);
+        const scrollLeft = mobileNavRef.current.scrollLeft;
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          const isScrolled = scrollLeft > 10;
+          setShowNavFade(!isScrolled);
+        });
       }
     };
 
     const navElement = mobileNavRef.current;
     if (navElement) {
-      navElement.addEventListener('scroll', handleNavScroll);
+      navElement.addEventListener('scroll', handleNavScroll, { passive: true });
       return () => {
         navElement.removeEventListener('scroll', handleNavScroll);
+        cancelAnimationFrame(rafId);
       };
     }
   }, []);

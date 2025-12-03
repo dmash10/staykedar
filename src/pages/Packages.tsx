@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import PromoBanner from "../components/home/PromoBanner";
 
 interface PackageType {
   id: string;
@@ -136,8 +137,8 @@ const Packages = () => {
                       key={cat.id}
                       onClick={() => setActiveCategory(cat.id)}
                       className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap ${activeCategory === cat.id
-                          ? "bg-[#0071c2] text-white shadow-md ring-2 ring-blue-200 ring-offset-1"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                        ? "bg-[#0071c2] text-white shadow-md ring-2 ring-blue-200 ring-offset-1"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
                         }`}
                     >
                       {cat.label}
@@ -150,6 +151,9 @@ const Packages = () => {
               </div>
             </Container>
           </div>
+
+          {/* Promo Banner */}
+          <PromoBanner position="package" />
 
           {/* Packages Grid */}
           <section className="py-12 bg-slate-50 min-h-[600px]">

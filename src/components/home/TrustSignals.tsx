@@ -85,9 +85,22 @@ const AnimatedCounter = ({ value, suffix, decimals = 0 }: { value: number; suffi
 
 const TrustSignals = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    
+
+    // Defer testimonials fetch until after initial render
+    const [shouldFetchTestimonials, setShouldFetchTestimonials] = useState(false);
+
+    useEffect(() => {
+        // Defer testimonials fetch - they're below the fold
+        const timer = setTimeout(() => {
+            setShouldFetchTestimonials(true);
+        }, 500); // Wait 500ms as this section is further down the page
+
+        return () => clearTimeout(timer);
+    }, []);
+
     const { data: testimonials = fallbackTestimonials } = useQuery({
         queryKey: ['public-testimonials'],
+        enabled: shouldFetchTestimonials, // Only fetch after delay
         queryFn: async () => {
             const { data, error } = await supabase
                 .from('testimonials')
@@ -95,13 +108,13 @@ const TrustSignals = () => {
                 .eq('is_active', true)
                 .order('is_featured', { ascending: false })
                 .limit(6);
-            
+
             if (error || !data || data.length === 0) {
                 return fallbackTestimonials;
             }
             return data;
         },
-        staleTime: 60000,
+        staleTime: 300000, // 5 minutes cache
     });
 
     useEffect(() => {
@@ -154,14 +167,16 @@ const TrustSignals = () => {
                     <div className="relative">
                         {testimonials.length > 1 && (
                             <>
-                                <button 
+                                <button
                                     onClick={prevSlide}
+                                    aria-label="Previous testimonial"
                                     className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-gray-400 hover:text-[#0071c2] transition-colors"
                                 >
                                     <ChevronLeft className="w-5 h-5" />
                                 </button>
-                                <button 
+                                <button
                                     onClick={nextSlide}
+                                    aria-label="Next testimonial"
                                     className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-12 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-gray-400 hover:text-[#0071c2] transition-colors"
                                 >
                                     <ChevronRight className="w-5 h-5" />
@@ -177,7 +192,7 @@ const TrustSignals = () => {
                             className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 md:p-8 text-center relative"
                         >
                             <Quote className="absolute top-4 left-4 w-8 h-8 text-[#0071c2]/10" />
-                            
+
                             {/* Rating */}
                             <div className="flex justify-center gap-1 mb-4">
                                 {[...Array(currentTestimonial?.rating || 5)].map((_, i) => (
@@ -205,19 +220,19 @@ const TrustSignals = () => {
                         </motion.div>
 
                         {/* Dots */}
-                        {testimonials.length > 1 && (
-                            <div className="flex justify-center gap-2 mt-6">
-                                {testimonials.map((_, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setCurrentIndex(idx)}
-                                        className={`w-2 h-2 rounded-full transition-all ${
-                                            currentIndex === idx ? 'w-6 bg-[#0071c2]' : 'bg-gray-300'
-                                        }`}
-                                    />
-                                ))}
-                            </div>
-                        )}
+                        <div className="flex justify-center gap-2 mt-6">
+                            {testimonials.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentIndex(idx)}
+                                    aria-label={`Go to testimonial ${idx + 1}`}
+                                    className="w-12 h-12 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                                >
+                                    <span className={`w-2 h-2 rounded-full transition-all ${currentIndex === idx ? 'w-6 bg-[#0071c2]' : 'bg-gray-300'
+                                        }`} />
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

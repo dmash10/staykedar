@@ -6,12 +6,14 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Loader2, Calendar, User, ArrowLeft, Share2, Clock, Eye, 
+import {
+  Loader2, Calendar, User, ArrowLeft, Share2, Clock, Eye,
   ChevronRight, BookOpen, Tag, Facebook, Twitter, Linkedin,
   Copy, Check, ArrowRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PromoBanner from '@/components/home/PromoBanner';
+import { OptimizedImage } from '@/components/OptimizedImage';
 import './BlogContent.css';
 
 interface BlogPost {
@@ -128,7 +130,7 @@ export default function BlogPostPage() {
   const sharePost = (platform?: string) => {
     const url = window.location.href;
     const title = post?.title || '';
-    
+
     if (platform === 'facebook') {
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
     } else if (platform === 'twitter') {
@@ -211,16 +213,19 @@ export default function BlogPostPage() {
       <section className="relative bg-gradient-to-br from-slate-900 via-[#0a1628] to-slate-900 pt-24 pb-32 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
+          <OptimizedImage
             src={post.featured_image || getDefaultImage(0)}
             alt={post.title}
+            width={1200}
+            height={600}
+            priority={true}
             className="w-full h-full object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-slate-900/60" />
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl mx-auto"
@@ -257,19 +262,19 @@ export default function BlogPostPage() {
                   <p className="text-xs text-gray-400">Author</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 <span>{formatDate(post.created_at)}</span>
               </div>
-              
+
               {post.reading_time && (
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   <span>{post.reading_time} min read</span>
                 </div>
               )}
-              
+
               {post.views > 0 && (
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
@@ -285,7 +290,7 @@ export default function BlogPostPage() {
         <div className="container mx-auto px-4 -mt-16 relative z-20">
           <div className="max-w-4xl mx-auto">
             {/* Main Content Card */}
-            <motion.article 
+            <motion.article
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -383,6 +388,11 @@ export default function BlogPostPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Promo Banner */}
+                <div className="mt-8 pt-8 border-t border-gray-200">
+                  <PromoBanner position="blog" />
+                </div>
               </div>
 
               {/* Author Card */}
@@ -404,8 +414,8 @@ export default function BlogPostPage() {
 
             {/* Back Button */}
             <div className="my-8 flex justify-center">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => navigate('/blog')}
                 className="border-gray-300 hover:border-[#0071c2] hover:text-[#0071c2]"
               >
@@ -415,14 +425,14 @@ export default function BlogPostPage() {
 
             {/* Related Posts */}
             {relatedPosts.length > 0 && (
-              <motion.section 
+              <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
                 className="pb-16"
               >
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">You Might Also Like</h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {relatedPosts.map((relatedPost, index) => (
                     <Link
@@ -431,9 +441,11 @@ export default function BlogPostPage() {
                       className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-100"
                     >
                       <div className="aspect-video relative overflow-hidden">
-                        <img
+                        <OptimizedImage
                           src={relatedPost.featured_image || getDefaultImage(index)}
                           alt={relatedPost.title}
+                          width={400}
+                          height={225}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           style={{ objectPosition: relatedPost.image_position || 'center' }}
                         />
@@ -443,12 +455,12 @@ export default function BlogPostPage() {
                           </Badge>
                         )}
                       </div>
-                      
+
                       <div className="p-4">
                         <h3 className="font-bold text-gray-900 group-hover:text-[#0071c2] transition-colors line-clamp-2 mb-2">
                           {relatedPost.title}
                         </h3>
-                        
+
                         <div className="flex items-center gap-3 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -469,7 +481,7 @@ export default function BlogPostPage() {
             )}
 
             {/* CTA Section */}
-            <motion.section 
+            <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -481,16 +493,16 @@ export default function BlogPostPage() {
                   Let us help you plan the perfect Kedarnath pilgrimage with our curated packages and expert guidance.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button 
-                    asChild 
+                  <Button
+                    asChild
                     className="bg-[#FFB700] text-slate-900 hover:bg-[#e5a600] font-semibold"
                   >
                     <Link to="/packages">
                       View Packages <ArrowRight className="w-4 h-4 ml-2" />
                     </Link>
                   </Button>
-                  <Button 
-                    asChild 
+                  <Button
+                    asChild
                     variant="outline"
                     className="border-white text-white hover:bg-white/10"
                   >

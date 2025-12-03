@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import HelpCenterLayout from '@/components/help/HelpCenterLayout';
+import PromoBanner from '@/components/home/PromoBanner';
 
 interface FAQ {
     id: string;
@@ -50,7 +51,7 @@ export default function HelpSearchResults() {
         queryKey: ['search-faqs', query],
         queryFn: async () => {
             if (!query.trim()) return [];
-            
+
             const { data, error } = await supabase
                 .from('faq_items')
                 .select(`
@@ -62,7 +63,7 @@ export default function HelpSearchResults() {
                 .order('is_featured', { ascending: false })
                 .order('view_count', { ascending: false })
                 .limit(10);
-            
+
             if (error) {
                 console.error('Error fetching FAQs:', error);
                 return [];
@@ -77,7 +78,7 @@ export default function HelpSearchResults() {
         queryKey: ['search-articles', query],
         queryFn: async (): Promise<Article[]> => {
             if (!query.trim()) return [];
-            
+
             const { data, error } = await supabase
                 .from('help_articles')
                 .select(`
@@ -88,7 +89,7 @@ export default function HelpSearchResults() {
                 .or(`title.ilike.%${query}%,content.ilike.%${query}%,excerpt.ilike.%${query}%`)
                 .order('views', { ascending: false })
                 .limit(10);
-            
+
             if (error) {
                 console.error('Error fetching articles:', error);
                 return [];
@@ -120,7 +121,7 @@ export default function HelpSearchResults() {
                 .select(column)
                 .eq('id', faqId)
                 .single();
-            
+
             if (currentFaq) {
                 await supabase
                     .from('faq_items')
@@ -145,8 +146,8 @@ export default function HelpSearchResults() {
             <section className="bg-gradient-to-br from-[#0A1628] via-[#0F2167] to-[#1E3A8A] py-8 md:py-12">
                 <div className="max-w-3xl mx-auto px-4">
                     {/* Back Button */}
-                    <Link 
-                        to="/help" 
+                    <Link
+                        to="/help"
                         className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-6 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -171,7 +172,7 @@ export default function HelpSearchResults() {
                                 className="flex-1 px-3 py-4 text-gray-900 placeholder-gray-400 bg-transparent border-none outline-none text-base"
                             />
                             <div className="pr-2">
-                                <Button 
+                                <Button
                                     type="submit"
                                     className="bg-[#0071c2] hover:bg-[#005999] text-white rounded-lg px-5 py-2"
                                 >
@@ -182,6 +183,9 @@ export default function HelpSearchResults() {
                     </form>
                 </div>
             </section>
+
+            {/* Search Banner */}
+            <PromoBanner position="search" />
 
             {/* Results Section */}
             <div className="max-w-3xl mx-auto px-4 py-8">
@@ -256,7 +260,7 @@ export default function HelpSearchResults() {
                                                     {faq.is_featured && (
                                                         <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
                                                     )}
-                                                    <span 
+                                                    <span
                                                         className="font-medium text-gray-900"
                                                         dangerouslySetInnerHTML={{ __html: highlightMatch(faq.question, query) }}
                                                     />
@@ -276,11 +280,11 @@ export default function HelpSearchResults() {
                                                     className="border-t border-gray-100"
                                                 >
                                                     <div className="p-4 bg-gray-50">
-                                                        <p 
+                                                        <p
                                                             className="text-gray-600 leading-relaxed"
                                                             dangerouslySetInnerHTML={{ __html: highlightMatch(faq.answer, query) }}
                                                         />
-                                                        
+
                                                         {/* Category Tag */}
                                                         {faq.faq_categories && (
                                                             <div className="mt-4">
@@ -340,25 +344,27 @@ export default function HelpSearchResults() {
                                         >
                                             {/* Decorative accent - always visible on mobile */}
                                             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#0071c2] to-[#005999] md:opacity-0 md:group-hover:opacity-100 transition-opacity" />
-                                            
+
                                             <div className="flex items-start gap-4">
                                                 {/* Icon */}
                                                 <div className="bg-[#0071c2]/10 md:bg-blue-50 p-2.5 rounded-xl text-[#0071c2] md:group-hover:bg-[#0071c2] md:group-hover:text-white transition-colors flex-shrink-0">
                                                     <BookOpen className="w-5 h-5" />
                                                 </div>
-                                                
+
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 
+                                                    <h3
                                                         className="font-semibold text-gray-900 md:group-hover:text-[#0071c2] transition-colors mb-1.5"
                                                         dangerouslySetInnerHTML={{ __html: highlightMatch(article.title, query) }}
                                                     />
                                                     {(article.excerpt || article.content) && (
-                                                        <p 
+                                                        <p
                                                             className="text-sm text-gray-500 line-clamp-2 mb-2"
-                                                            dangerouslySetInnerHTML={{ __html: highlightMatch(
-                                                                article.excerpt || article.content.replace(/<[^>]*>/g, '').substring(0, 150), 
-                                                                query
-                                                            ) }}
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: highlightMatch(
+                                                                    article.excerpt || article.content.replace(/<[^>]*>/g, '').substring(0, 150),
+                                                                    query
+                                                                )
+                                                            }}
                                                         />
                                                     )}
                                                     <div className="flex items-center gap-3 flex-wrap">
@@ -375,7 +381,7 @@ export default function HelpSearchResults() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                
+
                                                 {/* Arrow - always visible on mobile */}
                                                 <div className="flex-shrink-0 bg-gray-100 md:bg-transparent p-1.5 rounded-full md:group-hover:bg-[#0071c2]/10 transition-colors">
                                                     <ArrowRight className="w-4 h-4 text-[#0071c2] md:text-gray-300 md:group-hover:text-[#0071c2] transition-colors" />

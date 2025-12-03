@@ -20,11 +20,12 @@ const Index = () => {
 
       <div className="min-h-screen flex flex-col">
         <Nav />
-        
+
         {/* Promotional Banner Strip */}
         <PromoBanner position="homepage" />
 
         <main className="flex-grow">
+          {/* Hero now handles its own banner logic */}
           <Hero />
           <WhyUs />
           <FeaturedDestinations />
@@ -39,7 +40,7 @@ const Index = () => {
         </main>
 
         <Footer />
-        
+
         {/* Popup Banner (shows after delay) */}
         <PromoBanner position="popup" />
       </div>
