@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client'
 console.log("DEBUG: main.tsx executing");
 import App from './App.tsx'
 import './index.css'
+import './attraction-global.css' // Global styles for attraction content
 
 // Clear localStorage weather data to prevent caching issues
 localStorage.removeItem('kedarnath_weather_data');

@@ -192,6 +192,18 @@ export default function TiptapEditor({ content, onChange, placeholder, onAIMetad
         });
     }, [editor]);
 
+    // CRITICAL FIX: Sync editor content when prop changes (e.g., from AI generation)
+    useEffect(() => {
+        if (!editor || editor.isDestroyed) return;
+
+        // Only update if content actually changed to avoid cursor jumps
+        const currentContent = editor.getHTML();
+        if (currentContent !== content) {
+            console.log('🔄 TiptapEditor: Syncing content from prop');
+            editor.commands.setContent(content || '');
+        }
+    }, [editor, content]);
+
     if (!editor) return null;
     const addLink = () => {
         const url = window.prompt('Enter URL:');

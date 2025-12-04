@@ -1,0 +1,182 @@
+/* Attraction Content Display Styles - Matches Blog Styling */
+
+.attraction-content {
+    max-width: none;
+    margin-bottom: 3rem;
+    font-family: 'Inter', sans-serif;
+    color: #374151;
+    line-height: 1.8;
+    font-size: 1.125rem;
+}
+
+/* Headings - Blue Color like Blog */
+.attraction-content h2 {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 1.875rem;
+    /* 3xl */
+    font-weight: 700;
+    color: #2563eb;
+    /* Blue like blog */
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.attraction-content h3 {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 1.5rem;
+    /* xl */
+    font-weight: 600;
+    color: #2563eb;
+    /* Blue like blog */
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Paragraph and Text */
+.attraction-content p {
+    color: #374151;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+}
+
+.attraction-content strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Lists */
+.attraction-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #374151;
+}
+
+.attraction-content li {
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.attraction-content li::marker {
+    color: #2563eb;
+    /* Blue bullets */
+}
+
+/* Custom Cards - Vibrant Styles from Blog */
+.attraction-content div[data-type="custom-card"] {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-left-width: 4px;
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 1.25rem;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    position: relative;
+    background-color: #f9fafb;
+    /* Default fallback */
+}
+
+/* Card Header via Pseudo-element (Icons & Titles) */
+.attraction-content div[data-type="custom-card"]::before {
+    display: block;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+/* Info Card - Blue */
+.attraction-content div[data-card-type="info"] {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+.attraction-content div[data-card-type="info"]::before {
+    content: "ℹ️ Information";
+    color: #1e3a8a;
+}
+
+.attraction-content div[data-card-type="info"] p {
+    color: #1e3a8a;
+}
+
+.attraction-content div[data-card-type="info"] strong {
+    color: #172554;
+}
+
+/* Tip Card - Green */
+.attraction-content div[data-card-type="tip"] {
+    border-color: #22c55e;
+    background-color: #f0fdf4;
+}
+
+.attraction-content div[data-card-type="tip"]::before {
+    content: "💡 Pro Tip";
+    color: #14532d;
+}
+
+.attraction-content div[data-card-type="tip"] p {
+    color: #14532d;
+}
+
+.attraction-content div[data-card-type="tip"] strong {
+    color: #052e16;
+}
+
+/* Warning Card - Amber */
+.attraction-content div[data-card-type="warning"] {
+    border-color: #f59e0b;
+    background-color: #fffbeb;
+}
+
+.attraction-content div[data-card-type="warning"]::before {
+    content: "⚠️ Warning";
+    color: #78350f;
+}
+
+.attraction-content div[data-card-type="warning"] p {
+    color: #78350f;
+}
+
+.attraction-content div[data-card-type="warning"] strong {
+    color: #451a03;
+}
+
+/* Route Card - Indigo */
+.attraction-content div[data-card-type="route"] {
+    border-color: #6366f1;
+    background-color: #eef2ff;
+}
+
+.attraction-content div[data-card-type="route"]::before {
+    content: "🗺️ Route Details";
+    color: #312e81;
+}
+
+.attraction-content div[data-card-type="route"] p {
+    color: #312e81;
+}
+
+.attraction-content div[data-card-type="route"] strong {
+    color: #1e1b4b;
+}
+
+/* Weather Card - Sky */
+.attraction-content div[data-card-type="weather"] {
+    border-color: #0ea5e9;
+    background-color: #f0f9ff;
+}
+
+.attraction-content div[data-card-type="weather"]::before {
+    content: "⛅ Weather Update";
+    color: #0c4a6e;
+}
+
+.attraction-content div[data-card-type="weather"] p {
+    color: #0c4a6e;
+}
+
+.attraction-content div[data-card-type="weather"] strong {
+    color: #082f49;
+}

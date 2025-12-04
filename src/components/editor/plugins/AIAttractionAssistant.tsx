@@ -91,14 +91,13 @@ Examples:
         setIsGenerating(true);
 
         try {
-            // Check if user wants to generate/create OR improve existing attraction
-            const isGenerationRequest = forceGen ||
-                /\b(generate|create|make|write)\s+(attraction|listing|details)\b/i.test(currentInput) ||
-                // If editing existing attraction and asking for improvements
-                (currentData?.name && /\b(better|improve|enhance|regenerate|update|rewrite|optimize)\b/i.test(currentInput));
+            // ALWAYS GENERATE - Don't chat, just generate the JSON
+            const shouldChat = /\b(what|how|why|when|tell|explain|suggest|list|show)\b/i.test(currentInput) &&
+                !currentData?.name; // Only chat if NOT editing and asking questions
 
-            if (isGenerationRequest) {
-                await genAttraction(currentInput || 'Generate details based on our conversation');
+            if (!shouldChat || forceGen) {
+                // Generate for everything else
+                await genAttraction(currentInput || 'Generate complete details based on our conversation');
             } else {
                 await chat(currentInput);
             }
@@ -161,62 +160,101 @@ Never output JSON in the chat unless explicitly generating the full listing.` }]
         const context = messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
 
         const prompt = `CONTEXT:
-You are the content manager for Staykedar.com - a platform for Kedarnath attractions.
+You are an expert travel content writer for Staykedar.com - a premium platform showcasing Kedarnath attractions.
 
 ${currentData?.name ? `**EDITING MODE**: The user is currently editing the attraction "${currentData.name}".
-Here's the current data they have:
+Current data:
 - Name: ${currentData.name}
 - Type: ${currentData.type}
 - Difficulty: ${currentData.difficulty}
 - Location: ${currentData.location}
-- Elevation: ${currentData.elevation}
-- Distance: ${currentData.distance}
-- Current Description: ${currentData.description}
-- Current Tags: ${currentData.tags?.join(', ')}
 
-The user wants to improve or regenerate this attraction. Use the existing data as a foundation but make significant improvements.` : ''}
+The user wants to improve or regenerate this attraction. Create a significantly enhanced version.` : ''}
 
 YOUR TASK:
-Generate complete attraction details in JSON format based on the user's request and conversation history.
+Generate a complete, professional attraction listing in JSON format.
 
 CONVERSATION HISTORY:
 ${context}
 
 USER REQUEST: ${userInput}
 
-OUTPUT ONLY valid JSON in this exact format:
+OUTPUT REQUIREMENTS:
+1. **ONLY OUTPUT VALID JSON** - No markdown, no code blocks, no extra text
+2. **description field**: Use rich, engaging HTML with natural formatting
+3. **CRITICAL**: In HTML, use SINGLE quotes for attributes to avoid breaking JSON
+
+OPTIONAL ENHANCEMENT - Cards:
+You MAY use special highlight cards IF they genuinely add value. Don't force them.
+Only use when you have something truly important to highlight.
+
+Available card types (use single quotes):
+- data-card-type='tip' → For helpful visitor tips (e.g., "Visit early morning for best views")
+- data-card-type='warning' → For safety alerts (e.g., "Steep terrain, wear proper shoes")
+-  data-card-type='route' → For travel directions (e.g., "5km trek from Kedarnath")
+- data-card-type='info' → For quick facts (e.g., "Elevation: 3,800m")
+
+Card syntax example: <div data-type='custom-card' data-card-type='tip'><p>Visit during sunrise for breathtaking views</p></div>
+
+RECOMMENDED HTML STRUCTURE:
+Write naturally! Cards are optional. Use them ONLY if helpful. Here's a suggested flow:
+
+<h2>Overview</h2>
+<p>Engaging opening paragraph describing the attraction...</p>
+
+<h2>History & Significance</h2>
+<p>Tell the story, mythology, or historical importance...</p>
+
+<h2>What to Experience</h2>
+<p>Describe what visitors will see and do...</p>
+<ul>
+<li>Key highlight 1</li>
+<li>Key highlight 2</li>
+</ul>
+
+<!-- ONLY add a card if genuinely helpful, like: -->
+<div data-type='custom-card' data-card-type='tip'><p><strong>Pro Tip:</strong> Visit during early morning hours to avoid crowds and enjoy serene atmosphere</p></div>
+
+<h2>How to Reach</h2>
+<p>Directions and access information...</p>
+
+<!-- cards are OPTIONAL - use judgment -->
+
+JSON FORMAT (output ONLY this):
 {
   "name": "Attraction Name",
-  "short_description": "1-2 sentence summary",
-  "description": "<h2>Overview</h2><p>Detailed HTML description...</p>...",
+  "short_description": "Compelling 1-2 sentence summary",
+  "description": "NATURAL HTML - Use cards SPARINGLY if helpful",
   "type": "Religious" or "Natural" or "Historical",
   "difficulty": "Easy" or "Moderate" or "Moderate to Difficult" or "Difficult",
-  "location": "Location name (e.g., 'Near Kedarnath Temple')",
-  "elevation": "elevation in meters (e.g., '3,583m')",
-  "distance": "distance from Kedarnath (e.g., '5 km')",
-  "time_required": "time needed (e.g., '2-3 hours')",
-  "best_time": "best season (e.g., 'May to October')",
-  "tags": ["tag1", "tag2", "tag3"],
-  "main_image": "https://images.unsplash.com/photo-XXXXX?w=800",
+  "location": "Specific location",
+  "elevation": "X meters",
+  "distance": "X km from Kedarnath",
+  "time_required": "X hours",
+  "best_time": "Month range",
+  "tags": ["keyword1", "keyword2", "keyword3"],
+  "main_image": "https://images.unsplash.com/photo-REAL_ID?w=1200",
   "images": [
-    "https://images.unsplash.com/photo-XXXXX?w=800",
-    "https://images.unsplash.com/photo-XXXXX?w=800",
-    "https://images.unsplash.com/photo-XXXXX?w=800"
+    "https://images.unsplash.com/photo-REAL_ID1?w=800",
+    "https://images.unsplash.com/photo-REAL_ID2?w=800",
+    "https://images.unsplash.com/photo-REAL_ID3?w=800"
   ],
   "rating": 4.5,
-  "meta_title": "SEO title (60 chars)",
-  "meta_description": "SEO description (160 chars)"
+  "meta_title": "SEO-optimized title (max 60 chars)",
+  "meta_description": "Compelling SEO description (max 160 chars)"
 }
 
-REQUIREMENTS:
-- Description: Rich HTML with <h2>, <h3>, <p>, <ul>, <strong>. Make it engaging and informative.
-- Images: ONLY real Unsplash URLs (mountains, temples, nature, trekking). Do NOT use placeholders.
-- Tags: 3-5 relevant keywords.
-- Rating: Based on popularity/significance (1-5).
-- All fields must be filled.
-- Ensure JSON is valid and properly formatted.
-- Do NOT include any markdown code blocks or extra text, ONLY the JSON object.
-`;
+QUALITY STANDARDS:
+✓ Description: 300-500 words, natural narrative style
+✓ Cards: 0-2 cards maximum, ONLY when truly adding value
+✓ Use proper headings (h2, h3) to organize content
+✓ Use bold (<strong>) for emphasis
+✓ Add lists for features when appropriate
+✓ Write engagingly - like a travel guide, not a form
+✓ Images: ONLY real Unsplash URLs
+✓ All fields complete
+
+REMEMBER: Cards are OPTIONAL tools, not requirements. Focus on great writing!`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',

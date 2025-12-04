@@ -121,6 +121,12 @@ export const CustomCard = Node.create({
         return {
             type: {
                 default: 'info',
+                parseHTML: (element) => element.getAttribute('data-card-type'),
+                renderHTML: (attributes) => {
+                    return {
+                        'data-card-type': attributes.type,
+                    }
+                },
             },
         };
     },

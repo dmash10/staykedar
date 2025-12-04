@@ -355,13 +355,7 @@ const AttractionDetail = () => {
               >
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">About {attraction.name}</h2>
                 <div
-                  className="text-gray-600 leading-relaxed mb-6 prose prose-lg max-w-none
-                    prose-headings:text-gray-900 prose-headings:font-bold prose-headings:mb-3
-                    prose-h2:text-xl prose-h3:text-lg
-                    prose-p:mb-4 prose-p:leading-relaxed
-                    prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6
-                    prose-li:mb-2
-                    prose-strong:text-gray-900 prose-strong:font-semibold"
+                  className="attraction-content"
                   dangerouslySetInnerHTML={{ __html: attraction.description }}
                 />
 
