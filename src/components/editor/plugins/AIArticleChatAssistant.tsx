@@ -316,65 +316,110 @@ USER REQUEST: ${ui}
 ---
 
 YOUR TASK:
-Generate a clear, helpful, and professional support article. Output ONLY valid JSON in this exact format:
+Generate a clear, helpful, and AI-SEARCH-OPTIMIZED support article. Output ONLY valid JSON in this exact format:
 
 {
-  "title": "Clear, action-oriented title (e.g., 'How to cancel your booking')",
+  "title": "Clear, action-oriented title (e.g., 'How to Cancel Your Booking')",
   "slug": "url-friendly-slug-with-hyphens",
   "excerpt": "Brief summary of the solution (150-160 characters)",
   "content": "Full HTML content here"
 }
 
-CONTENT REQUIREMENTS:
+═══════════════════════════════════════════════════════════
+🎯 AI SEARCH OPTIMIZATION (Critical for Google AI Overviews)
+═══════════════════════════════════════════════════════════
 
-1. STRUCTURE (300-600 words):
-   - Problem Statement: Briefly state what this article solves
-   - Solution Steps: Clear, numbered steps to resolve the issue
-   - Additional Info: Important notes, warnings, or related policies
-   - Contact Support: Brief reminder to contact support if issue persists
+1. DIRECT ANSWER FIRST
+   - Start with the solution in the first 1-2 sentences
+   - Put the answer before the explanation
+   Good: "To cancel your booking, go to My Bookings > Select booking > Cancel."
+   Bad: "StayKedarnath offers flexible cancellation policies..."
 
-2. HTML FORMATTING:
-   - <h2>Main Section Title</h2>
-   - <h3>Subsection Title</h3>
-   - <p>Paragraph text</p>
-   - <ol><li>Step 1</li><li>Step 2</li></ol> (Use ordered lists for steps)
-   - <ul><li>List item</li></ul> (Use unordered lists for options)
-   - <a href="https://real-url.com" target="_blank">Linked text</a>
-   - <strong>Bold</strong> for UI elements or key terms
+2. QUESTION-BASED HEADINGS
+   - Use H3s that match what users search for:
+   <h3>How do I cancel my booking?</h3>
+   <h3>When will I get my refund?</h3>
+   <h3>Can I modify my booking dates?</h3>
 
-3. TONE & STYLE:
-   - Professional, empathetic, and direct
-   - Avoid marketing fluff
-   - Focus on solving the user's problem quickly
-   - Use "You" to address the user
+3. INCLUDE SPECIFIC DETAILS
+   - Timeframes: "5-7 business days"
+   - Costs: "₹500 cancellation fee"
+   - Requirements: "Booking ID required"
 
-4. SPECIAL CARDS (OPTIONAL - Use IF helpful):
-   
-   INFO CARD:
+═══════════════════════════════════════════════════════════
+CONTENT STRUCTURE (400-800 words)
+═══════════════════════════════════════════════════════════
+
+1. QUICK ANSWER (First 2-3 sentences)
+   - Directly answer the main question
+   - Include key action or link
+
+2. STEP-BY-STEP GUIDE
+   <h2>How to [Action]</h2>
+   <ol>
+     <li><strong>Step 1:</strong> Go to <a href="https://staykedarnath.in/dashboard/bookings">My Bookings</a></li>
+     <li><strong>Step 2:</strong> Click on the booking you want to modify</li>
+     <li><strong>Step 3:</strong> Select "Cancel" or "Modify"</li>
+   </ol>
+
+3. IMPORTANT NOTES (Use cards)
    <div data-type="custom-card" type="info">
-     <p>Note: Refunds take 5-7 business days to process.</p>
-   </div>
-   
-   WARNING CARD:
-   <div data-type="custom-card" type="warning">
-     <p>Cancellation fees apply if cancelled within 24 hours.</p>
-   </div>
-   
-   TIP CARD:
-   <div data-type="custom-card" type="tip">
-     <p>Tip: Keep your booking ID handy when contacting support.</p>
+     <p><strong>Note:</strong> Refunds are processed within 5-7 business days.</p>
    </div>
 
-5. SEO OPTIMIZATION:
-   - Title: specific and searchable
-   - Slug: clean and descriptive
-   - Excerpt: answers the question directly
+4. RELATED QUESTIONS (Use H3 question format)
+   <h3>What if I need to change my dates instead?</h3>
+   <p>You can modify your booking dates up to 24 hours before check-in...</p>
+   
+   <h3>When will I receive my refund?</h3>
+   <p>Refunds are processed within 5-7 business days to your original payment method.</p>
 
-REMEMBER:
-- Output ONLY the JSON object
+5. STILL NEED HELP?
+   <p>If you need further assistance, <a href="https://staykedarnath.in/support/raise">contact our support team</a>.</p>
+
+═══════════════════════════════════════════════════════════
+HTML FORMATTING
+═══════════════════════════════════════════════════════════
+- <h2>Main Section Title</h2>
+- <h3>Question-based subsection?</h3> (for AI citations)
+- <p>Short paragraphs (2-3 sentences)</p>
+- <ol><li><strong>Step 1:</strong> Action</li></ol>
+- <a href="https://staykedarnath.in/..." target="_blank">Link text</a>
+- <strong>Bold</strong> for UI elements and key terms
+
+═══════════════════════════════════════════════════════════
+SPECIAL CARDS
+═══════════════════════════════════════════════════════════
+<div data-type="custom-card" type="info"><p><strong>Note:</strong> Content</p></div>
+<div data-type="custom-card" type="warning"><p><strong>Important:</strong> Content</p></div>
+<div data-type="custom-card" type="tip"><p><strong>Tip:</strong> Content</p></div>
+
+═══════════════════════════════════════════════════════════
+SITE URLS (Always use these exact links)
+═══════════════════════════════════════════════════════════
+- My Bookings: https://staykedarnath.in/dashboard/bookings
+- Support: https://staykedarnath.in/support/raise
+- Track Ticket: https://staykedarnath.in/support/track
+- Help Center: https://staykedarnath.in/help
+- Cancellation Policy: https://staykedarnath.in/cancellation-policy
+
+═══════════════════════════════════════════════════════════
+TONE & STYLE
+═══════════════════════════════════════════════════════════
+- Direct and helpful - solve the problem fast
+- Use "you" and "your" - talk to the user
+- Include specific numbers, timeframes, requirements
+- No marketing language - just solutions
+- Short paragraphs (2-3 sentences max)
+
+═══════════════════════════════════════════════════════════
+OUTPUT RULES
+═══════════════════════════════════════════════════════════
+- Output ONLY valid JSON object
 - Start with { and end with }
 - No markdown code blocks
-- Focus on CLARITY and HELPFULNESS
+- Title should be action-oriented (How to..., What is..., Why...)
+- Excerpt should directly answer the question
 
 Now generate the article as JSON:`;
 

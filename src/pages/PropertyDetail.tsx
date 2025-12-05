@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { format, addDays } from 'date-fns';
 import { Loader2, MapPin, Star, Share2, Heart, Wifi, Car, Utensils, Zap, Shield, Check, Users, BedDouble } from 'lucide-react';
 import Nav from '@/components/Nav';
@@ -8,6 +9,8 @@ import Container from '@/components/Container';
 import stayService, { Property, RoomTypeAvailability } from '@/api/stayService';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { generateStaySchema, generateBreadcrumbSchema } from '@/components/SEO/SchemaMarkup';
+import AIOptimizedFAQ, { StaysFAQs } from '@/components/SEO/AIOptimizedFAQ';
 
 const PropertyDetail: React.FC = () => {
     const { propertyId } = useParams<{ propertyId: string }>();
@@ -98,8 +101,52 @@ const PropertyDetail: React.FC = () => {
         );
     }
 
+    // Generate schema for SEO
+    const staySchema = generateStaySchema({
+        name: property.name,
+        slug: propertyId || '',
+        description: property.description || `Stay at ${property.name} near Kedarnath. Comfortable accommodation for pilgrims with modern amenities.`,
+        images: property.images || [],
+        address: property.address || 'Kedarnath, Uttarakhand',
+        priceRange: '₹₹',
+        rating: 4.5,
+        amenities: property.amenities || [],
+        checkInTime: '12:00',
+        checkOutTime: '11:00'
+    });
+
+    const breadcrumbSchema = generateBreadcrumbSchema([
+        { name: 'Home', url: 'https://staykedarnath.in' },
+        { name: 'Stays', url: 'https://staykedarnath.in/stays' },
+        { name: property.name, url: `https://staykedarnath.in/stays/${propertyId}` }
+    ]);
+
     return (
         <>
+            <Helmet>
+                <title>{property.name} - Book Stay Near Kedarnath | StayKedarnath</title>
+                <meta name="description" content={`Book ${property.name} near Kedarnath Temple. ${property.description?.slice(0, 120) || 'Comfortable accommodation for Char Dham pilgrims with modern amenities.'}`} />
+                <meta name="keywords" content={`${property.name}, Kedarnath hotel, Kedarnath stay, Kedarnath accommodation, Char Dham booking`} />
+                <link rel="canonical" href={`https://staykedarnath.in/stays/${propertyId}`} />
+                
+                {/* Open Graph */}
+                <meta property="og:type" content="hotel" />
+                <meta property="og:title" content={`${property.name} | StayKedarnath`} />
+                <meta property="og:description" content={property.description || 'Book your stay near Kedarnath Temple'} />
+                {property.images?.[0] && <meta property="og:image" content={property.images[0]} />}
+                <meta property="og:url" content={`https://staykedarnath.in/stays/${propertyId}`} />
+                
+                {/* LodgingBusiness Schema */}
+                <script type="application/ld+json">
+                    {JSON.stringify(staySchema)}
+                </script>
+                
+                {/* Breadcrumb Schema */}
+                <script type="application/ld+json">
+                    {JSON.stringify(breadcrumbSchema)}
+                </script>
+            </Helmet>
+            
             <Nav />
             <main className="min-h-screen bg-gray-50 pb-12">
                 {/* Image Gallery */}
@@ -288,6 +335,14 @@ const PropertyDetail: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                </Container>
+                
+                {/* FAQ Section for SEO */}
+                <Container className="py-12">
+                    <AIOptimizedFAQ 
+                        title="Frequently Asked Questions About Kedarnath Stays"
+                        faqs={StaysFAQs}
+                    />
                 </Container>
             </main>
             <Footer />

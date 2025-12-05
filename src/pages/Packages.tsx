@@ -22,6 +22,31 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import PromoBanner from "../components/home/PromoBanner";
+import AIOptimizedFAQ, { FAQItem } from "../components/SEO/AIOptimizedFAQ";
+
+// Package-specific FAQs for SEO
+const PackageFAQs: FAQItem[] = [
+  {
+    question: "What is included in a Kedarnath yatra package?",
+    answer: "Typical Kedarnath packages include: Transportation (ex-Delhi/Haridwar), accommodation at Guptkashi/Gaurikund, meals (breakfast + dinner), helicopter tickets (if applicable), VIP darshan arrangement, local sightseeing, and travel insurance. Premium packages may include Badrinath darshan, professional guide, and porter services."
+  },
+  {
+    question: "How much does a Kedarnath package cost?",
+    answer: "Kedarnath packages range from ₹8,000-50,000+ per person depending on duration and inclusions. Budget packages (trek-based) start at ₹8,000-12,000 for 4-5 days. Standard packages with helicopter are ₹15,000-25,000. Premium packages with VIP darshan, better hotels, and Badrinath combo cost ₹30,000-50,000+."
+  },
+  {
+    question: "What is the best package for senior citizens?",
+    answer: "For senior citizens, we recommend helicopter packages that minimize trekking. Look for packages that include: Round-trip helicopter from Phata/Sersi, wheelchair/palki assistance at temple, stays in Guptkashi (lower altitude), and medical support on call. VIP darshan packages reduce waiting time significantly."
+  },
+  {
+    question: "Can I customize my Kedarnath package?",
+    answer: "Yes, most packages can be customized. Common customizations include: Adding/removing helicopter service, extending stay duration, upgrading hotel category, adding Badrinath or other Char Dham destinations, adjusting meal plans, and arranging special poojas. Contact us for custom quotes."
+  },
+  {
+    question: "What is the difference between Do Dham and Char Dham packages?",
+    answer: "Do Dham packages cover 2 temples (usually Kedarnath + Badrinath) in 5-7 days, costing ₹15,000-35,000. Char Dham packages cover all 4 temples (Yamunotri, Gangotri, Kedarnath, Badrinath) in 10-14 days, costing ₹35,000-80,000+. Char Dham is the complete pilgrimage circuit."
+  }
+];
 
 interface PackageType {
   id: string;
@@ -278,6 +303,17 @@ const Packages = () => {
                   </div>
                 ))}
               </div>
+            </Container>
+          </section>
+          
+          {/* FAQ Section for SEO */}
+          <section className="bg-gray-50 py-12 border-t">
+            <Container>
+              <AIOptimizedFAQ 
+                title="Kedarnath Package FAQs"
+                description="Common questions about Char Dham and Kedarnath yatra packages"
+                faqs={PackageFAQs}
+              />
             </Container>
           </section>
         </main>

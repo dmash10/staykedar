@@ -69,8 +69,9 @@ const PropertyOwnerRoute = ({ children }: PropertyOwnerRouteProps) => {
     return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} />;
   }
 
-  // If role is admin, allow access (admins can access all areas)
-  if (role === 'admin') {
+  // If role is admin/super_admin, allow access (admins can access all areas)
+  const adminRoles = ['admin', 'super_admin', 'manager'];
+  if (adminRoles.includes(role)) {
     console.log("PropertyOwnerRoute: User is admin, allowing access");
     return <>{children}</>;
   }

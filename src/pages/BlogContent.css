@@ -217,96 +217,198 @@
     text-align: justify;
 }
 
-/* Custom Cards */
+/* ═══════════════════════════════════════════════════════════
+   CUSTOM CARDS - Colorful Highlight Boxes
+   ═══════════════════════════════════════════════════════════ */
+
+/* Base Card Styles */
 .blog-content div[data-type="custom-card"] {
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-left-width: 4px;
-    border-radius: 0 0.5rem 0.5rem 0;
-    padding: 1rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    margin: 1.5rem 0;
+    border-left: 4px solid;
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-/* Card Types */
-.blog-content div[data-type="custom-card"][type="info"] {
-    border-color: #3b82f6;
-    background-color: #eff6ff;
+/* Card Content */
+.blog-content div[data-type="custom-card"] p {
+    margin: 0;
+    color: inherit;
+    line-height: 1.6;
 }
 
-.blog-content div[data-type="custom-card"][type="warning"] {
-    border-color: #f59e0b;
-    background-color: #fffbeb;
+.blog-content div[data-type="custom-card"] strong {
+    font-weight: 700;
 }
 
-.blog-content div[data-type="custom-card"][type="tip"] {
-    border-color: #22c55e;
-    background-color: #f0fdf4;
-}
-
-.blog-content div[data-type="custom-card"][type="weather"] {
-    border-color: #0ea5e9;
-    background-color: #f0f9ff;
-}
-
-.blog-content div[data-type="custom-card"][type="route"] {
-    border-color: #6366f1;
-    background-color: #eef2ff;
-}
-
-/* Card Header */
-.blog-content div[data-type="custom-card"]>div:first-child {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    user-select: none;
-}
-
-/* Card Icons (using pseudo-elements or SVGs if possible, but here we rely on the rendered HTML structure) */
-/* Since the React Node View renders SVGs, we need to ensure they are preserved or handled. 
-   However, Tiptap's renderHTML for the node just outputs the div. 
-   The React component is for the EDITOR. 
-   For the public page, we need to ensure the HTML content has the icon or we add it via CSS.
-   
-   Actually, the `renderHTML` in CustomCard.tsx only outputs `['div', mergeAttributes(HTMLAttributes, { 'data-type': 'custom-card' }), 0]`.
-   It DOES NOT render the icon in the saved HTML.
-   
-   FIX: We need to update CustomCard.tsx to include the header in the rendered HTML, 
-   OR we use CSS pseudo-elements to add the "Title" and "Icon" based on the type attribute.
-   
-   Let's use CSS pseudo-elements for the Title to keep it simple and robust without complex HTML parsing on the frontend.
-*/
-
+/* Card Headers via ::before pseudo-element */
 .blog-content div[data-type="custom-card"]::before {
-    content: attr(type);
     display: block;
-    font-weight: bold;
-    text-transform: capitalize;
+    font-weight: 700;
+    font-size: 0.875rem;
     margin-bottom: 0.5rem;
+    letter-spacing: 0.025em;
 }
 
-.blog-content div[data-type="custom-card"][type="info"]::before {
-    content: "ℹ️ Information";
+/* ──────────────────────────────────────────────────────────
+   INFO CARD - Blue Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="info"],
+.blog-content div[data-type="custom-card"][data-card-type="info"] {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-color: #3b82f6;
     color: #1e3a8a;
 }
 
-.blog-content div[data-type="custom-card"][type="warning"]::before {
-    content: "⚠️ Warning";
+.blog-content div[data-type="custom-card"][type="info"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="info"]::before {
+    content: "ℹ️ Information";
+    color: #1e40af;
+}
+
+/* ──────────────────────────────────────────────────────────
+   WARNING CARD - Amber Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="warning"],
+.blog-content div[data-type="custom-card"][data-card-type="warning"] {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-color: #f59e0b;
     color: #78350f;
 }
 
-.blog-content div[data-type="custom-card"][type="tip"]::before {
-    content: "💡 Pro Tip";
+.blog-content div[data-type="custom-card"][type="warning"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="warning"]::before {
+    content: "⚠️ Warning";
+    color: #b45309;
+}
+
+/* ──────────────────────────────────────────────────────────
+   TIP CARD - Green Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="tip"],
+.blog-content div[data-type="custom-card"][data-card-type="tip"] {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #22c55e;
     color: #14532d;
 }
 
-.blog-content div[data-type="custom-card"][type="weather"]::before {
-    content: "⛅ Weather Update";
+.blog-content div[data-type="custom-card"][type="tip"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="tip"]::before {
+    content: "💡 Pro Tip";
+    color: #15803d;
+}
+
+/* ──────────────────────────────────────────────────────────
+   WEATHER CARD - Sky Blue Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="weather"],
+.blog-content div[data-type="custom-card"][data-card-type="weather"] {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-color: #0ea5e9;
     color: #0c4a6e;
 }
 
-.blog-content div[data-type="custom-card"][type="route"]::before {
-    content: "🗺️ Route Details";
+.blog-content div[data-type="custom-card"][type="weather"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="weather"]::before {
+    content: "⛅ Weather Update";
+    color: #0369a1;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ROUTE CARD - Indigo Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="route"],
+.blog-content div[data-type="custom-card"][data-card-type="route"] {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border-color: #6366f1;
     color: #312e81;
+}
+
+.blog-content div[data-type="custom-card"][type="route"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="route"]::before {
+    content: "🗺️ Route Details";
+    color: #4338ca;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SUCCESS CARD - Emerald Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="success"],
+.blog-content div[data-type="custom-card"][data-card-type="success"] {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-color: #10b981;
+    color: #064e3b;
+}
+
+.blog-content div[data-type="custom-card"][type="success"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="success"]::before {
+    content: "✅ Success";
+    color: #047857;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ERROR CARD - Red Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="error"],
+.blog-content div[data-type="custom-card"][data-card-type="error"] {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #ef4444;
+    color: #7f1d1d;
+}
+
+.blog-content div[data-type="custom-card"][type="error"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="error"]::before {
+    content: "❌ Error";
+    color: #dc2626;
+}
+
+/* ──────────────────────────────────────────────────────────
+   NOTE CARD - Gray Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="note"],
+.blog-content div[data-type="custom-card"][data-card-type="note"] {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-color: #6b7280;
+    color: #1f2937;
+}
+
+.blog-content div[data-type="custom-card"][type="note"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="note"]::before {
+    content: "📝 Note";
+    color: #4b5563;
+}
+
+/* ──────────────────────────────────────────────────────────
+   DANGER CARD - Rose Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="danger"],
+.blog-content div[data-type="custom-card"][data-card-type="danger"] {
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+    border-color: #f43f5e;
+    color: #881337;
+}
+
+.blog-content div[data-type="custom-card"][type="danger"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="danger"]::before {
+    content: "🚨 Danger";
+    color: #e11d48;
+}
+
+/* ──────────────────────────────────────────────────────────
+   QUOTE CARD - Purple Theme
+   ────────────────────────────────────────────────────────── */
+.blog-content div[data-type="custom-card"][type="quote"],
+.blog-content div[data-type="custom-card"][data-card-type="quote"] {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border-color: #a855f7;
+    color: #581c87;
+    font-style: italic;
+}
+
+.blog-content div[data-type="custom-card"][type="quote"]::before,
+.blog-content div[data-type="custom-card"][data-card-type="quote"]::before {
+    content: "💬 Quote";
+    color: #7c3aed;
+    font-style: normal;
 }

@@ -1,0 +1,616 @@
+[
+  {
+    "slug": "haridwar",
+    "name": "Haridwar",
+    "type": "City",
+    "meta_title": "Haridwar to Kedarnath Taxi Service | Fare & Route Guide 2025",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 29.9457,
+      "lng": 78.1642
+    },
+    "images": [
+      "/images/cities/haridwar-taxi-stand.jpg",
+      "/images/cities/har-ki-pauri.jpg",
+      "/images/cities/haridwar-ganga.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "rishikesh",
+      "distance_to_next": "20 km",
+      "nearest_airport": "Dehradun (Jolly Grant) - 38 km",
+      "nearest_railway": "Haridwar Junction"
+    },
+    "distance_from_delhi": "230 km",
+    "distance_from_kedarnath": "250 km",
+    "elevation": "314 m",
+    "position_on_route": 1,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 4500,
+      "drop_sonprayag_suv": 7500,
+      "drop_sonprayag_tempo": 12000,
+      "per_km_rate_plains": 14,
+      "per_km_rate_hills": 18,
+      "min_km_per_day": 250,
+      "driver_allowance": 300
+    },
+    "description": "Gateway to the Char Dham pilgrimage, Haridwar is one of the seven holiest places in Hinduism. Known for the Ganga Aarti at Har Ki Pauri.",
+    "special_info": "Major railway junction - most pilgrims start their Kedarnath journey from here. Book early morning taxis to reach Sonprayag by evening.",
+    "nearby_attractions": ["Har Ki Pauri", "Mansa Devi Temple", "Chandi Devi Temple"],
+    "taxi_tip": "Haridwar is the most economical starting point with maximum taxi availability. Pre-book during peak season.",
+    "stay_vibe": "Budget & Transit Hub",
+    "highlight_tag": "Railway Connected",
+    "avg_hotel_price": "₹800 - ₹3,000",
+    "faqs": [
+      {
+        "question": "How much is taxi fare from Haridwar to Kedarnath?",
+        "answer": "Taxi fare from Haridwar to Sonprayag (Kedarnath base) is ₹4,500-6,000 for sedan (Swift Dzire) and ₹7,000-9,000 for SUV (Innova). The 250 km journey takes 9-10 hours with multiple mountain road sections."
+      },
+      {
+        "question": "What is the best time to leave Haridwar for Kedarnath?",
+        "answer": "Leave Haridwar by 4-5 AM to reach Sonprayag by 2-3 PM. This allows you to complete registration and rest before the next day's trek. Avoid night driving on mountain roads."
+      },
+      {
+        "question": "Is shared taxi available from Haridwar to Kedarnath?",
+        "answer": "Yes, shared taxis and Uttarakhand Transport buses run from Haridwar ISBT to Sonprayag. Shared taxi costs ₹800-1,200 per seat. However, private taxi is recommended for comfort on this long journey."
+      }
+    ]
+  },
+  {
+    "slug": "rishikesh",
+    "name": "Rishikesh",
+    "type": "City",
+    "meta_title": "Rishikesh to Kedarnath Taxi | Best Rates & Route 2025",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.0869,
+      "lng": 78.2676
+    },
+    "images": [
+      "/images/cities/rishikesh-lakshman-jhula.jpg",
+      "/images/cities/rishikesh-ganga.jpg",
+      "/images/cities/rishikesh-taxi.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "devprayag",
+      "distance_to_next": "70 km",
+      "nearest_airport": "Dehradun (Jolly Grant) - 20 km",
+      "nearest_railway": "Rishikesh Station"
+    },
+    "distance_from_delhi": "250 km",
+    "distance_from_kedarnath": "230 km",
+    "elevation": "372 m",
+    "position_on_route": 2,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 4800,
+      "drop_sonprayag_suv": 7800,
+      "drop_sonprayag_tempo": 12500,
+      "per_km_rate_plains": 14,
+      "per_km_rate_hills": 18,
+      "min_km_per_day": 250,
+      "driver_allowance": 300
+    },
+    "description": "The Yoga Capital of the World, Rishikesh is a spiritual hub with ashrams, adventure sports, and the iconic Lakshman Jhula.",
+    "special_info": "Better road conditions than Haridwar route. Many pilgrims prefer staying here for spiritual preparation before the yatra.",
+    "nearby_attractions": ["Lakshman Jhula", "Ram Jhula", "Triveni Ghat", "Beatles Ashram"],
+    "taxi_tip": "Rishikesh taxis are slightly pricier but drivers are experienced in mountain routes. Good option if you want to combine adventure + pilgrimage.",
+    "stay_vibe": "Spiritual & Adventure Hub",
+    "highlight_tag": "Yoga Capital",
+    "avg_hotel_price": "₹1,000 - ₹5,000",
+    "faqs": [
+      {
+        "question": "Is Rishikesh better than Haridwar for starting Kedarnath trip?",
+        "answer": "Rishikesh is 20 km ahead on the route, saving 30-40 minutes. It offers better hotels and spiritual atmosphere. However, Haridwar has more budget options and railway connectivity. Choose based on your preference."
+      },
+      {
+        "question": "How much time does it take from Rishikesh to Kedarnath?",
+        "answer": "From Rishikesh to Sonprayag (Kedarnath base) takes 8-9 hours by car covering 230 km. The route passes through Devprayag, Srinagar, Rudraprayag, and Guptkashi."
+      },
+      {
+        "question": "Can I book a taxi from Rishikesh for entire Char Dham yatra?",
+        "answer": "Yes, you can book a taxi for the complete Char Dham circuit from Rishikesh. 10-12 day packages cost ₹35,000-50,000 for sedan and ₹50,000-70,000 for SUV including driver stay."
+      }
+    ]
+  },
+  {
+    "slug": "dehradun",
+    "name": "Dehradun",
+    "type": "City",
+    "meta_title": "Dehradun Airport to Kedarnath Taxi | Direct Rates 2025",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.3165,
+      "lng": 78.0322
+    },
+    "images": [
+      "/images/cities/dehradun-airport.jpg",
+      "/images/cities/dehradun-city.jpg",
+      "/images/cities/jolly-grant.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "rishikesh",
+      "distance_to_next": "45 km",
+      "nearest_airport": "Jolly Grant Airport (In City)",
+      "nearest_railway": "Dehradun Station"
+    },
+    "distance_from_delhi": "250 km",
+    "distance_from_kedarnath": "270 km",
+    "elevation": "640 m",
+    "position_on_route": 0,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 5500,
+      "drop_sonprayag_suv": 8500,
+      "drop_sonprayag_tempo": 14000,
+      "per_km_rate_plains": 14,
+      "per_km_rate_hills": 18,
+      "min_km_per_day": 250,
+      "driver_allowance": 350
+    },
+    "description": "Capital of Uttarakhand with Jolly Grant Airport - the nearest airport to Kedarnath. Modern city with excellent connectivity.",
+    "special_info": "Best option if flying from other cities. Helicopter services to Kedarnath often operate from here during peak season.",
+    "nearby_attractions": ["Robber's Cave", "Sahastradhara", "Mindrolling Monastery"],
+    "taxi_tip": "Airport pickup taxis available 24/7. Book in advance during May-June rush. Direct helicopter packages available.",
+    "stay_vibe": "Modern City & Air Hub",
+    "highlight_tag": "Airport City",
+    "avg_hotel_price": "₹1,500 - ₹6,000",
+    "faqs": [
+      {
+        "question": "How to reach Kedarnath from Dehradun airport?",
+        "answer": "From Jolly Grant Airport, take a taxi to Sonprayag (270 km, 10-11 hours, ₹5,000-8,000). Alternatively, helicopter services operate from Sahastradhara helipad to Kedarnath during peak season (₹5,000-8,000 per person)."
+      },
+      {
+        "question": "Is it better to fly to Dehradun for Kedarnath trip?",
+        "answer": "Flying to Dehradun saves 6-8 hours compared to train/bus from Delhi. Recommended for pilgrims with limited time or senior citizens. Flight + taxi combo is more comfortable than 12+ hour road journey from Delhi."
+      }
+    ]
+  },
+  {
+    "slug": "devprayag",
+    "name": "Devprayag",
+    "type": "Town",
+    "meta_title": "Devprayag - Sacred Confluence on Kedarnath Route",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.1466,
+      "lng": 78.5984
+    },
+    "images": [
+      "/images/cities/devprayag-sangam.jpg",
+      "/images/cities/devprayag-confluence.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "srinagar-garhwal",
+      "distance_to_next": "30 km",
+      "nearest_airport": "Dehradun (Jolly Grant) - 95 km",
+      "nearest_railway": "Rishikesh - 70 km"
+    },
+    "distance_from_delhi": "300 km",
+    "distance_from_kedarnath": "175 km",
+    "elevation": "830 m",
+    "position_on_route": 3,
+    "is_major_hub": false,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 3200,
+      "drop_sonprayag_suv": 5200,
+      "drop_sonprayag_tempo": 8500,
+      "per_km_rate_plains": 16,
+      "per_km_rate_hills": 20,
+      "min_km_per_day": 200,
+      "driver_allowance": 300
+    },
+    "description": "Sacred confluence of Alaknanda and Bhagirathi rivers forming the Ganga. One of the Panch Prayag (five confluences).",
+    "special_info": "Stop here for 30 minutes to witness the confluence. Many pilgrims take a holy dip. Temple of Raghunath Ji is worth visiting.",
+    "nearby_attractions": ["Sangam Point", "Raghunath Temple", "Chandrabadni Temple"],
+    "taxi_tip": "Not a common pickup point but taxis pass through. Good for day trips from Rishikesh.",
+    "stay_vibe": "Pilgrimage Stopover",
+    "highlight_tag": "Panch Prayag",
+    "avg_hotel_price": "₹500 - ₹2,000",
+    "faqs": [
+      {
+        "question": "Should I stop at Devprayag on my way to Kedarnath?",
+        "answer": "Yes, a 30-minute stop at Devprayag is highly recommended. Witness the confluence where green Bhagirathi meets blue Alaknanda to form Ganga. It's a spiritually significant site and beautiful photo opportunity."
+      },
+      {
+        "question": "Is there accommodation at Devprayag?",
+        "answer": "Basic guesthouses and dharamshalas are available at Devprayag starting ₹500/night. However, most pilgrims prefer staying at Srinagar (30 km ahead) which has better facilities."
+      }
+    ]
+  },
+  {
+    "slug": "srinagar-garhwal",
+    "name": "Srinagar Garhwal",
+    "type": "Town",
+    "meta_title": "Srinagar Garhwal Hotels & Taxi | Kedarnath Midpoint",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.2193,
+      "lng": 78.7833
+    },
+    "images": [
+      "/images/cities/srinagar-garhwal.jpg",
+      "/images/cities/dhari-devi.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "rudraprayag",
+      "distance_to_next": "35 km",
+      "nearest_airport": "Dehradun (Jolly Grant) - 110 km",
+      "nearest_railway": "Rishikesh - 105 km"
+    },
+    "distance_from_delhi": "330 km",
+    "distance_from_kedarnath": "145 km",
+    "elevation": "560 m",
+    "position_on_route": 4,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 2800,
+      "drop_sonprayag_suv": 4500,
+      "drop_sonprayag_tempo": 7500,
+      "per_km_rate_plains": 16,
+      "per_km_rate_hills": 20,
+      "min_km_per_day": 200,
+      "driver_allowance": 300
+    },
+    "description": "Largest town in Garhwal region with good facilities. Old capital of Garhwal Kingdom. University town with modern amenities.",
+    "special_info": "Best mid-point for overnight stay if starting late from Delhi. Medical facilities available. ATMs and fuel stations present.",
+    "nearby_attractions": ["Dhari Devi Temple", "Shankaracharya Samadhi", "HNB Garhwal University"],
+    "taxi_tip": "Local taxis available for short trips. Good place to change taxi if needed. Reasonable rates compared to tourist towns.",
+    "stay_vibe": "Town & Transit Point",
+    "highlight_tag": "Medical Facilities",
+    "avg_hotel_price": "₹800 - ₹2,500",
+    "faqs": [
+      {
+        "question": "Is Srinagar Garhwal a good place to stay overnight?",
+        "answer": "Yes, Srinagar Garhwal is ideal for overnight stay if you start late from Delhi/Haridwar. It has good hotels (₹800-2,500), restaurants, ATMs, and hospitals. Continue to Sonprayag next morning (5-6 hours)."
+      },
+      {
+        "question": "What is special about Dhari Devi Temple near Srinagar?",
+        "answer": "Dhari Devi is a powerful goddess temple on the banks of Alaknanda. The idol is believed to change expression throughout the day. The original temple was submerged during the 2013 floods; a new temple has been built."
+      }
+    ]
+  },
+  {
+    "slug": "rudraprayag",
+    "name": "Rudraprayag",
+    "type": "Town",
+    "meta_title": "Rudraprayag Taxi Service | Kedarnath-Badrinath Junction",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.2861,
+      "lng": 78.9803
+    },
+    "images": [
+      "/images/cities/rudraprayag-sangam.jpg",
+      "/images/cities/rudraprayag-junction.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "guptkashi",
+      "distance_to_next": "45 km",
+      "nearest_airport": "Dehradun (Jolly Grant) - 160 km",
+      "nearest_railway": "Rishikesh - 140 km"
+    },
+    "distance_from_delhi": "370 km",
+    "distance_from_kedarnath": "75 km",
+    "elevation": "610 m",
+    "position_on_route": 5,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 2200,
+      "drop_sonprayag_suv": 3800,
+      "drop_sonprayag_tempo": 6000,
+      "per_km_rate_plains": 18,
+      "per_km_rate_hills": 22,
+      "min_km_per_day": 150,
+      "driver_allowance": 300
+    },
+    "description": "Sacred confluence of Mandakini and Alaknanda rivers. The junction point for Kedarnath and Badrinath routes.",
+    "special_info": "Critical junction - Left goes to Kedarnath via Guptkashi, Right goes to Badrinath via Chamoli. Many pilgrims change vehicles here.",
+    "nearby_attractions": ["Rudranath Temple", "Sangam Point", "Koteshwar Temple"],
+    "taxi_tip": "If coming from Badrinath, change taxi here for Kedarnath. Local drivers know the tricky hill roads better. Negotiate for round-trip deals.",
+    "stay_vibe": "Junction Town",
+    "highlight_tag": "Route Junction",
+    "avg_hotel_price": "₹600 - ₹2,500",
+    "warning_tip": "This is the main junction. If coming from Delhi, don't stop here - continue to Guptkashi for better stay options.",
+    "faqs": [
+      {
+        "question": "Why is Rudraprayag important for Kedarnath trip?",
+        "answer": "Rudraprayag is where the road splits - left to Kedarnath via Guptkashi, right to Badrinath. It's one of the Panch Prayag where Mandakini (from Kedarnath) meets Alaknanda. A sacred stop on your pilgrimage."
+      },
+      {
+        "question": "Should I stay overnight at Rudraprayag?",
+        "answer": "While possible, we recommend continuing 45 km to Guptkashi instead. Guptkashi has better hotels, is at higher altitude (closer acclimatization), and is the last major town before Sonprayag."
+      },
+      {
+        "question": "How far is Kedarnath from Rudraprayag?",
+        "answer": "Rudraprayag to Kedarnath Temple is 75 km by road (to Sonprayag) + 22 km trek. By car, Rudraprayag to Sonprayag takes 2.5-3 hours. From Sonprayag, trek or helicopter to reach the temple."
+      }
+    ]
+  },
+  {
+    "slug": "guptkashi",
+    "name": "Guptkashi",
+    "type": "Town",
+    "meta_title": "Guptkashi Hotels & Taxi | Best Base for Kedarnath 2025",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.5271,
+      "lng": 79.0875
+    },
+    "images": [
+      "/images/cities/guptkashi-vishwanath.jpg",
+      "/images/cities/guptkashi-hotels.jpg",
+      "/images/cities/guptkashi-view.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "phata",
+      "distance_to_next": "25 km",
+      "nearest_airport": "Phata Helipad - 25 km",
+      "nearest_railway": "Rishikesh - 185 km"
+    },
+    "distance_from_delhi": "420 km",
+    "distance_from_kedarnath": "47 km",
+    "elevation": "1319 m",
+    "position_on_route": 6,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 1200,
+      "drop_sonprayag_suv": 1800,
+      "drop_sonprayag_tempo": 3000,
+      "per_km_rate_plains": 20,
+      "per_km_rate_hills": 25,
+      "min_km_per_day": 100,
+      "driver_allowance": 350
+    },
+    "description": "Last major town before Kedarnath with proper hotels and facilities. Home to the ancient Vishwanath Temple.",
+    "special_info": "Best place to stay before the trek. Most helicopter packages include Guptkashi stay. Many pilgrims acclimatize here.",
+    "nearby_attractions": ["Vishwanath Temple", "Ardhnarishwar Temple", "Manikarnik Kund"],
+    "taxi_tip": "Book local Guptkashi-Sonprayag taxis early morning. These drivers know the narrow roads well. Don't use plains drivers beyond this point.",
+    "stay_vibe": "Premium Base Camp",
+    "highlight_tag": "Near Helipad",
+    "avg_hotel_price": "₹1,500 - ₹5,000",
+    "alert": "Book at least 2 months in advance for May-June. Hotels fill up fast during peak yatra season.",
+    "faqs": [
+      {
+        "question": "Why should I stay in Guptkashi before Kedarnath trek?",
+        "answer": "Guptkashi offers: Best hotels on the route, proper acclimatization at 1,319m, helicopter helipad proximity, hot springs for relaxation, and the sacred Vishwanath Temple. It's the ideal base for your Kedarnath journey."
+      },
+      {
+        "question": "How far is Guptkashi from Kedarnath helipad?",
+        "answer": "Guptkashi to Phata helipad is 25 km (1 hour drive). From Phata, helicopter takes 7 minutes to Kedarnath. Most helicopter packages include Guptkashi hotel pickup."
+      },
+      {
+        "question": "What is the significance of Vishwanath Temple in Guptkashi?",
+        "answer": "Guptkashi means 'Hidden Kashi'. When Lord Shiva hid from Pandavas, he appeared here as Vishwanath. The temple has an idol that is half Shiva-half Parvati (Ardhnarishwar form). Highly recommended visit."
+      }
+    ]
+  },
+  {
+    "slug": "phata",
+    "name": "Phata",
+    "type": "Village",
+    "meta_title": "Phata Helipad | Kedarnath Helicopter Booking Point",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.5889,
+      "lng": 79.0933
+    },
+    "images": [
+      "/images/cities/phata-helipad.jpg",
+      "/images/cities/phata-kedarnath-heli.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "sonprayag",
+      "distance_to_next": "10 km",
+      "nearest_airport": "Phata Helipad (Here)",
+      "nearest_railway": "Rishikesh - 200 km"
+    },
+    "distance_from_delhi": "435 km",
+    "distance_from_kedarnath": "32 km",
+    "elevation": "1524 m",
+    "position_on_route": 7,
+    "is_major_hub": false,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 600,
+      "drop_sonprayag_suv": 900,
+      "drop_sonprayag_tempo": 1500,
+      "per_km_rate_plains": 22,
+      "per_km_rate_hills": 28,
+      "min_km_per_day": 80,
+      "driver_allowance": 350
+    },
+    "description": "Main helipad location for Kedarnath helicopter services. Small village with basic facilities.",
+    "special_info": "Helicopter services operate from here. Arrive by 6 AM for early morning slots. Weather-dependent operations.",
+    "nearby_attractions": ["Phata Helipad", "Triyuginarayan Temple (15 km)"],
+    "taxi_tip": "If taking helicopter, taxi from Guptkashi to Phata helipad costs ₹500-800. Book round trip for pickup after return.",
+    "stay_vibe": "Helipad Village",
+    "highlight_tag": "Helicopter Base",
+    "avg_hotel_price": "₹800 - ₹2,000",
+    "faqs": [
+      {
+        "question": "How to reach Phata helipad for Kedarnath helicopter?",
+        "answer": "From Guptkashi, Phata is 25 km (1 hour by taxi, ₹500-800). From Sonprayag, it's 10 km back. Most helicopter operators provide pickup from Guptkashi hotels. Reach helipad by 6 AM."
+      },
+      {
+        "question": "What is the helicopter fare from Phata to Kedarnath?",
+        "answer": "Helicopter fare from Phata to Kedarnath is ₹3,000-7,000 per person one-way depending on operator and season. Round trip is ₹5,000-12,000. Book online through IRCTC or authorized agents."
+      },
+      {
+        "question": "Is accommodation available at Phata?",
+        "answer": "Basic guesthouses are available at Phata (₹800-2,000/night). However, most pilgrims stay in Guptkashi (better facilities) and come to Phata just for helicopter. Few lodges near helipad for early morning flights."
+      }
+    ]
+  },
+  {
+    "slug": "sonprayag",
+    "name": "Sonprayag",
+    "type": "Town",
+    "meta_title": "Sonprayag - Kedarnath Trek Starting Point | Registration",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.6277,
+      "lng": 79.0661
+    },
+    "images": [
+      "/images/cities/sonprayag-registration.jpg",
+      "/images/cities/sonprayag-market.jpg",
+      "/images/cities/sonprayag-parking.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "gaurikund",
+      "distance_to_next": "5 km",
+      "nearest_airport": "Phata Helipad - 10 km",
+      "nearest_railway": "Rishikesh - 210 km"
+    },
+    "distance_from_delhi": "450 km",
+    "distance_from_kedarnath": "22 km",
+    "elevation": "1829 m",
+    "position_on_route": 8,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 0,
+      "drop_sonprayag_suv": 0,
+      "drop_sonprayag_tempo": 0,
+      "per_km_rate_plains": 0,
+      "per_km_rate_hills": 0,
+      "min_km_per_day": 0,
+      "driver_allowance": 0,
+      "note": "Taxi endpoint - no further vehicle access"
+    },
+    "description": "Gateway to Kedarnath trek. All vehicles stop here - registration point and starting point of the yatra.",
+    "special_info": "Private vehicles not allowed beyond Sonprayag. Mandatory biometric registration. Government jeeps/shared taxis to Gaurikund.",
+    "nearby_attractions": ["Gaurikund (5 km)", "Triyuginarayan Temple (10 km)"],
+    "taxi_tip": "Your taxi journey ends here. Park your vehicle (₹50/day) and take government jeep to Gaurikund (₹30 per seat). Return pickup can be arranged.",
+    "stay_vibe": "Trek Gateway",
+    "highlight_tag": "Registration Point",
+    "avg_hotel_price": "₹1,000 - ₹3,500",
+    "alert": "Very crowded during peak season. Private cars not allowed inside market. Park at designated lots.",
+    "faqs": [
+      {
+        "question": "Why can't private vehicles go beyond Sonprayag?",
+        "answer": "Due to narrow roads and landslide-prone area, private vehicles are not allowed beyond Sonprayag. Government-authorized jeeps (₹30/seat) and shuttle services take pilgrims to Gaurikund, the trek starting point."
+      },
+      {
+        "question": "What is the registration process at Sonprayag?",
+        "answer": "Biometric registration is mandatory at Sonprayag. Carry: ID proof (Aadhaar/Passport), passport photos, and medical certificate if 60+ years. Registration opens at 5 AM. Process takes 30-60 minutes during peak season."
+      },
+      {
+        "question": "Should I stay at Sonprayag or Guptkashi?",
+        "answer": "Guptkashi is recommended for comfortable hotels and facilities. Sonprayag is crowded and basic. However, if you arrive late evening, Sonprayag stay saves early morning travel. Start trek from Gaurikund by 5-6 AM."
+      }
+    ]
+  },
+  {
+    "slug": "gaurikund",
+    "name": "Gaurikund",
+    "type": "Village",
+    "meta_title": "Gaurikund - Kedarnath Trek Start | Hot Springs & Pony Booking",
+    "state": "Uttarakhand",
+    "coordinates": {
+      "lat": 30.6544,
+      "lng": 79.0389
+    },
+    "images": [
+      "/images/cities/gaurikund-trek-start.jpg",
+      "/images/cities/gaurikund-hot-spring.jpg"
+    ],
+    "connectivity": {
+      "next_stop": null,
+      "distance_to_next": null,
+      "nearest_airport": "Phata Helipad - 15 km",
+      "nearest_railway": "Rishikesh - 215 km"
+    },
+    "distance_from_delhi": "455 km",
+    "distance_from_kedarnath": "16 km",
+    "elevation": "1982 m",
+    "position_on_route": 9,
+    "is_major_hub": false,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 0,
+      "drop_sonprayag_suv": 0,
+      "drop_sonprayag_tempo": 0,
+      "per_km_rate_plains": 0,
+      "per_km_rate_hills": 0,
+      "min_km_per_day": 0,
+      "driver_allowance": 0,
+      "note": "No taxi access - Government shuttle only from Sonprayag"
+    },
+    "description": "The actual starting point of Kedarnath trek. Sacred hot water spring dedicated to Goddess Gauri (Parvati).",
+    "special_info": "Trek to Kedarnath Temple starts here. Hot water kund for holy dip. Ponies, palanquins, and porters available.",
+    "nearby_attractions": ["Gauri Kund (Hot Spring)", "Gauri Devi Temple", "Trek Start Point"],
+    "taxi_tip": "No private taxis. Only government jeeps from Sonprayag reach here. Walking distance from jeep stand to trek start is 500m.",
+    "stay_vibe": "Trek Starting Point",
+    "highlight_tag": "Hot Springs",
+    "avg_hotel_price": "₹500 - ₹1,500",
+    "faqs": [
+      {
+        "question": "What time should I reach Gaurikund to start Kedarnath trek?",
+        "answer": "Reach Gaurikund by 5-6 AM to start the trek early. This allows you to reach Kedarnath by 2-3 PM, avoiding afternoon crowds and having time for darshan. Return by evening or stay overnight at Kedarnath."
+      },
+      {
+        "question": "Is pony or palanquin available from Gaurikund?",
+        "answer": "Yes, at Gaurikund you'll find: Ponies (₹2,500-4,000), Palanquins/Doli (₹6,000-12,000), and Porters for luggage (₹500-800). Book at the counter near trek start. Prices are fixed by government."
+      },
+      {
+        "question": "What is special about Gauri Kund hot spring?",
+        "answer": "Gauri Kund is a natural hot water spring where Goddess Parvati (Gauri) is said to have meditated to win Lord Shiva. Pilgrims take a holy dip here before starting the trek. Separate bathing areas for men and women."
+      }
+    ]
+  },
+  {
+    "slug": "delhi",
+    "name": "Delhi",
+    "type": "Metro",
+    "meta_title": "Delhi to Kedarnath Taxi | Complete Route & Fare Guide 2025",
+    "state": "Delhi",
+    "coordinates": {
+      "lat": 28.6139,
+      "lng": 77.2090
+    },
+    "images": [
+      "/images/cities/delhi-taxi.jpg",
+      "/images/cities/delhi-isbt.jpg"
+    ],
+    "connectivity": {
+      "next_stop": "haridwar",
+      "distance_to_next": "230 km",
+      "nearest_airport": "IGI Airport (In City)",
+      "nearest_railway": "New Delhi / Hazrat Nizamuddin"
+    },
+    "distance_from_delhi": "0 km",
+    "distance_from_kedarnath": "460 km",
+    "elevation": "216 m",
+    "position_on_route": -1,
+    "is_major_hub": true,
+    "taxi_rates": {
+      "drop_sonprayag_sedan": 7500,
+      "drop_sonprayag_suv": 11000,
+      "drop_sonprayag_tempo": 18000,
+      "per_km_rate_plains": 12,
+      "per_km_rate_hills": 18,
+      "min_km_per_day": 300,
+      "driver_allowance": 400
+    },
+    "description": "National capital and major starting point for Kedarnath pilgrims from across India.",
+    "special_info": "Most pilgrims start from Delhi via road, train to Haridwar, or flight to Dehradun. Multiple transport options available.",
+    "nearby_attractions": ["India Gate", "Red Fort", "Lotus Temple"],
+    "taxi_tip": "Book round-trip taxis for best rates. 5-7 day packages available. Innova recommended for long-distance comfort.",
+    "stay_vibe": "Metro Hub",
+    "highlight_tag": "Starting Point",
+    "avg_hotel_price": "₹1,500 - ₹10,000",
+    "faqs": [
+      {
+        "question": "How to reach Kedarnath from Delhi?",
+        "answer": "From Delhi to Kedarnath: 1) By taxi/car (460 km to Sonprayag, 12-14 hours, ₹6,500-12,000), 2) Train to Haridwar + taxi (cheaper, 5+9 hours), 3) Flight to Dehradun + taxi (fastest, 1+10 hours). All routes end at Sonprayag, then 16 km trek."
+      },
+      {
+        "question": "What is the best way to travel from Delhi to Kedarnath?",
+        "answer": "For comfort: Hire a private taxi (₹6,500-12,000 one-way). For budget: Train to Haridwar + shared taxi. For speed: Flight to Dehradun + taxi. For pilgrimage experience: Overnight bus to Haridwar + local transport."
+      },
+      {
+        "question": "How much does Delhi to Kedarnath taxi cost?",
+        "answer": "Delhi to Sonprayag (Kedarnath base) taxi fares: Sedan (Swift Dzire): ₹6,500-8,000 one-way, SUV (Innova): ₹9,000-12,000 one-way, Tempo Traveller: ₹12,000-18,000. Round-trip with 5-7 days is ₹15,000-25,000 for sedan."
+      }
+    ]
+  }
+]

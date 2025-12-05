@@ -168,11 +168,34 @@ export default function FAQPage() {
         return acc;
     }, {} as Record<string, { category: FAQCategory; items: FAQItem[] }>);
 
+    // Generate FAQ Schema for AI Search
+    const faqSchema = faqs.length > 0 ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+            }
+        }))
+    } : null;
+
     return (
         <>
             <Helmet>
-                <title>FAQs - Frequently Asked Questions | StayKedarnath</title>
-                <meta name="description" content="Find answers to frequently asked questions about booking stays, helicopter services, trek information, and more for your Kedarnath Yatra." />
+                <title>FAQs - Kedarnath Yatra Questions & Answers | StayKedarnath</title>
+                <meta name="description" content="Find answers to frequently asked questions about Kedarnath booking, helicopter services, trek difficulty, best time to visit, cancellation policy, and pilgrimage planning." />
+                <meta name="keywords" content="Kedarnath FAQ, Kedarnath questions, Kedarnath booking help, Char Dham FAQ, helicopter booking FAQ, trek questions" />
+                <link rel="canonical" href="https://staykedarnath.in/help/faq" />
+                
+                {/* FAQ Schema for AI Overviews */}
+                {faqSchema && (
+                    <script type="application/ld+json">
+                        {JSON.stringify(faqSchema)}
+                    </script>
+                )}
             </Helmet>
 
             <div className="min-h-screen flex flex-col bg-gray-50">

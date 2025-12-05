@@ -140,7 +140,7 @@ USER REQUEST: ${ui}
 ---
 
 YOUR TASK:
-Generate a complete, SEO-optimized blog post. Output ONLY valid JSON in this exact format:
+Generate a complete, AI-SEARCH-OPTIMIZED blog post. Output ONLY valid JSON in this exact format:
 
 {
   "title": "Engaging title (60-70 characters, includes main keyword)",
@@ -149,110 +149,117 @@ Generate a complete, SEO-optimized blog post. Output ONLY valid JSON in this exa
   "content": "Full HTML content here"
 }
 
-CONTENT REQUIREMENTS:
+═══════════════════════════════════════════════════════════
+🎯 AI SEARCH OPTIMIZATION (Critical for Google AI Overviews)
+═══════════════════════════════════════════════════════════
+Google AI Mode (Gemini), ChatGPT, and Perplexity select content based on:
 
-1. STRUCTURE (800-1000 words):
-   - Opening: Hook readers with a captivating intro
-   - Body: 4-6 main sections with clear H2 headings
-   - Include practical details: distances, costs, timings, heights, dates
-   - Add personal/experiential elements to make it relatable
-   - Closing: Call-to-action or summary
+1. DIRECT ANSWERS FIRST - Start sections with the answer
+   Bad: "The weather in the region varies..."
+   Good: "The best time to visit Kedarnath is May-June and September-October when skies are clear."
 
-2. HTML FORMATTING:
-   - <h2>Main Section Title</h2>
-   - <h3>Subsection Title</h3>
-   - <p>Paragraph text with <strong>bold</strong> and <em>italic</em></p>
-   - <ul><li>List item</li><li>List item</li></ul>
-   - <a href="https://real-url.com" target="_blank">Linked text</a>
+2. E-E-A-T SIGNALS - Experience, Expertise, Authoritativeness, Trust
+   - Include specific numbers: costs, distances, timings, elevations
+   - Share personal insights: "Trust me, start early - by 10 AM the clouds roll in"
+   - Reference official sources when relevant
 
-3. IMAGES (OPTIONAL - Add IF relevant):
-   ⚠️ NEVER use src="placeholder" or src="..."
-   ✅ ONLY use REAL working Unsplash URLs
+3. MANDATORY FAQ SECTION - Critical for AI citations!
+   End with "Frequently Asked Questions" section using H3 questions:
+   <h2>Frequently Asked Questions</h2>
+   <h3>How much does a Kedarnath trip cost?</h3>
+   <p>A basic Kedarnath trip costs ₹5,000-15,000 per person for 3-4 days...</p>
+   <h3>Is Kedarnath trek difficult?</h3>
+   <p>The 16 km trek from Gaurikund is rated moderate to difficult...</p>
    
-   Examples:
-   <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Snow-capped Kedarnath peaks at sunrise">
-   <img src="https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800" alt="Ancient Himalayan temple architecture">
-   <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800" alt="Pilgrims trekking mountain path">
-   <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=800" alt="Serene mountain valley view">
-   
-   - Add 1-3 images ONLY if they enhance the content naturally
-   - Every image MUST have descriptive alt text
-   - Choose images relevant to the topic
+   Include 4-6 FAQs covering: cost, timing, difficulty, safety, accommodation, transport
 
-4. YOUTUBE VIDEOS (OPTIONAL - Add IF highly relevant):
-   Use iframe for YouTube videos when they add real value:
-   <iframe width="640" height="360" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
-   
-   - Only include if there's a specific, helpful video (travel vlogs, guides, virtual tours)
-   - Don't force videos into every blog
+4. INFORMATION DENSITY - Use bullet points, bold key facts
+   - Specific data that AI can quote
+   - Prices in ₹ with ranges
+   - Distances in km
+   - Times with hour estimates
 
-5. SPECIAL CARDS (OPTIONAL - Use 1-3 IF they add value):
-   
-   INFO CARD:
+═══════════════════════════════════════════════════════════
+CONTENT STRUCTURE (1,500-2,500 words)
+═══════════════════════════════════════════════════════════
+
+1. OPENING (First 100 words MUST contain direct answer to main question)
+   - Hook with a compelling fact or question
+   - Immediately answer the main query users are searching for
+   - Preview what the article covers
+
+2. QUICK FACTS BOX (Use tip card)
    <div data-type="custom-card" type="info">
-     <p>Best time to visit: May-June and Sept-Oct when weather is ideal</p>
+     <p><strong>Quick Facts:</strong><br>
+     • Best Time: May-June, Sep-Oct<br>
+     • Cost: ₹X-₹X per person<br>
+     • Duration: X days recommended<br>
+     • Difficulty: Easy/Moderate/Difficult</p>
    </div>
-   
-   WARNING CARD:
-   <div data-type="custom-card" type="warning">
-     <p>Altitude sickness risk above 3,000m - acclimatize properly</p>
-   </div>
-   
-   TIP CARD:
-   <div data-type="custom-card" type="tip">
-     <p>Pro tip: Book helicopter tickets 30 days in advance for best rates</p>
-   </div>
-   
-   WEATHER CARD:
-   <div data-type="custom-card" type="weather">
-     <p>Temperature ranges: Summer 15-20°C, Winter -5 to 10°C. Heavy snowfall Dec-Feb</p>
-   </div>
-   
-   ROUTE CARD:
-   <div data-type="custom-card" type="route">
-     <p>Route: Haridwar → Rishikesh → Rudraprayag → Gaurikund → Kedarnath (16 km trek)</p>
-   </div>
-   
-   ⚠️ Don't force cards into every blog - use them ONLY when they genuinely add value
-   Use naturally where the information type matches the card style
 
-6. SEO OPTIMIZATION:
-   - Title: Include main keyword naturally (Kedarnath, Yatra, Char Dham, etc.)
-   - Slug: lowercase-with-hyphens, descriptive, includes keyword
-   - Excerpt: Compelling, benefit-focused, makes reader want to click
-   - Keywords to integrate naturally: pilgrimage, trekking, Himalayas, temple, spiritual, adventure, route, guide, tips
-   - Use semantic variations: journey/yatra, trek/hike, temple/shrine
+3. MAIN CONTENT (4-6 H2 sections)
+   - <h2>How to Reach [Destination]</h2>
+   - <h2>Best Time to Visit [Destination]</h2>
+   - <h2>What to Expect</h2>
+   - <h2>Where to Stay</h2>
+   - <h2>Essential Tips</h2>
+   - <h2>Frequently Asked Questions</h2> (REQUIRED!)
 
-7. TONE & STYLE:
-   - Spiritual yet practical - balance devotion with logistics
-   - Inspiring but informative - motivate readers to visit
-   - Accessible language - avoid overly technical jargon
-   - First-person perspective acceptable for tips/experiences
-   - Include specific numbers, facts, dates where relevant
+4. FAQ SECTION (MANDATORY - 4-6 questions)
+   Format: <h3>Question?</h3><p>Direct answer with specifics...</p>
+   Cover: cost, timing, difficulty, safety, accommodation, transport
 
-7. CONTENT ELEMENTS TO INCLUDE: Optional
-   - Historical/cultural context of the destination
-   - Practical travel information (how to reach, accommodation)
-   - Cost breakdown (approximate ranges)
-   - Best times to visit
-   - Safety tips and precautions
-   - What to pack/bring
-   - Local customs and etiquette
-   - Nearby attractions or alternative routes
+═══════════════════════════════════════════════════════════
+HTML FORMATTING
+═══════════════════════════════════════════════════════════
+- <h2>Main Section Title</h2>
+- <h3>Question-based headings for FAQs</h3>
+- <p>Short paragraphs (2-4 sentences max)</p>
+- <strong>Bold key facts</strong> that AI can cite
+- <ul><li>Bullet points for lists</li></ul>
+- <a href="https://real-url.com" target="_blank" rel="noopener">Authority links</a>
 
-8. LINKS & MEDIA (OPTIONAL):
-   - Add 1-3 external links ONLY if they provide real value
-   - Could link to: YouTube videos, official temple sites, government tourism, weather services
-   - Make links open in new tab with target="_blank"
-   - Don't force links/media - add naturally where helpful
+═══════════════════════════════════════════════════════════
+SPECIAL CARDS (Use 2-4 naturally)
+═══════════════════════════════════════════════════════════
+<div data-type="custom-card" type="tip"><p>Pro tip content</p></div>
+<div data-type="custom-card" type="warning"><p>Safety warning</p></div>
+<div data-type="custom-card" type="info"><p>Key information</p></div>
+<div data-type="custom-card" type="route"><p>Route details</p></div>
+<div data-type="custom-card" type="weather"><p>Weather info</p></div>
 
-REMEMBER:
-- Output ONLY the JSON object
+═══════════════════════════════════════════════════════════
+IMAGES (Use 1-3 real Unsplash URLs)
+═══════════════════════════════════════════════════════════
+ONLY use REAL working Unsplash URLs:
+<img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Descriptive alt text">
+
+═══════════════════════════════════════════════════════════
+WRITING TONE
+═══════════════════════════════════════════════════════════
+- Write like a friendly local guide, not a tourism brochure
+- Use "you" and "your" - talk directly to reader
+- Be specific: "₹2,500-7,000 one-way" not "affordable"
+- Honest about challenges: "The last 2 km are steep"
+- Short paragraphs (2-4 sentences max)
+
+═══════════════════════════════════════════════════════════
+AUTHORITY LINKING (2-3 outbound links)
+═══════════════════════════════════════════════════════════
+Link to trusted sources for E-E-A-T:
+- uttarakhandtourism.gov.in
+- Wikipedia for factual info
+- Official temple/government sites
+Format: <a href='URL' target='_blank' rel='noopener'>anchor text</a>
+
+═══════════════════════════════════════════════════════════
+OUTPUT RULES
+═══════════════════════════════════════════════════════════
+- Output ONLY valid JSON object
 - Start with { and end with }
 - No markdown code blocks, no explanations
-- Images MUST have real Unsplash URLs
-- Use custom cards for important info
-- Make it comprehensive, practical, and inspiring
+- Use single quotes in HTML attributes
+- MUST include FAQ section with 4-6 questions
 
 Now generate the blog post as JSON:`;
 

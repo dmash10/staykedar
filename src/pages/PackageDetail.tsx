@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import PromoBanner from "@/components/home/PromoBanner";
+import { generatePackageSchema, generateBreadcrumbSchema } from "@/components/SEO/SchemaMarkup";
 
 interface PackageDetail {
     id: string;
@@ -132,11 +133,50 @@ const PackageDetail = () => {
         );
     }
 
+    // Generate schema for SEO
+    const packageSchema = generatePackageSchema({
+        name: pkg.title,
+        slug: slug || '',
+        description: pkg.description,
+        image: pkg.images?.[0] || 'https://staykedarnath.in/og-image.png',
+        price: pkg.price,
+        duration: pkg.duration,
+        inclusions: pkg.inclusions,
+        itinerary: pkg.itinerary
+    });
+
+    const breadcrumbSchema = generateBreadcrumbSchema([
+        { name: 'Home', url: 'https://staykedarnath.in' },
+        { name: 'Packages', url: 'https://staykedarnath.in/packages' },
+        { name: pkg.title, url: `https://staykedarnath.in/packages/${slug}` }
+    ]);
+
     return (
         <>
             <Helmet>
-                <title>{pkg.title} | StayKedarnath</title>
-                <meta name="description" content={pkg.description} />
+                <title>{pkg.title} - Kedarnath Yatra Package | StayKedarnath</title>
+                <meta name="description" content={`${pkg.title} - ${pkg.duration} Kedarnath package at ₹${pkg.price.toLocaleString()}. Includes: ${pkg.inclusions?.slice(0, 3).join(', ')}. Book your Char Dham Yatra now!`} />
+                <meta name="keywords" content={`${pkg.title}, Kedarnath package, Char Dham package, Kedarnath yatra, pilgrimage package, ${pkg.location}`} />
+                <link rel="canonical" href={`https://staykedarnath.in/packages/${slug}`} />
+                
+                {/* Open Graph */}
+                <meta property="og:type" content="product" />
+                <meta property="og:title" content={`${pkg.title} | StayKedarnath`} />
+                <meta property="og:description" content={pkg.description} />
+                {pkg.images?.[0] && <meta property="og:image" content={pkg.images[0]} />}
+                <meta property="og:url" content={`https://staykedarnath.in/packages/${slug}`} />
+                <meta property="product:price:amount" content={pkg.price.toString()} />
+                <meta property="product:price:currency" content="INR" />
+                
+                {/* TouristTrip Schema */}
+                <script type="application/ld+json">
+                    {JSON.stringify(packageSchema)}
+                </script>
+                
+                {/* Breadcrumb Schema */}
+                <script type="application/ld+json">
+                    {JSON.stringify(breadcrumbSchema)}
+                </script>
             </Helmet>
 
             <div className="min-h-screen flex flex-col bg-gray-50">

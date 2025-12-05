@@ -1,0 +1,463 @@
+/* Attraction Content Display Styles - Matches Blog Content Styling */
+
+.attraction-content {
+    max-width: none;
+    margin-bottom: 2rem;
+}
+
+/* FORCE ALL HEADINGS TO BE BLACK - Override any inline styles */
+.attraction-content h1[style],
+.attraction-content h2[style],
+.attraction-content h3[style],
+.attraction-content h4[style],
+.attraction-content h5[style],
+.attraction-content h6[style] {
+    color: #111827 !important;
+}
+
+/* Headings - Black Color (Force Override) */
+.attraction-content h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #111827 !important;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.attraction-content h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #111827 !important;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+/* Remove top margin from first heading */
+.attraction-content h1:first-child,
+.attraction-content h2:first-child,
+.attraction-content h3:first-child {
+    margin-top: 0 !important;
+}
+
+.attraction-content h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #111827 !important;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+/* Paragraph and Text */
+.attraction-content p {
+    color: #374151;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.attraction-content strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+.attraction-content em {
+    font-style: italic;
+    color: #4b5563;
+}
+
+.attraction-content code {
+    background-color: #f3f4f6;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #1e40af;
+    font-family: 'Courier New', monospace;
+}
+
+.attraction-content u {
+    text-decoration: underline;
+}
+
+/* Lists - Black bullets and numbers */
+.attraction-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: #111827 !important;
+}
+
+.attraction-content ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: #111827 !important;
+}
+
+.attraction-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+    color: #111827 !important;
+}
+
+.attraction-content li p {
+    margin: 0;
+    color: #374151 !important;
+}
+
+/* Force list markers to be black */
+.attraction-content ul li::marker,
+.attraction-content ol li::marker {
+    color: #111827 !important;
+}
+
+/* Blockquote */
+.attraction-content blockquote {
+    border-left: 4px solid #111827;
+    background-color: #f3f4f6;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #111827 !important;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Links - Keep blue for links as it's standard */
+.attraction-content a {
+    color: #2563eb !important;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.attraction-content a:hover {
+    color: #1d4ed8 !important;
+}
+
+/* Images */
+.attraction-content img {
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+    margin: 1.5rem auto;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Highlight */
+.attraction-content mark {
+    background-color: #fef08a;
+    color: #78350f;
+    padding: 0 0.25rem;
+    border-radius: 0.125rem;
+}
+
+/* Code Blocks */
+.attraction-content pre {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+}
+
+.attraction-content pre code {
+    background-color: transparent;
+    color: #f3f4f6;
+    padding: 0;
+}
+
+/* Tables */
+.attraction-content table {
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.attraction-content th {
+    background-color: #2563eb;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border: 1px solid #1d4ed8;
+}
+
+.attraction-content td {
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.attraction-content tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.attraction-content tr:hover {
+    background-color: #f3f4f6;
+}
+
+/* YouTube Embeds */
+.attraction-content iframe {
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+    width: 100%;
+    min-height: 400px;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+}
+
+/* Horizontal Rule */
+.attraction-content hr {
+    margin: 2rem 0;
+    border: none;
+    border-top: 2px solid #e5e7eb;
+}
+
+/* Text Alignment */
+.attraction-content .text-left {
+    text-align: left;
+}
+
+.attraction-content .text-center {
+    text-align: center;
+}
+
+.attraction-content .text-right {
+    text-align: right;
+}
+
+.attraction-content .text-justify {
+    text-align: justify;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CUSTOM CARDS - Colorful Highlight Boxes
+   ═══════════════════════════════════════════════════════════ */
+
+/* Base Card Styles */
+.attraction-content div[data-type="custom-card"] {
+    margin: 1.5rem 0;
+    border-left: 4px solid;
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Card Content */
+.attraction-content div[data-type="custom-card"] p {
+    margin: 0;
+    color: inherit;
+    line-height: 1.6;
+}
+
+.attraction-content div[data-type="custom-card"] strong {
+    font-weight: 700;
+}
+
+/* Card Headers via ::before pseudo-element */
+.attraction-content div[data-type="custom-card"]::before {
+    display: block;
+    font-weight: 700;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.025em;
+}
+
+/* ──────────────────────────────────────────────────────────
+   INFO CARD - Blue Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="info"],
+.attraction-content div[data-type="custom-card"][data-card-type="info"] {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-color: #3b82f6;
+    color: #1e3a8a;
+}
+
+.attraction-content div[data-type="custom-card"][type="info"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="info"]::before {
+    content: "ℹ️ Information";
+    color: #1e40af;
+}
+
+/* ──────────────────────────────────────────────────────────
+   WARNING CARD - Amber Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="warning"],
+.attraction-content div[data-type="custom-card"][data-card-type="warning"] {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-color: #f59e0b;
+    color: #78350f;
+}
+
+.attraction-content div[data-type="custom-card"][type="warning"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="warning"]::before {
+    content: "⚠️ Warning";
+    color: #b45309;
+}
+
+/* ──────────────────────────────────────────────────────────
+   TIP CARD - Green Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="tip"],
+.attraction-content div[data-type="custom-card"][data-card-type="tip"] {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #22c55e;
+    color: #14532d;
+}
+
+.attraction-content div[data-type="custom-card"][type="tip"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="tip"]::before {
+    content: "💡 Pro Tip";
+    color: #15803d;
+}
+
+/* ──────────────────────────────────────────────────────────
+   WEATHER CARD - Sky Blue Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="weather"],
+.attraction-content div[data-type="custom-card"][data-card-type="weather"] {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+.attraction-content div[data-type="custom-card"][type="weather"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="weather"]::before {
+    content: "⛅ Weather Update";
+    color: #0369a1;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ROUTE CARD - Indigo Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="route"],
+.attraction-content div[data-type="custom-card"][data-card-type="route"] {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border-color: #6366f1;
+    color: #312e81;
+}
+
+.attraction-content div[data-type="custom-card"][type="route"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="route"]::before {
+    content: "🗺️ Route Details";
+    color: #4338ca;
+}
+
+/* ──────────────────────────────────────────────────────────
+   SUCCESS CARD - Emerald Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="success"],
+.attraction-content div[data-type="custom-card"][data-card-type="success"] {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-color: #10b981;
+    color: #064e3b;
+}
+
+.attraction-content div[data-type="custom-card"][type="success"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="success"]::before {
+    content: "✅ Success";
+    color: #047857;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ERROR CARD - Red Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="error"],
+.attraction-content div[data-type="custom-card"][data-card-type="error"] {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #ef4444;
+    color: #7f1d1d;
+}
+
+.attraction-content div[data-type="custom-card"][type="error"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="error"]::before {
+    content: "❌ Error";
+    color: #dc2626;
+}
+
+/* ──────────────────────────────────────────────────────────
+   NOTE CARD - Gray Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="note"],
+.attraction-content div[data-type="custom-card"][data-card-type="note"] {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-color: #6b7280;
+    color: #1f2937;
+}
+
+.attraction-content div[data-type="custom-card"][type="note"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="note"]::before {
+    content: "📝 Note";
+    color: #4b5563;
+}
+
+/* ──────────────────────────────────────────────────────────
+   DANGER CARD - Rose Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="danger"],
+.attraction-content div[data-type="custom-card"][data-card-type="danger"] {
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+    border-color: #f43f5e;
+    color: #881337;
+}
+
+.attraction-content div[data-type="custom-card"][type="danger"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="danger"]::before {
+    content: "🚨 Danger";
+    color: #e11d48;
+}
+
+/* ──────────────────────────────────────────────────────────
+   QUOTE CARD - Purple Theme
+   ────────────────────────────────────────────────────────── */
+.attraction-content div[data-type="custom-card"][type="quote"],
+.attraction-content div[data-type="custom-card"][data-card-type="quote"] {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border-color: #a855f7;
+    color: #581c87;
+    font-style: italic;
+}
+
+.attraction-content div[data-type="custom-card"][type="quote"]::before,
+.attraction-content div[data-type="custom-card"][data-card-type="quote"]::before {
+    content: "💬 Quote";
+    color: #7c3aed;
+    font-style: normal;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+    .attraction-content h1 {
+        font-size: 1.75rem;
+    }
+    
+    .attraction-content h2 {
+        font-size: 1.35rem;
+    }
+    
+    .attraction-content h3 {
+        font-size: 1.15rem;
+    }
+    
+    .attraction-content p {
+        font-size: 0.95rem;
+    }
+    
+    .attraction-content div[data-type="custom-card"] {
+        padding: 0.875rem 1rem;
+    }
+    
+    .attraction-content iframe {
+        min-height: 250px;
+    }
+}
+

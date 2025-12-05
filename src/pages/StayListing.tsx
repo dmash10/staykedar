@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { format } from 'date-fns';
 import { Loader2, Filter, Star } from 'lucide-react';
 import Container from '@/components/Container';
@@ -8,6 +9,11 @@ import Footer from '@/components/Footer';
 import MainSearchBar from '@/components/search/MainSearchBar';
 import stayService, { PropertySearchResult } from '@/api/stayService';
 import { useToast } from '@/components/ui/use-toast';
+import AIOptimizedFAQ, { StaysFAQs } from '@/components/SEO/AIOptimizedFAQ';
+import { Link } from 'react-router-dom';
+import { MapPin, Mountain, Bed, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import citiesData from '@/data/cities.json';
 
 const StayListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -139,6 +145,13 @@ const StayListing = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Hotels & Stays Near Kedarnath Temple | StayKedarnath</title>
+        <meta name="description" content="Book verified hotels and stays near Kedarnath Temple. Budget to premium accommodations in Gaurikund, Sonprayag, and Guptkashi. Best prices guaranteed with free cancellation." />
+        <meta name="keywords" content="Kedarnath hotel, Kedarnath stay, Gaurikund hotel, Sonprayag hotel, Guptkashi hotel, Kedarnath accommodation, Char Dham stay" />
+        <link rel="canonical" href="https://staykedarnath.in/stays" />
+      </Helmet>
+      
       <Nav />
       <main className="min-h-screen bg-gray-50">
         {/* Header with Search Bar */}
@@ -401,6 +414,74 @@ const StayListing = () => {
               )}
             </div>
           </div>
+        </Container>
+        
+        {/* Stays by Location - Internal Linking for SEO */}
+        <section className="py-12 bg-gray-50 border-t">
+          <Container>
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Find Stays by Location
+              </h2>
+              <p className="text-gray-600">
+                Explore accommodation options at different stops on the Kedarnath route
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {(citiesData as any[])
+                .filter(city => city.is_major_hub && city.stay_vibe)
+                .sort((a, b) => a.position_on_route - b.position_on_route)
+                .map((city, index) => (
+                  <motion.div
+                    key={city.slug}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Link to={`/stays/location/${city.slug}`}>
+                      <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-lg transition-all group cursor-pointer border-2 hover:border-[#0071c2]">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-[#0071c2] transition-colors">
+                            <Bed className="w-5 h-5 text-[#0071c2] group-hover:text-white transition-colors" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 group-hover:text-[#0071c2] transition-colors">
+                              {city.name}
+                            </h3>
+                            <p className="text-xs text-gray-500">{city.stay_vibe}</p>
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500 space-y-1">
+                          <div className="flex items-center gap-1">
+                            <Mountain className="w-3 h-3" /> {city.elevation}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" /> {city.distance_from_kedarnath}
+                          </div>
+                        </div>
+                        {city.avg_hotel_price && (
+                          <div className="mt-2 pt-2 border-t text-sm">
+                            <span className="text-gray-500">Hotels from </span>
+                            <span className="font-semibold text-[#0071c2]">{city.avg_hotel_price}</span>
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+            </div>
+          </Container>
+        </section>
+
+        {/* FAQ Section for SEO */}
+        <Container className="py-12 bg-white border-t">
+          <AIOptimizedFAQ 
+            title="Frequently Asked Questions About Kedarnath Accommodation"
+            description="Everything you need to know before booking your stay"
+            faqs={StaysFAQs}
+          />
         </Container>
       </main>
       <Footer />

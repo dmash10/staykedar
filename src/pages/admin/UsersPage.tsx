@@ -90,9 +90,10 @@ export default function UsersPage() {
     user.phone_number?.includes(searchTerm)
   ) || [];
 
+  const adminRoles = ['admin', 'super_admin', 'manager', 'content_editor', 'support_agent'];
   const stats = {
     total: users?.length || 0,
-    admins: users?.filter(u => u.role === 'admin').length || 0,
+    admins: users?.filter(u => adminRoles.includes(u.role)).length || 0,
     propertyOwners: users?.filter(u => u.role === 'property_owner').length || 0,
     customers: users?.filter(u => u.role === 'customer' || !u.role).length || 0,
   };

@@ -44,9 +44,10 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
           .single();
 
         const customer = customerData as any;
+        const adminRoles = ['admin', 'super_admin', 'manager', 'content_editor', 'support_agent'];
 
-        if (!customerError && customer && customer.role === 'admin') {
-          console.log("User has admin role in customer_details");
+        if (!customerError && customer && adminRoles.includes(customer.role)) {
+          console.log("User has admin role in customer_details:", customer.role);
 
           // Double check admin_users table for extra security
           const { data: adminData, error: adminError } = await supabase
@@ -59,10 +60,22 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
             console.log("User is confirmed in admin_users table");
             isUserAdmin = true;
           } else {
-            console.log("User has admin role but not in admin_users table. Denying access.");
+            // Also check admin_user_roles table
+            const { data: roleData, error: roleError } = await supabase
+              .from('admin_user_roles')
+              .select('*, admin_roles(*)')
+              .eq('user_id', user.id)
+              .single();
+
+            if (!roleError && roleData) {
+              console.log("User has assigned role in admin_user_roles:", roleData);
+              isUserAdmin = true;
+            } else {
+              console.log("User has admin role but not in admin_users or admin_user_roles table. Denying access.");
+            }
           }
         } else {
-          console.log("User does not have admin role");
+          console.log("User does not have admin role, current role:", customer?.role);
         }
       } catch (error) {
         console.error("Error checking admin status in tables:", error);
@@ -89,12 +102,18 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     }
   }
 
-  // TEMPORARY: Bypass all checks for development/demo purposes
-  // Original checks:
-  // if (!user) return <Navigate to="/auth" />;
-  // if (!isAdmin) return <Navigate to="/dashboard" />;
+  // Proper admin access control
+  if (!user) {
+    console.log("No user, redirecting to auth");
+    return <Navigate to="/auth" />;
+  }
+  
+  if (!isAdmin) {
+    console.log("User is not admin, redirecting to dashboard");
+    return <Navigate to="/dashboard" />;
+  }
 
-  console.log("Admin access granted (Bypassed) to:", user?.email || "Guest");
+  console.log("Admin access granted to:", user?.email);
   return <>{children}</>;
 };
 

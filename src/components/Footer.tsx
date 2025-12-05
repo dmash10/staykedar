@@ -15,12 +15,12 @@ import {
   Users,
   HelpCircle,
   FileCheck,
-  FileWarning
+  FileWarning,
+  Car
 } from "lucide-react";
 import Container from "./Container";
 import { EditableButton, EditableText } from "./editable";
 import { useEdit } from "@/contexts/EditContext";
-import PromoBanner from "./home/PromoBanner";
 
 const Footer = () => {
   const { isEditMode } = useEdit();
@@ -28,11 +28,6 @@ const Footer = () => {
   return (
     <footer className="bg-primary-deep/10 pt-8 pb-6">
       <Container>
-        {/* Footer Banner */}
-        <div className="mb-8">
-          <PromoBanner position="footer" />
-        </div>
-
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-4">
           {/* Support */}
           <div>
@@ -141,6 +136,18 @@ const Footer = () => {
                   />
                 </Link>
               </li>
+              <li>
+                <Link to="/car-rentals" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Car className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
+                  <EditableButton
+                    section="footer"
+                    contentKey="car_rentals_link"
+                    defaultValue="Car Rentals"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
+                    variant="ghost"
+                  />
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -203,36 +210,50 @@ const Footer = () => {
                   />
                 </Link>
               </li>
+              <li>
+                <Link to="/driver-registration" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                  <Car className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
+                  <EditableButton
+                    section="footer"
+                    contentKey="driver_registration_link"
+                    defaultValue="Become a Driver"
+                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
+                    variant="ghost"
+                  />
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* About */}
           <div className="col-span-2 md:col-span-2 lg:col-span-1">
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Contact Us</h3>
+            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">About</h3>
             <div className="space-y-2">
               <EditableText
                 section="footer"
                 contentKey="company_description"
-                defaultValue="Your trusted partner for a seamless and spiritual Kedarnath journey."
+                defaultValue="Your trusted partner for a seamless and spiritual Kedarnath journey. We provide accommodation, travel services, and complete pilgrimage packages."
                 className="text-xs text-muted-foreground leading-relaxed"
               />
-              <div className="space-y-1.5 pt-1">
-                <a href="mailto:help@staykedarnath.in" className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">
-                  <Mail className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <span>help@staykedarnath.in</span>
-                </a>
-                <a href="mailto:support@staykedarnath.in" className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">
-                  <Mail className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <span>support@staykedarnath.in</span>
-                </a>
-                <a href="mailto:bookings@staykedarnath.in" className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors">
-                  <Mail className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <span>bookings@staykedarnath.in</span>
-                </a>
+              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
+                <Mail className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
+                <EditableButton
+                  section="footer"
+                  contentKey="company_email"
+                  defaultValue="dmworkforash@gmail.com"
+                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-xs md:text-sm"
+                  variant="ghost"
+                />
               </div>
-              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground pt-1">
+              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
                 <Phone className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                <a href="tel:+919027475942" className="hover:text-primary transition-colors">+91 90274 75942</a>
+                <EditableButton
+                  section="footer"
+                  contentKey="company_phone"
+                  defaultValue="+91 9027475942"
+                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-xs md:text-sm"
+                  variant="ghost"
+                />
               </div>
               <div className="flex space-x-3 md:space-x-4 pt-2">
                 <a
@@ -290,14 +311,14 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-          <div className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             <EditableText
               section="footer"
               contentKey="copyright"
               defaultValue="© 2025 StayKedar. All rights reserved."
               className="text-xs text-muted-foreground"
             />
-          </div>
+          </p>
         </div>
       </Container>
     </footer>

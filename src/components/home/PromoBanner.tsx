@@ -23,7 +23,7 @@ interface Banner {
 }
 
 interface PromoBannerProps {
-    position?: 'hero' | 'homepage' | 'sidebar' | 'footer' | 'popup' | 'package' | 'blog' | 'destination' | 'search' | 'inline' | 'confirmation';
+    position?: 'hero' | 'homepage' | 'sidebar' | 'footer' | 'popup' | 'package' | 'blog' | 'destination' | 'search' | 'inline' | 'confirmation' | 'marquee';
     className?: string;
 }
 

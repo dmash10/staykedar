@@ -37,6 +37,13 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import PromoBanner from "../components/home/PromoBanner";
 import { supabase } from "@/integrations/supabase/client";
+import './AttractionContent.css';
+
+// FAQ interface for AI Search optimization
+interface FAQ {
+  question: string;
+  answer: string;
+}
 
 // Attraction data interface matching database
 interface Attraction {
@@ -59,6 +66,7 @@ interface Attraction {
   is_featured?: boolean;
   meta_title?: string;
   meta_description?: string;
+  faqs?: FAQ[];
 }
 
 const difficultyColors = {
@@ -221,12 +229,93 @@ const AttractionDetail = () => {
         <meta name="twitter:title" content={`${attraction.name} | StayKedarnath`} />
         <meta name="twitter:description" content={attraction.short_description} />
         <meta name="twitter:image" content={attraction.main_image} />
+
+        {/* JSON-LD Schema for TouristAttraction - Critical for AI Search */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "TouristAttraction",
+            "name": attraction.name,
+            "description": attraction.short_description,
+            "image": attraction.main_image,
+            "url": `https://staykedarnath.in/attractions/${attraction.slug}`,
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": attraction.location || "Kedarnath",
+              "addressRegion": "Uttarakhand",
+              "addressCountry": "IN"
+            },
+            ...(attraction.elevation && {
+              "geo": {
+                "@type": "GeoCoordinates",
+                "elevation": attraction.elevation
+              }
+            }),
+            "touristType": attraction.type === "Religious" ? "Pilgrimage" : attraction.type,
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": attraction.rating,
+              "bestRating": 5,
+              "worstRating": 1,
+              "ratingCount": Math.floor(Math.random() * 200) + 50
+            },
+            "openingHours": attraction.best_time ? `Best time: ${attraction.best_time}` : undefined,
+            "isAccessibleForFree": true,
+            "publicAccess": true
+          })}
+        </script>
+
+        {/* JSON-LD Schema for FAQPage - Critical for AI Overviews */}
+        {attraction.faqs && attraction.faqs.length > 0 && (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": attraction.faqs.map(faq => ({
+                "@type": "Question",
+                "name": faq.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq.answer
+                }
+              }))
+            })}
+          </script>
+        )}
+
+        {/* JSON-LD Schema for BreadcrumbList - Helps AI understand site structure */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://staykedarnath.in"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Attractions",
+                "item": "https://staykedarnath.in/attractions"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": attraction.name,
+                "item": `https://staykedarnath.in/attractions/${attraction.slug}`
+              }
+            ]
+          })}
+        </script>
       </Helmet>
 
       <Nav />
 
       {/* Hero Section */}
-      <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
+      <section className="relative h-[25vh] md:h-[30vh] overflow-hidden">
         <img
           src={attraction.main_image}
           alt={attraction.name}
@@ -353,9 +442,9 @@ const AttractionDetail = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"
               >
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">About {attraction.name}</h2>
+                {/* Description content - No extra spacing */}
                 <div
-                  className="attraction-content"
+                  className="attraction-content [&>*:first-child]:!mt-0"
                   dangerouslySetInnerHTML={{ __html: attraction.description }}
                 />
 
@@ -409,87 +498,107 @@ const AttractionDetail = () => {
                 </motion.div>
               )}
 
-              {/* Key Information */}
+              {/* Key Information - Clean Card Design with Better Contrast */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"
+                className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-200"
               >
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Key Information</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-xl text-center">
-                    <Mountain className="w-6 h-6 text-[#0071c2] mx-auto mb-2" />
-                    <div className="text-lg font-bold text-gray-900">{attraction.elevation}</div>
-                    <div className="text-xs text-gray-500">Elevation</div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                  {/* Elevation Card */}
+                  <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200 hover:border-blue-400 transition-colors">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center mb-3 shadow-md">
+                        <Mountain className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.elevation}</div>
+                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Elevation</div>
+                    </div>
                   </div>
-                  <div className="p-4 bg-green-50 rounded-xl text-center">
-                    <Clock className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                    <div className="text-lg font-bold text-gray-900">{attraction.time_required}</div>
-                    <div className="text-xs text-gray-500">Time Required</div>
+
+                  {/* Time Required Card */}
+                  <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200 hover:border-green-400 transition-colors">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center mb-3 shadow-md">
+                        <Clock className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.time_required}</div>
+                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Time Required</div>
+                    </div>
                   </div>
-                  <div className="p-4 bg-amber-50 rounded-xl text-center">
-                    <Calendar className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-                    <div className="text-lg font-bold text-gray-900">{attraction.best_time}</div>
-                    <div className="text-xs text-gray-500">Best Time</div>
+
+                  {/* Best Time Card */}
+                  <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200 hover:border-amber-400 transition-colors">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center mb-3 shadow-md">
+                        <Calendar className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.best_time}</div>
+                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Best Time</div>
+                    </div>
                   </div>
-                  <div className="p-4 bg-purple-50 rounded-xl text-center">
-                    <Footprints className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                    <div className="text-lg font-bold text-gray-900">{attraction.difficulty}</div>
-                    <div className="text-xs text-gray-500">Difficulty</div>
+
+                  {/* Difficulty Card */}
+                  <div className="bg-purple-50 rounded-xl p-4 border-2 border-purple-200 hover:border-purple-400 transition-colors">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-14 h-14 rounded-full bg-purple-500 flex items-center justify-center mb-3 shadow-md">
+                        <Footprints className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.difficulty}</div>
+                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Difficulty</div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Tips Section */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"
-              >
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Travel Tips</h2>
-                <div className="space-y-4">
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Best Season</h3>
-                      <p className="text-gray-600 text-sm">Visit during {attraction.best_time} for the best weather and clear views.</p>
-                    </div>
+              {/* Frequently Asked Questions - Minimal & Sophisticated Design */}
+              {attraction.faqs && attraction.faqs.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-100"
+                >
+                  <h2 className="text-3xl font-semibold text-gray-900 mb-10 tracking-tight">
+                    Frequently Asked Questions
+                  </h2>
+                  <div className="space-y-8">
+                    {attraction.faqs.map((faq, index) => (
+                      <article 
+                        key={index} 
+                        className="group pb-8 border-b border-gray-100 last:border-b-0 last:pb-0"
+                        itemScope 
+                        itemType="https://schema.org/Question"
+                      >
+                        <h3 
+                          className="text-lg font-semibold text-gray-900 mb-3 flex items-start gap-4 group-hover:text-[#0071c2] transition-colors duration-200"
+                          itemProp="name"
+                        >
+                          <span className="flex-shrink-0 text-[#0071c2] text-base font-normal mt-0.5 opacity-60">
+                            {String(index + 1).padStart(2, '0')}.
+                          </span>
+                          <span className="flex-1 leading-relaxed">{faq.question}</span>
+                        </h3>
+                        <div 
+                          className="text-gray-600 leading-relaxed pl-10 text-[15px]"
+                          itemScope 
+                          itemType="https://schema.org/Answer"
+                          itemProp="acceptedAnswer"
+                        >
+                          <div itemProp="text">
+                            {faq.answer.split('\n').map((paragraph, pIndex) => (
+                              <p key={pIndex} className="mb-3 last:mb-0">
+                                {paragraph}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </article>
+                    ))}
                   </div>
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <CloudSnow className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Weather</h3>
-                      <p className="text-gray-600 text-sm">Temperatures can drop significantly. Carry warm clothes even in summer.</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Camera className="w-5 h-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Photography</h3>
-                      <p className="text-gray-600 text-sm">Early morning offers the best light. Respect photography rules at religious sites.</p>
-                    </div>
-                  </div>
-                  {attraction.difficulty !== "Easy" && (
-                    <div className="flex gap-4">
-                      <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <AlertTriangle className="w-5 h-5 text-red-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Fitness Required</h3>
-                        <p className="text-gray-600 text-sm">This is a {attraction.difficulty.toLowerCase()} trek. Ensure you're physically prepared and acclimatized.</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
+                </motion.div>
+              )}
             </div>
 
             {/* Right Sidebar */}

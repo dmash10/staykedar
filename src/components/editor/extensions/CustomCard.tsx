@@ -121,9 +121,37 @@ export const CustomCard = Node.create({
         return {
             type: {
                 default: 'info',
-                parseHTML: (element) => element.getAttribute('data-card-type'),
+                // Parse from multiple possible attributes for backwards compatibility
+                parseHTML: (element) => {
+                    // Try multiple attribute names
+                    let cardType = element.getAttribute('type') || 
+                                   element.getAttribute('data-card-type') ||
+                                   element.getAttribute('card-type');
+                    
+                    // Clean the value (remove quotes, whitespace)
+                    if (cardType) {
+                        cardType = cardType.replace(/['"]/g, '').trim().toLowerCase();
+                    }
+                    
+                    // Validate against known types
+                    const validTypes = ['info', 'warning', 'tip', 'weather', 'route', 'success', 'error', 'note', 'danger', 'quote'];
+                    if (cardType && validTypes.includes(cardType)) {
+                        return cardType;
+                    }
+                    
+                    // Fallback: try to detect from content or class
+                    const content = element.textContent?.toLowerCase() || '';
+                    if (content.includes('pro tip') || content.includes('💡')) return 'tip';
+                    if (content.includes('warning') || content.includes('⚠️')) return 'warning';
+                    if (content.includes('route') || content.includes('🗺️')) return 'route';
+                    if (content.includes('weather') || content.includes('⛅')) return 'weather';
+                    
+                    return 'info';
+                },
                 renderHTML: (attributes) => {
+                    // Output both 'type' (for CSS styling) and 'data-card-type' (for compatibility)
                     return {
+                        'type': attributes.type,
                         'data-card-type': attributes.type,
                     }
                 },
@@ -134,12 +162,22 @@ export const CustomCard = Node.create({
     parseHTML() {
         return [
             {
+                // Match div with data-type="custom-card" attribute
                 tag: 'div[data-type="custom-card"]',
+            },
+            {
+                // Also match older format with just data-card-type
+                tag: 'div[data-card-type]',
+                getAttrs: (element) => {
+                    if (typeof element === 'string') return false;
+                    return element.hasAttribute('data-card-type') ? {} : false;
+                },
             },
         ];
     },
 
     renderHTML({ HTMLAttributes }) {
+        // Merge attributes and ensure data-type is set for identification
         return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'custom-card' }), 0];
     },
 

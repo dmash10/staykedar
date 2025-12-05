@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, User, Home, Cloud, Landmark, UserPlus, Package, FileText, Puzzle, MapPin, Bed, BookOpen, LogOut, Settings, ChevronDown } from "lucide-react";
+import { Menu, X, User, Home, Landmark, UserPlus, Package, FileText, Puzzle, MapPin, Bed, BookOpen, LogOut, Settings, ChevronDown, Car } from "lucide-react";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import Container from "./Container";
 import { EditableButton } from "./editable";
@@ -27,7 +27,7 @@ const ADMIN_EMAILS: string[] = [];
 const publicNavLinks = [
   { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
   { name: "Stays", path: "/stays", icon: <Bed className="w-4 h-4" /> },
-  { name: "Weather", path: "/weather", icon: <Cloud className="w-4 h-4" /> },
+  { name: "Car Rentals", path: "/car-rentals", icon: <Car className="w-4 h-4" /> },
   { name: "Attractions", path: "/attractions", icon: <MapPin className="w-4 h-4" /> },
   { name: "Packages", path: "/packages", icon: <Package className="w-4 h-4" /> },
   { name: "Blog", path: "/blog", icon: <FileText className="w-4 h-4" /> },
@@ -121,19 +121,17 @@ const Nav = () => {
   const navLinks = [...publicNavLinks, ...(isAdmin ? adminNavLinks : [])];
 
   useEffect(() => {
-    let rafId: number;
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        setScrolled(scrollY > 20);
-      });
+      if (window.scrollY > 20) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -141,63 +139,20 @@ const Nav = () => {
     setMobileMenuOpen(false);
   }, [location]);
 
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      // Save current scroll position
-      const scrollY = window.scrollY;
-
-      // Lock body scroll
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      document.body.style.overflow = 'hidden';
-    } else {
-      // Get the scroll position before unlocking
-      const scrollY = document.body.style.top;
-
-      // Unlock body scroll
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-
-      // Restore scroll position
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-    }
-
-    // Cleanup function to ensure overflow is reset
-    return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
-
-  // Setup scroll listener for fade effect (only once)
   // Setup scroll listener for fade effect (only once)
   useEffect(() => {
-    let rafId: number;
     const handleNavScroll = () => {
       if (mobileNavRef.current) {
-        const scrollLeft = mobileNavRef.current.scrollLeft;
-        cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(() => {
-          const isScrolled = scrollLeft > 10;
-          setShowNavFade(!isScrolled);
-        });
+        const isScrolled = mobileNavRef.current.scrollLeft > 10;
+        setShowNavFade(!isScrolled);
       }
     };
 
     const navElement = mobileNavRef.current;
     if (navElement) {
-      navElement.addEventListener('scroll', handleNavScroll, { passive: true });
+      navElement.addEventListener('scroll', handleNavScroll);
       return () => {
         navElement.removeEventListener('scroll', handleNavScroll);
-        cancelAnimationFrame(rafId);
       };
     }
   }, []);
@@ -412,8 +367,8 @@ const Nav = () => {
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 top-[72px] bg-[#003580] z-50 overflow-y-auto">
-            <div className="flex flex-col space-y-2 py-4 px-4">
+          <div className="md:hidden bg-[#003580] border-t border-[#004cb8] py-4 px-4 animate-fade-in">
+            <div className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}

@@ -198,9 +198,19 @@ export default function TiptapEditor({ content, onChange, placeholder, onAIMetad
 
         // Only update if content actually changed to avoid cursor jumps
         const currentContent = editor.getHTML();
-        if (currentContent !== content) {
+        
+        // Normalize both for comparison (remove extra whitespace)
+        const normalizedCurrent = currentContent.replace(/\s+/g, ' ').trim();
+        const normalizedNew = (content || '').replace(/\s+/g, ' ').trim();
+        
+        if (normalizedCurrent !== normalizedNew && content) {
             console.log('🔄 TiptapEditor: Syncing content from prop');
-            editor.commands.setContent(content || '');
+            // Use setTimeout to avoid flushSync warning during React render cycle
+            setTimeout(() => {
+                if (editor && !editor.isDestroyed) {
+                    editor.commands.setContent(content, { emitUpdate: false });
+                }
+            }, 0);
         }
     }, [editor, content]);
 
@@ -363,7 +373,7 @@ export default function TiptapEditor({ content, onChange, placeholder, onAIMetad
                 <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} className="hover:bg-[#1a1a1a] text-white disabled:opacity-50" title="Redo"><Redo className="h-4 w-4" /></Button>
             </div>
 
-            <EditorContent editor={editor} className="dark-editor" />
+            <EditorContent editor={editor} className="" />
         </div >
     );
 }

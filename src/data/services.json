@@ -1,0 +1,122 @@
+{
+  "taxi": {
+    "name": "Taxi Service",
+    "slug": "taxi",
+    "title_template": "Taxi Service in {city} | Book Car for Kedarnath Yatra 2025",
+    "description_template": "Book reliable taxi service in {city} for your Kedarnath pilgrimage. Verified drivers, best prices, 24/7 support. Sedan, SUV & Tempo Traveller available.",
+    "h1_template": "Taxi Service in {city}",
+    "schema_type": "TaxiService",
+    "vehicle_types": [
+      {
+        "name": "Sedan",
+        "model": "Swift Dzire / Toyota Etios",
+        "capacity": "4 passengers",
+        "luggage": "2 medium bags",
+        "per_km_rate_plains": 14,
+        "per_km_rate_hills": 18,
+        "min_km_per_day": 250,
+        "driver_allowance": 300,
+        "best_for": "Couples, Solo travelers, Small families",
+        "features": [
+          "AC (Plains only on steep climbs)",
+          "Comfortable seating",
+          "Boot space for 2 bags",
+          "First Aid Kit"
+        ]
+      },
+      {
+        "name": "SUV",
+        "model": "Toyota Innova / Ertiga",
+        "capacity": "6-7 passengers",
+        "luggage": "4 medium bags",
+        "per_km_rate_plains": 18,
+        "per_km_rate_hills": 24,
+        "min_km_per_day": 250,
+        "driver_allowance": 350,
+        "best_for": "Families, Groups, Comfortable travel",
+        "features": [
+          "AC (Limited on steep climbs)",
+          "Hill Certified Driver",
+          "Carrier for extra luggage",
+          "First Aid Kit",
+          "Push-back seats"
+        ]
+      },
+      {
+        "name": "Tempo Traveller",
+        "model": "Force Traveller 12-17 Seater",
+        "capacity": "12-17 passengers",
+        "luggage": "Roof carrier available",
+        "per_km_rate_plains": 24,
+        "per_km_rate_hills": 32,
+        "min_km_per_day": 250,
+        "driver_allowance": 400,
+        "best_for": "Large groups, Family gatherings",
+        "features": [
+          "AC with extra blowers",
+          "Experienced Hill Driver",
+          "Roof carrier for luggage",
+          "Push-back seats",
+          "Music system",
+          "First Aid Kit"
+        ]
+      }
+    ],
+    "pricing_notes": {
+      "toll_included": false,
+      "parking_included": false,
+      "night_halt_charge": "₹300-400 per night",
+      "inter_state_permit": "Included for Delhi-Uttarakhand",
+      "gst_note": "5% GST applicable on total fare"
+    }
+  },
+  "stays": {
+    "name": "Hotels & Stays",
+    "slug": "stays",
+    "title_template": "Hotels in {city} | Best Stays for Kedarnath Pilgrims",
+    "description_template": "Find the best hotels and stays in {city} for your Kedarnath trip. From budget dharamshalas to premium resorts. Book with best price guarantee.",
+    "h1_template": "Where to Stay in {city}",
+    "schema_type": "LodgingBusiness",
+    "highlight_tags": {
+      "sonprayag": "Near Trek Start",
+      "guptkashi": "with Helipad Access",
+      "phata": "at Helipad",
+      "gaurikund": "at Trek Point",
+      "rudraprayag": "Junction Town"
+    }
+  },
+  "helicopter": {
+    "name": "Helicopter Assistance",
+    "slug": "helicopter",
+    "title_template": "Kedarnath Helicopter Guide & Packages from {city}",
+    "description_template": "Complete guide for Kedarnath helicopter booking from {city}. We assist with registration, hotel stay in Phata/Guptkashi, and helipad transfers. Government booking links provided.",
+    "h1_template": "Helicopter Packages & Tips: {city}",
+    "schema_type": "Service",
+    "disclaimer": "We are a travel agency assisting with helicopter packages. Helicopter tickets are subject to government availability. We do not sell helicopter tickets directly - we help you book through official channels (IRCTC/operators) and provide package services including hotel, transfers, and guidance.",
+    "booking_channels": [
+      {
+        "name": "IRCTC (Government)",
+        "url": "https://www.irctchelitour.com",
+        "type": "official"
+      },
+      {
+        "name": "Pawan Hans",
+        "url": "https://pawanhans.co.in",
+        "type": "official"
+      }
+    ],
+    "package_includes": [
+      "Hotel booking in Guptkashi/Phata",
+      "Transfer to helipad",
+      "Booking assistance",
+      "Local guide",
+      "Return transfer"
+    ],
+    "important_notes": [
+      "Helicopter operations are weather-dependent",
+      "Carry original ID proof",
+      "Weight limit: 80kg per person (including baggage)",
+      "Check-in 1 hour before flight"
+    ]
+  }
+}

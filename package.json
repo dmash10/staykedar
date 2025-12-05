@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generate-sitemap.js && vite build",
     "build:dev": "vite build --mode development",
+    "build:no-sitemap": "vite build",
+    "sitemap": "node scripts/generate-sitemap.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -99,6 +101,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@vercel/node": "^3.0.0",
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.5.5",

@@ -121,7 +121,7 @@ const Hero = () => {
   // If we have hero banners, show the banner slider
   if (banners.length > 0 && currentBanner) {
     return (
-      <section className="relative pb-32 md:pb-20">
+      <section className="relative">
         <div className="relative overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
@@ -130,7 +130,7 @@ const Hero = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="relative h-[300px] md:h-[400px] cursor-pointer"
+              className="relative h-[320px] md:h-[400px] cursor-pointer"
               style={{ backgroundColor: currentBanner.background_color || '#003580' }}
               onClick={() => handleClick(currentBanner)}
             >
@@ -146,10 +146,10 @@ const Hero = () => {
                 />
               )}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-              <Container className="relative z-10 h-full flex items-end pb-8">
-                <div className="max-w-4xl">
+              <Container className="relative z-10 h-full flex flex-col justify-end pt-8 pb-6">
+                <div className="max-w-4xl mb-6">
                   <h1
                     className="text-3xl md:text-5xl font-bold mb-4"
                     style={{ color: currentBanner.text_color || '#ffffff' }}
@@ -158,7 +158,7 @@ const Hero = () => {
                   </h1>
                   {currentBanner.subtitle && (
                     <p
-                      className="text-lg md:text-xl mb-6 opacity-90"
+                      className="text-lg md:text-xl mb-4 opacity-90"
                       style={{ color: currentBanner.text_color || '#ffffff' }}
                     >
                       {currentBanner.subtitle}
@@ -173,6 +173,11 @@ const Hero = () => {
                     </Button>
                   )}
                 </div>
+                
+                {/* Search Bar - Inside Hero */}
+                <div className="w-full">
+                  <MainSearchBar onSearch={handleSearch} />
+                </div>
               </Container>
             </motion.div>
           </AnimatePresence>
@@ -181,24 +186,24 @@ const Hero = () => {
           {banners.length > 1 && (
             <>
               <button
-                onClick={() => setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+                onClick={(e) => { e.stopPropagation(); setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length); }}
+                className="absolute left-4 top-1/3 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
-                onClick={() => setCurrentIndex((prev) => (prev + 1) % banners.length)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+                onClick={(e) => { e.stopPropagation(); setCurrentIndex((prev) => (prev + 1) % banners.length); }}
+                className="absolute right-4 top-1/3 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
 
               {/* Dots */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              <div className="absolute bottom-24 md:bottom-28 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                 {banners.map((_, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setCurrentIndex(idx)}
+                    onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
                     className={`w-2 h-2 rounded-full transition-all ${idx === currentIndex ? 'w-6 bg-white' : 'bg-white/50'
                       }`}
                   />
@@ -207,22 +212,15 @@ const Hero = () => {
             </>
           )}
         </div>
-
-        {/* Booking Form */}
-        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 z-20">
-          <Container>
-            <MainSearchBar onSearch={handleSearch} />
-          </Container>
-        </div>
       </section>
     );
   }
 
   // Default hero when no banners are active
   return (
-    <section className="bg-[#003580] relative pb-32 md:pb-20">
-      <Container className="relative z-10 pt-12 pb-8">
-        <div className="flex flex-col items-start text-left mb-4">
+    <section className="bg-[#003580] relative">
+      <Container className="relative z-10 pt-16 pb-6">
+        <div className="flex flex-col items-start text-left mb-6">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
             Discover Your Spiritual Journey<br className="hidden md:block" /> to Kedarnath
           </h1>
@@ -230,14 +228,12 @@ const Hero = () => {
             Find Serene Stays and Plan Your Yatra with Ease.
           </p>
         </div>
-      </Container>
-
-      {/* Booking Form */}
-      <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2 z-20">
-        <Container>
+        
+        {/* Search Bar - Inside Hero */}
+        <div className="w-full">
           <MainSearchBar onSearch={handleSearch} />
-        </Container>
-      </div>
+        </div>
+      </Container>
     </section>
   );
 };

@@ -83,8 +83,9 @@ const CustomerRoute = ({ children }: CustomerRouteProps) => {
     return <Navigate to="/auth" />;
   }
 
-  // If role is admin, redirect to admin dashboard
-  if (role === 'admin') {
+  // If role is admin/super_admin, redirect to admin dashboard
+  const adminRoles = ['admin', 'super_admin', 'manager', 'content_editor', 'support_agent'];
+  if (adminRoles.includes(role)) {
     console.log("CustomerRoute: User is admin, redirecting to admin dashboard");
     return <Navigate to="/admin" />;
   }

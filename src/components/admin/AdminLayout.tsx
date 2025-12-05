@@ -23,19 +23,10 @@ import {
   Menu,
   X,
   Puzzle,
+  Car,
+  Globe,
+  RouteIcon,
   MapPin,
-  Activity,
-  HelpCircle,
-  MessageSquareQuote,
-  Shield,
-  Mail,
-  ImageIcon,
-  UserCog,
-  LayoutTemplate,
-  Bug,
-  Send,
-  Gift,
-  Database
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -64,42 +55,6 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     navigate('/auth');
   };
 
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      // Save current scroll position
-      const scrollY = window.scrollY;
-      
-      // Lock body scroll
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      document.body.style.overflow = 'hidden';
-    } else {
-      // Get the scroll position before unlocking
-      const scrollY = document.body.style.top;
-      
-      // Unlock body scroll
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-      
-      // Restore scroll position
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-    }
-
-    // Cleanup function to ensure overflow is reset
-    return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
-
   const isActive = (path: string) => {
     if (path === '/admin') {
       return location.pathname === path;
@@ -120,33 +75,27 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       label: 'Management',
       items: [
         { name: 'Properties', path: '/admin/properties', icon: Building2 },
-        { name: 'Attractions', path: '/admin/attractions', icon: MapPin },
+        { name: 'Car Drivers', path: '/admin/car-drivers', icon: Car },
+        { name: 'Packages', path: '/admin/packages', icon: Package },
         { name: 'Bookings', path: '/admin/bookings', icon: Calendar },
         { name: 'Users', path: '/admin/users', icon: Users },
-        { name: 'User Management', path: '/admin/user-management', icon: UserCog },
-        { name: 'Packages', path: '/admin/packages', icon: Package },
-        { name: 'Promo Codes', path: '/admin/promo-codes', icon: Ticket },
+      ]
+    },
+    {
+      label: 'SEO Pages',
+      items: [
+        { name: 'SEO Cities', path: '/admin/seo-cities', icon: MapPin },
+        { name: 'SEO Routes', path: '/admin/seo-routes', icon: RouteIcon },
+        { name: 'Attractions', path: '/admin/attractions', icon: Globe },
       ]
     },
     {
       label: 'Content',
       items: [
-        { name: 'Homepage Editor', path: '/admin/homepage-editor', icon: LayoutTemplate },
         { name: 'Blog Manager', path: '/admin/blog', icon: FileText },
         { name: 'Help Articles', path: '/admin/help/articles', icon: FileText },
-        { name: 'FAQ Manager', path: '/admin/faq', icon: HelpCircle },
-        { name: 'Testimonials', path: '/admin/testimonials', icon: MessageSquareQuote },
-        { name: 'Banners', path: '/admin/banners', icon: ImageIcon },
         { name: 'Media Library', path: '/admin/media', icon: Image },
         { name: 'Reviews', path: '/admin/reviews', icon: Star },
-      ]
-    },
-    {
-      label: 'Marketing',
-      items: [
-        { name: 'Email Campaigns', path: '/admin/email-campaigns', icon: Send },
-        { name: 'Push Notifications', path: '/admin/push-notifications', icon: Bell },
-        { name: 'Referral Program', path: '/admin/referral-program', icon: Gift },
       ]
     },
     {
@@ -160,11 +109,6 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       label: 'System',
       items: [
         { name: 'Settings', path: '/admin/settings', icon: Settings },
-        { name: 'Roles & Permissions', path: '/admin/roles', icon: Shield },
-        { name: 'Email Templates', path: '/admin/email-templates', icon: Mail },
-        { name: 'System Health', path: '/admin/system-health', icon: Activity },
-        { name: 'Error Logs', path: '/admin/error-logs', icon: Bug },
-        { name: 'Cache Management', path: '/admin/cache', icon: Database },
         { name: 'Activity Logs', path: '/admin/logs', icon: ClipboardList },
         { name: 'Plugins', path: '/admin/plugins', icon: Puzzle },
       ]
@@ -284,69 +228,53 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
               </DropdownMenu>
 
               {/* Mobile Menu Button */}
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden text-white h-9 w-9 p-0 flex items-center justify-center rounded-lg hover:bg-[#1A1A1A]"
+                className="lg:hidden text-white h-9 w-9 p-0"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
             </div>
           </div>
+
+          {/* Mobile Menu Dropdown */}
+          {mobileMenuOpen && (
+            <div className="lg:hidden border-t border-[#1F1F1F] bg-black">
+              <div className="px-4 py-4 space-y-4 max-h-[80vh] overflow-y-auto">
+                {navGroups.map((group) => (
+                  <div key={group.label}>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                      {group.label}
+                    </p>
+                    <div className="space-y-1">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        const active = isActive(item.path);
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition ${active
+                              ? 'bg-blue-600 text-white'
+                              : 'text-gray-300 hover:text-white hover:bg-[#1A1A1A]'
+                              }`}
+                          >
+                            <Icon className="w-5 h-5" />
+                            <span className="font-medium">{item.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </header>
-
-      {/* Mobile Menu - Outside header for proper stacking */}
-      {mobileMenuOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 top-[64px] bg-[#0A0A0A] overflow-y-auto"
-          style={{ zIndex: 9999 }}
-        >
-          <div className="px-4 py-4 space-y-6 pb-20">
-            {navGroups.map((group) => (
-              <div key={group.label}>
-                <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-3 px-3">
-                  {group.label}
-                </p>
-                <div className="space-y-1">
-                  {group.items.map((item) => {
-                    const Icon = item.icon;
-                    const active = isActive(item.path);
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${active
-                          ? 'bg-blue-600 text-white'
-                          : 'text-gray-200 hover:text-white hover:bg-[#1A1A1A]'
-                          }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        <span className="font-medium text-base">{item.name}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-            
-            {/* Sign Out Button at bottom */}
-            <div className="pt-4 border-t border-[#2A2A2A]">
-              <button
-                onClick={() => {
-                  handleSignOut();
-                  setMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 w-full transition"
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium text-base">Sign Out</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Main Content Area - Full Width */}
       <main className="max-w-[1920px] mx-auto">

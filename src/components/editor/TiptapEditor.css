@@ -69,11 +69,11 @@
     pointer-events: none;
 }
 
-/* Headings - Blue for Editor */
+/* Headings - Black for Editor */
 .ProseMirror h1 {
     font-size: 2.25rem;
     font-weight: bold;
-    color: #2563eb;
+    color: #111827;
     margin-top: 1.5rem;
     margin-bottom: 1rem;
 }
@@ -81,7 +81,7 @@
 .ProseMirror h2 {
     font-size: 1.875rem;
     font-weight: bold;
-    color: #2563eb;
+    color: #111827;
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
 }
@@ -89,7 +89,7 @@
 .ProseMirror h3 {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #2563eb;
+    color: #111827;
     margin-top: 1.25rem;
     margin-bottom: 0.75rem;
 }
@@ -432,95 +432,18 @@
     vertical-align: super;
 }
 
-/* Custom Cards - Styled for Frontend Display */
+/* ═══════════════════════════════════════════════════════════
+   CUSTOM CARDS - Editor & Article Content Display
+   ═══════════════════════════════════════════════════════════ */
+
+/* Base Card Styles */
 .ProseMirror div[data-type="custom-card"],
 .article-content div[data-type="custom-card"] {
     border-left: 4px solid;
-    border-radius: 0 0.5rem 0.5rem 0;
-    padding: 1rem;
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 1rem 1.25rem;
     margin: 1.5rem 0;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* Info Card - Blue */
-.ProseMirror div[data-type="custom-card"][type="info"],
-.article-content div[data-type="custom-card"][type="info"] {
-    background-color: #eff6ff;
-    border-color: #3b82f6;
-    color: #1e3a8a;
-}
-
-/* Warning Card - Amber */
-.ProseMirror div[data-type="custom-card"][type="warning"],
-.article-content div[data-type="custom-card"][type="warning"] {
-    background-color: #fffbeb;
-    border-color: #f59e0b;
-    color: #78350f;
-}
-
-/* Tip Card - Green */
-.ProseMirror div[data-type="custom-card"][type="tip"],
-.article-content div[data-type="custom-card"][type="tip"] {
-    background-color: #f0fdf4;
-    border-color: #22c55e;
-    color: #14532d;
-}
-
-/* Weather Card - Sky */
-.ProseMirror div[data-type="custom-card"][type="weather"],
-.article-content div[data-type="custom-card"][type="weather"] {
-    background-color: #f0f9ff;
-    border-color: #0ea5e9;
-    color: #0c4a6e;
-}
-
-/* Route Card - Indigo */
-.ProseMirror div[data-type="custom-card"][type="route"],
-.article-content div[data-type="custom-card"][type="route"] {
-    background-color: #eef2ff;
-    border-color: #6366f1;
-    color: #312e81;
-}
-
-/* Success Card - Emerald */
-.ProseMirror div[data-type="custom-card"][type="success"],
-.article-content div[data-type="custom-card"][type="success"] {
-    background-color: #ecfdf5;
-    border-color: #10b981;
-    color: #064e3b;
-}
-
-/* Error Card - Red */
-.ProseMirror div[data-type="custom-card"][type="error"],
-.article-content div[data-type="custom-card"][type="error"] {
-    background-color: #fef2f2;
-    border-color: #ef4444;
-    color: #7f1d1d;
-}
-
-/* Note Card - Gray */
-.ProseMirror div[data-type="custom-card"][type="note"],
-.article-content div[data-type="custom-card"][type="note"] {
-    background-color: #f9fafb;
-    border-color: #9ca3af;
-    color: #1f2937;
-}
-
-/* Danger Card - Rose */
-.ProseMirror div[data-type="custom-card"][type="danger"],
-.article-content div[data-type="custom-card"][type="danger"] {
-    background-color: #fff1f2;
-    border-color: #f43f5e;
-    color: #881337;
-}
-
-/* Quote Card - Purple */
-.ProseMirror div[data-type="custom-card"][type="quote"],
-.article-content div[data-type="custom-card"][type="quote"] {
-    background-color: #faf5ff;
-    border-color: #a855f7;
-    color: #581c87;
-    font-style: italic;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.1);
 }
 
 /* Card content styling */
@@ -533,7 +456,108 @@
 
 .ProseMirror div[data-type="custom-card"] strong,
 .article-content div[data-type="custom-card"] strong {
-    font-weight: 600;
+    font-weight: 700;
+}
+
+/* Info Card - Blue */
+.ProseMirror div[data-type="custom-card"][type="info"],
+.ProseMirror div[data-type="custom-card"][data-card-type="info"],
+.article-content div[data-type="custom-card"][type="info"],
+.article-content div[data-type="custom-card"][data-card-type="info"] {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-color: #3b82f6;
+    color: #1e3a8a;
+}
+
+/* Warning Card - Amber */
+.ProseMirror div[data-type="custom-card"][type="warning"],
+.ProseMirror div[data-type="custom-card"][data-card-type="warning"],
+.article-content div[data-type="custom-card"][type="warning"],
+.article-content div[data-type="custom-card"][data-card-type="warning"] {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-color: #f59e0b;
+    color: #78350f;
+}
+
+/* Tip Card - Green */
+.ProseMirror div[data-type="custom-card"][type="tip"],
+.ProseMirror div[data-type="custom-card"][data-card-type="tip"],
+.article-content div[data-type="custom-card"][type="tip"],
+.article-content div[data-type="custom-card"][data-card-type="tip"] {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #22c55e;
+    color: #14532d;
+}
+
+/* Weather Card - Sky */
+.ProseMirror div[data-type="custom-card"][type="weather"],
+.ProseMirror div[data-type="custom-card"][data-card-type="weather"],
+.article-content div[data-type="custom-card"][type="weather"],
+.article-content div[data-type="custom-card"][data-card-type="weather"] {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+/* Route Card - Indigo */
+.ProseMirror div[data-type="custom-card"][type="route"],
+.ProseMirror div[data-type="custom-card"][data-card-type="route"],
+.article-content div[data-type="custom-card"][type="route"],
+.article-content div[data-type="custom-card"][data-card-type="route"] {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border-color: #6366f1;
+    color: #312e81;
+}
+
+/* Success Card - Emerald */
+.ProseMirror div[data-type="custom-card"][type="success"],
+.ProseMirror div[data-type="custom-card"][data-card-type="success"],
+.article-content div[data-type="custom-card"][type="success"],
+.article-content div[data-type="custom-card"][data-card-type="success"] {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-color: #10b981;
+    color: #064e3b;
+}
+
+/* Error Card - Red */
+.ProseMirror div[data-type="custom-card"][type="error"],
+.ProseMirror div[data-type="custom-card"][data-card-type="error"],
+.article-content div[data-type="custom-card"][type="error"],
+.article-content div[data-type="custom-card"][data-card-type="error"] {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-color: #ef4444;
+    color: #7f1d1d;
+}
+
+/* Note Card - Gray */
+.ProseMirror div[data-type="custom-card"][type="note"],
+.ProseMirror div[data-type="custom-card"][data-card-type="note"],
+.article-content div[data-type="custom-card"][type="note"],
+.article-content div[data-type="custom-card"][data-card-type="note"] {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-color: #6b7280;
+    color: #1f2937;
+}
+
+/* Danger Card - Rose */
+.ProseMirror div[data-type="custom-card"][type="danger"],
+.ProseMirror div[data-type="custom-card"][data-card-type="danger"],
+.article-content div[data-type="custom-card"][type="danger"],
+.article-content div[data-type="custom-card"][data-card-type="danger"] {
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+    border-color: #f43f5e;
+    color: #881337;
+}
+
+/* Quote Card - Purple */
+.ProseMirror div[data-type="custom-card"][type="quote"],
+.ProseMirror div[data-type="custom-card"][data-card-type="quote"],
+.article-content div[data-type="custom-card"][type="quote"],
+.article-content div[data-type="custom-card"][data-card-type="quote"] {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border-color: #a855f7;
+    color: #581c87;
+    font-style: italic;
 }
 
 /* Selection - Dark Theme */

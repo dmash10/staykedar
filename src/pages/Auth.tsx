@@ -88,7 +88,8 @@ const Auth = () => {
           .single();
 
         const customer = customerData as any;
-        if (customer?.role === 'admin') {
+        const adminRoles = ['admin', 'super_admin', 'manager', 'content_editor', 'support_agent'];
+        if (adminRoles.includes(customer?.role)) {
           navigate('/admin');
         } else if (customer?.role === 'property_owner') {
           navigate('/dashboard/properties');

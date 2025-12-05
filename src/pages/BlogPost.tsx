@@ -14,6 +14,7 @@ import {
 import { motion } from 'framer-motion';
 import PromoBanner from '@/components/home/PromoBanner';
 import { OptimizedImage } from '@/components/OptimizedImage';
+import { generateArticleSchema, generateBreadcrumbSchema, generateFAQSchema } from '@/components/SEO/SchemaMarkup';
 import './BlogContent.css';
 
 interface BlogPost {
@@ -194,17 +195,65 @@ export default function BlogPostPage() {
     return null;
   }
 
+  // Generate comprehensive schema for AI Search
+  const articleSchema = generateArticleSchema({
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    content: post.content,
+    author: post.author || 'StayKedarnath Team',
+    datePublished: post.created_at,
+    dateModified: post.updated_at,
+    featuredImage: post.featured_image || undefined,
+    category: post.category || undefined,
+    tags: post.tags || undefined,
+    readingTime: post.reading_time || undefined
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: 'https://staykedarnath.in' },
+    { name: 'Blog', url: 'https://staykedarnath.in/blog' },
+    { name: post.title, url: `https://staykedarnath.in/blog/${post.slug}` }
+  ]);
+
   return (
     <>
       <Helmet>
         <title>{post.meta_title || post.title} | StayKedarnath Blog</title>
         <meta name="description" content={post.meta_description || post.excerpt} />
         {post.meta_keywords && <meta name="keywords" content={post.meta_keywords} />}
+        <link rel="canonical" href={`https://staykedarnath.in/blog/${post.slug}`} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt} />
         {post.featured_image && <meta property="og:image" content={post.featured_image} />}
-        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://staykedarnath.in/blog/${post.slug}`} />
+        <meta property="og:site_name" content="StayKedarnath" />
+        <meta property="article:published_time" content={post.created_at} />
+        <meta property="article:modified_time" content={post.updated_at} />
+        {post.author && <meta property="article:author" content={post.author} />}
+        {post.category && <meta property="article:section" content={post.category} />}
+        {post.tags?.map((tag, i) => (
+          <meta key={i} property="article:tag" content={tag} />
+        ))}
+        
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.excerpt} />
+        {post.featured_image && <meta name="twitter:image" content={post.featured_image} />}
+        
+        {/* Article Schema for AI Search */}
+        <script type="application/ld+json">
+          {JSON.stringify(articleSchema)}
+        </script>
+        
+        {/* Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
       </Helmet>
 
       <Nav />

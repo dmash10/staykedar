@@ -1,9 +1,23 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Plus, MessageSquare, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -11,298 +25,244 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { 
-    Ticket, Plus, Search, Clock, CheckCircle2, 
-    MessageSquare, AlertCircle, RefreshCw, Filter,
-    ArrowRight, Calendar, Loader2
-} from "lucide-react";
-import { Helmet } from "react-helmet";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import { motion } from "framer-motion";
-
-interface TicketData {
-    id: string;
-    ticket_number: string;
-    subject: string;
-    status: string;
-    priority: string;
-    created_at: string;
-    updated_at: string;
-    support_categories?: {
-        name: string;
-    };
-    message_count?: number;
-}
-
-const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ReactNode }> = {
-    open: { label: "Open", color: "text-blue-700", bgColor: "bg-blue-100", icon: <Clock className="w-3.5 h-3.5" /> },
-    in_progress: { label: "In Progress", color: "text-yellow-700", bgColor: "bg-yellow-100", icon: <RefreshCw className="w-3.5 h-3.5" /> },
-    waiting_customer: { label: "Needs Reply", color: "text-orange-700", bgColor: "bg-orange-100", icon: <MessageSquare className="w-3.5 h-3.5" /> },
-    waiting_internal: { label: "Under Review", color: "text-purple-700", bgColor: "bg-purple-100", icon: <Clock className="w-3.5 h-3.5" /> },
-    resolved: { label: "Resolved", color: "text-green-700", bgColor: "bg-green-100", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-    closed: { label: "Closed", color: "text-gray-700", bgColor: "bg-gray-100", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-};
-
-const priorityColors: Record<string, string> = {
-    low: "bg-gray-100 text-gray-700",
-    medium: "bg-blue-100 text-blue-700",
-    high: "bg-orange-100 text-orange-700",
-    urgent: "bg-red-100 text-red-700",
-};
+import { useToast } from '@/hooks/use-toast';
 
 export default function UserTickets() {
-    const { user } = useAuth();
-    const navigate = useNavigate();
-    const [tickets, setTickets] = useState<TicketData[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
 
-    useEffect(() => {
-        if (user) {
-            fetchTickets();
-        }
-    }, [user]);
+    // Form state
+    const [subject, setSubject] = useState('');
+    const [category, setCategory] = useState('other');
+    const [priority, setPriority] = useState('low');
+    const [message, setMessage] = useState('');
 
-    const fetchTickets = async () => {
-        if (!user) return;
-        
-        setIsLoading(true);
-        try {
+    const { data: tickets, isLoading, refetch } = useQuery({
+        queryKey: ['user-tickets'],
+        queryFn: async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('Not authenticated');
+
             const { data, error } = await supabase
-                .from("support_tickets")
-                .select(`
-                    *,
-                    support_categories (name)
-                `)
-                .eq("user_id", user.id)
-                .order("created_at", { ascending: false });
+                .from('support_tickets')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
+            return data;
+        }
+    });
 
-            // Get message counts for each ticket
-            const ticketsWithCounts = await Promise.all(
-                (data || []).map(async (ticket) => {
-                    const { count } = await supabase
-                        .from("ticket_messages")
-                        .select("*", { count: "exact", head: true })
-                        .eq("ticket_id", ticket.id);
-                    return { ...ticket, message_count: count || 0 };
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('Not authenticated');
+
+            // 1. Create ticket
+            const { data: ticket, error: ticketError } = await supabase
+                .from('support_tickets')
+                .insert({
+                    user_id: user.id,
+                    subject,
+                    category,
+                    priority,
+                    status: 'open'
                 })
-            );
+                .select()
+                .single();
 
-            setTickets(ticketsWithCounts);
-        } catch (error) {
-            console.error("Error fetching tickets:", error);
+            if (ticketError) throw ticketError;
+
+            // 2. Create initial message
+            const { error: messageError } = await supabase
+                .from('ticket_messages')
+                .insert({
+                    ticket_id: ticket.id,
+                    sender_id: user.id,
+                    message,
+                    is_admin: false
+                });
+
+            if (messageError) throw messageError;
+
+            toast({
+                title: 'Ticket Created',
+                description: 'We have received your request and will respond shortly.',
+            });
+
+            setIsCreateOpen(false);
+            setSubject('');
+            setMessage('');
+            setCategory('other');
+            refetch();
+        } catch (error: any) {
+            toast({
+                title: 'Error',
+                description: error.message,
+                variant: 'destructive',
+            });
         } finally {
-            setIsLoading(false);
+            setIsSubmitting(false);
         }
     };
 
-    const filteredTickets = tickets.filter((ticket) => {
-        const matchesSearch = 
-            ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            ticket.ticket_number.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesStatus = statusFilter === "all" || ticket.status === statusFilter;
-        return matchesSearch && matchesStatus;
-    });
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffDays = Math.floor(diffMs / 86400000);
-
-        if (diffDays === 0) return "Today";
-        if (diffDays === 1) return "Yesterday";
-        if (diffDays < 7) return `${diffDays} days ago`;
-        return date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    const getStatusBadge = (status: string) => {
+        const styles = {
+            open: 'bg-blue-100 text-blue-800',
+            in_progress: 'bg-amber-100 text-amber-800',
+            closed: 'bg-green-100 text-green-800',
+        };
+        return (
+            <Badge className={styles[status as keyof typeof styles] || styles.open}>
+                {status.replace('_', ' ').toUpperCase()}
+            </Badge>
+        );
     };
 
-    const openTicketsCount = tickets.filter(t => !["resolved", "closed"].includes(t.status)).length;
-    const needsReplyCount = tickets.filter(t => t.status === "waiting_customer").length;
-
-    if (!user) {
-        return (
-            <>
-                <Nav />
-                <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center">
-                    <div className="text-center">
-                        <p className="text-gray-600 mb-4">Please sign in to view your tickets</p>
-                        <Button onClick={() => navigate("/auth")}>Sign In</Button>
-                    </div>
-                </div>
-                <Footer />
-            </>
-        );
-    }
-
     return (
-        <>
-            <Helmet>
-                <title>My Support Tickets | StayKedarnath</title>
-            </Helmet>
-            <Nav />
-            
-            <div className="min-h-screen bg-gray-50 pt-20">
-                {/* Header */}
-                <div className="bg-white border-b border-gray-200">
-                    <div className="max-w-6xl mx-auto px-4 py-6">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-900">My Support Tickets</h1>
-                                <p className="text-gray-600 mt-1">View and manage your support requests</p>
-                            </div>
-                            <Button 
-                                onClick={() => navigate("/support/raise")}
-                                className="bg-[#0071c2] hover:bg-[#005999]"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                New Ticket
-                            </Button>
-                        </div>
-
-                        {/* Stats */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                            <div className="bg-gray-50 rounded-xl p-4">
-                                <p className="text-2xl font-bold text-gray-900">{tickets.length}</p>
-                                <p className="text-sm text-gray-600">Total Tickets</p>
-                            </div>
-                            <div className="bg-blue-50 rounded-xl p-4">
-                                <p className="text-2xl font-bold text-blue-700">{openTicketsCount}</p>
-                                <p className="text-sm text-blue-600">Open</p>
-                            </div>
-                            <div className="bg-orange-50 rounded-xl p-4">
-                                <p className="text-2xl font-bold text-orange-700">{needsReplyCount}</p>
-                                <p className="text-sm text-orange-600">Needs Reply</p>
-                            </div>
-                            <div className="bg-green-50 rounded-xl p-4">
-                                <p className="text-2xl font-bold text-green-700">
-                                    {tickets.filter(t => t.status === "resolved").length}
-                                </p>
-                                <p className="text-sm text-green-600">Resolved</p>
-                            </div>
-                        </div>
-                    </div>
+        <div className="container mx-auto p-6 max-w-5xl">
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Support Tickets</h1>
+                    <p className="text-gray-500 mt-1">Track and manage your support requests</p>
                 </div>
-
-                {/* Filters */}
-                <div className="max-w-6xl mx-auto px-4 py-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <Input
-                                placeholder="Search tickets..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10"
-                            />
-                        </div>
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-full md:w-48">
-                                <Filter className="w-4 h-4 mr-2" />
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Status</SelectItem>
-                                <SelectItem value="open">Open</SelectItem>
-                                <SelectItem value="in_progress">In Progress</SelectItem>
-                                <SelectItem value="waiting_customer">Needs Reply</SelectItem>
-                                <SelectItem value="resolved">Resolved</SelectItem>
-                                <SelectItem value="closed">Closed</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
-                {/* Tickets List */}
-                <div className="max-w-6xl mx-auto px-4 pb-8">
-                    {isLoading ? (
-                        <div className="flex items-center justify-center py-16">
-                            <Loader2 className="w-8 h-8 animate-spin text-[#0071c2]" />
-                        </div>
-                    ) : filteredTickets.length === 0 ? (
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Ticket className="w-8 h-8 text-gray-400" />
+                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="bg-blue-600 hover:bg-blue-700">
+                            <Plus className="w-4 h-4 mr-2" />
+                            New Ticket
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px]">
+                        <DialogHeader>
+                            <DialogTitle>Create Support Ticket</DialogTitle>
+                            <DialogDescription>
+                                Describe your issue and we'll help you resolve it.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="subject">Subject</Label>
+                                <Input
+                                    id="subject"
+                                    value={subject}
+                                    onChange={(e) => setSubject(e.target.value)}
+                                    placeholder="Brief summary of the issue"
+                                    required
+                                />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                {searchQuery || statusFilter !== "all" ? "No tickets found" : "No support tickets yet"}
-                            </h3>
-                            <p className="text-gray-600 mb-6">
-                                {searchQuery || statusFilter !== "all" 
-                                    ? "Try adjusting your search or filters"
-                                    : "When you create a support ticket, it will appear here"
-                                }
-                            </p>
-                            {!searchQuery && statusFilter === "all" && (
-                                <Button 
-                                    onClick={() => navigate("/support/raise")}
-                                    className="bg-[#0071c2] hover:bg-[#005999]"
-                                >
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Create Your First Ticket
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="category">Category</Label>
+                                    <Select value={category} onValueChange={setCategory}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="booking">Booking Issue</SelectItem>
+                                            <SelectItem value="payment">Payment</SelectItem>
+                                            <SelectItem value="account">Account</SelectItem>
+                                            <SelectItem value="other">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="priority">Priority</Label>
+                                    <Select value={priority} onValueChange={setPriority}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select priority" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="low">Low</SelectItem>
+                                            <SelectItem value="medium">Medium</SelectItem>
+                                            <SelectItem value="high">High</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="message">Description</Label>
+                                <Textarea
+                                    id="message"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Please provide details..."
+                                    className="min-h-[100px]"
+                                    required
+                                />
+                            </div>
+
+                            <div className="flex justify-end pt-4">
+                                <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700">
+                                    {isSubmitting ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Submit Ticket'
+                                    )}
                                 </Button>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {filteredTickets.map((ticket, index) => {
-                                const status = statusConfig[ticket.status] || statusConfig.open;
-                                return (
-                                    <motion.div
-                                        key={ticket.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.05 }}
-                                    >
-                                        <Link
-                                            to={`/support/ticket/${ticket.ticket_number}`}
-                                            className="block bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-[#0071c2]/30 transition-all group"
-                                        >
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="font-mono text-xs text-gray-500">
-                                                            {ticket.ticket_number}
-                                                        </span>
-                                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${status.bgColor} ${status.color}`}>
-                                                            {status.icon}
-                                                            {status.label}
-                                                        </span>
-                                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${priorityColors[ticket.priority]}`}>
-                                                            {ticket.priority}
-                                                        </span>
-                                                    </div>
-                                                    <h3 className="font-semibold text-gray-900 group-hover:text-[#0071c2] transition-colors truncate">
-                                                        {ticket.subject}
-                                                    </h3>
-                                                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                                        <span className="flex items-center gap-1">
-                                                            <Calendar className="w-3.5 h-3.5" />
-                                                            {formatDate(ticket.created_at)}
-                                                        </span>
-                                                        {ticket.support_categories && (
-                                                            <span>{ticket.support_categories.name}</span>
-                                                        )}
-                                                        <span className="flex items-center gap-1">
-                                                            <MessageSquare className="w-3.5 h-3.5" />
-                                                            {ticket.message_count} messages
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#0071c2] transition-colors flex-shrink-0" />
-                                            </div>
-                                        </Link>
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                            </div>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
-            <Footer />
-        </>
+
+            {isLoading ? (
+                <div className="flex justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                </div>
+            ) : tickets?.length === 0 ? (
+                <Card className="text-center py-12">
+                    <CardContent>
+                        <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900">No tickets yet</h3>
+                        <p className="text-gray-500 mb-4">You haven't created any support tickets.</p>
+                        <Button onClick={() => setIsCreateOpen(true)} variant="outline">
+                            Create your first ticket
+                        </Button>
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="grid gap-4">
+                    {tickets?.map((ticket) => (
+                        <Link key={ticket.id} to={`/dashboard/tickets/${ticket.id}`}>
+                            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                                <CardContent className="p-6">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <h3 className="font-semibold text-lg text-gray-900">{ticket.subject}</h3>
+                                                {getStatusBadge(ticket.status)}
+                                                <Badge variant="outline" className="capitalize">{ticket.category}</Badge>
+                                            </div>
+                                            <p className="text-sm text-gray-500">
+                                                Created on {format(new Date(ticket.created_at), 'MMM dd, yyyy')} • ID: #{ticket.id.slice(0, 8)}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className={`text-xs font-medium px-2 py-1 rounded-full ${ticket.priority === 'high' || ticket.priority === 'critical'
+                                                    ? 'bg-red-100 text-red-700'
+                                                    : 'bg-gray-100 text-gray-600'
+                                                }`}>
+                                                {ticket.priority.toUpperCase()} Priority
+                                            </span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </div>
     );
 }
