@@ -108,6 +108,17 @@ interface SEOCity {
   is_featured: boolean;
   created_at: string;
   updated_at: string;
+
+  // Rich Content Fields
+  taxi_hero_title?: string;
+  stays_hero_title?: string;
+  long_description?: string;
+  how_to_reach?: string;
+  best_time_to_visit?: string;
+  weather_info?: string;
+  local_food?: string;
+  history?: string;
+  route_description?: string;
 }
 
 const defaultCity: Partial<SEOCity> = {
@@ -144,6 +155,17 @@ const defaultCity: Partial<SEOCity> = {
   faqs: [],
   is_active: true,
   is_featured: false,
+
+  // Rich Content Defaults
+  taxi_hero_title: '',
+  stays_hero_title: '',
+  long_description: '',
+  how_to_reach: '',
+  best_time_to_visit: '',
+  weather_info: '',
+  local_food: '',
+  history: '',
+  route_description: '',
 };
 
 export default function SEOCitiesPage() {
@@ -191,7 +213,7 @@ export default function SEOCitiesPage() {
     try {
       const today = new Date().toISOString().split('T')[0];
       const baseUrl = 'https://staykedarnath.in';
-      
+
       // Static pages
       const staticPages = [
         { path: '/', priority: 1.0, changefreq: 'daily' },
@@ -232,7 +254,7 @@ export default function SEOCitiesPage() {
       activeCities?.forEach(city => {
         const lastmod = city.updated_at?.split('T')[0] || today;
         const hasTaxi = city.taxi_rates?.drop_sonprayag_sedan > 0;
-        
+
         if (hasTaxi) {
           programmaticUrls.push({
             path: `/taxi/${city.slug}`,
@@ -241,7 +263,7 @@ export default function SEOCitiesPage() {
             lastmod
           });
         }
-        
+
         programmaticUrls.push({
           path: `/stays/location/${city.slug}`,
           priority: city.is_featured ? 0.8 : 0.7,
@@ -274,7 +296,7 @@ export default function SEOCitiesPage() {
       let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 `;
-      
+
       [...staticPages, ...programmaticUrls].forEach(url => {
         xml += `  <url>
     <loc>${baseUrl}${url.path}</loc>
@@ -284,7 +306,7 @@ export default function SEOCitiesPage() {
   </url>
 `;
       });
-      
+
       xml += '</urlset>';
 
       // Download the file
@@ -334,10 +356,28 @@ export default function SEOCitiesPage() {
     setIsDialogOpen(true);
   };
 
+  const checkSlugAvailability = async (slug: string, currentId?: string): Promise<boolean> => {
+    try {
+      let query = supabase.from('seo_cities').select('id').eq('slug', slug);
+
+      if (currentId) {
+        query = query.neq('id', currentId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      return data && data.length > 0;
+    } catch (error) {
+      console.error('Error checking slug:', error);
+      return false;
+    }
+  };
+
   // Save city (create or update)
   const handleSaveCity = async () => {
     if (!editingCity) return;
-    
+
     if (!editingCity.slug || !editingCity.name) {
       toast({
         title: 'Validation Error',
@@ -349,6 +389,18 @@ export default function SEOCitiesPage() {
 
     setSaving(true);
     try {
+      // Check for duplicate slug
+      const slugExists = await checkSlugAvailability(editingCity.slug, editingCity.id);
+      if (slugExists) {
+        toast({
+          title: 'Validation Error',
+          description: `The slug "${editingCity.slug}" is already in use. Please choose another one.`,
+          variant: 'destructive',
+        });
+        setSaving(false);
+        return;
+      }
+
       if (editingCity.id) {
         // Update existing
         const { error } = await supabase
@@ -375,6 +427,17 @@ export default function SEOCitiesPage() {
             faqs: editingCity.faqs,
             is_active: editingCity.is_active,
             is_featured: editingCity.is_featured,
+
+            // Rich Content
+            taxi_hero_title: editingCity.taxi_hero_title,
+            stays_hero_title: editingCity.stays_hero_title,
+            long_description: editingCity.long_description,
+            how_to_reach: editingCity.how_to_reach,
+            best_time_to_visit: editingCity.best_time_to_visit,
+            weather_info: editingCity.weather_info,
+            local_food: editingCity.local_food,
+            history: editingCity.history,
+            route_description: editingCity.route_description,
           })
           .eq('id', editingCity.id);
 
@@ -406,6 +469,17 @@ export default function SEOCitiesPage() {
             faqs: editingCity.faqs,
             is_active: editingCity.is_active,
             is_featured: editingCity.is_featured,
+
+            // Rich Content
+            taxi_hero_title: editingCity.taxi_hero_title,
+            stays_hero_title: editingCity.stays_hero_title,
+            long_description: editingCity.long_description,
+            how_to_reach: editingCity.how_to_reach,
+            best_time_to_visit: editingCity.best_time_to_visit,
+            weather_info: editingCity.weather_info,
+            local_food: editingCity.local_food,
+            history: editingCity.history,
+            route_description: editingCity.route_description,
           }]);
 
         if (error) throw error;
@@ -601,9 +675,9 @@ export default function SEOCitiesPage() {
             </Button>
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={generateSitemap} 
+            <Button
+              variant="outline"
+              onClick={generateSitemap}
               disabled={generatingSitemap}
               className="border-[#2A2A2A] text-gray-300 hover:text-white"
             >
@@ -639,7 +713,7 @@ export default function SEOCitiesPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-[#2A2A2A] hover:bg-transparent">
-                      <TableHead 
+                      <TableHead
                         className="text-gray-400 cursor-pointer"
                         onClick={() => {
                           if (sortField === 'position_on_route') {
@@ -657,7 +731,7 @@ export default function SEOCitiesPage() {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead 
+                      <TableHead
                         className="text-gray-400 cursor-pointer"
                         onClick={() => {
                           if (sortField === 'name') {
@@ -836,7 +910,7 @@ export default function SEOCitiesPage() {
                   } : undefined}
                   onContentGenerated={(data, mode) => {
                     if (!editingCity) return;
-                    
+
                     // Merge AI-generated content with current data
                     setEditingCity(prev => {
                       if (!prev) return prev;
@@ -905,12 +979,14 @@ export default function SEOCitiesPage() {
                       <SelectTrigger className="bg-[#1A1A1A] border-[#2A2A2A] text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                      <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A] text-white">
                         <SelectItem value="City">City</SelectItem>
-                        <SelectItem value="Town">Town</SelectItem>
-                        <SelectItem value="Village">Village</SelectItem>
-                        <SelectItem value="Temple Town">Temple Town</SelectItem>
-                        <SelectItem value="Base Camp">Base Camp</SelectItem>
+                        <SelectItem value="Major Hub">Major Hub</SelectItem>
+                        <SelectItem value="Transit Point">Transit Point</SelectItem>
+                        <SelectItem value="Religious Site">Religious Site</SelectItem>
+                        <SelectItem value="Trekking Base">Trekking Base</SelectItem>
+                        <SelectItem value="Airport">Airport</SelectItem>
+                        <SelectItem value="Railway Station">Railway Station</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1066,7 +1142,7 @@ export default function SEOCitiesPage() {
               <TabsContent value="content" className="space-y-4 mt-4">
                 <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg mb-4">
                   <p className="text-sm text-blue-300">
-                    💡 <strong>SEO Tip:</strong> Add unique content here to make each city page different from others. 
+                    💡 <strong>SEO Tip:</strong> Add unique content here to make each city page different from others.
                     Google penalizes pages with thin/duplicate content.
                   </p>
                 </div>

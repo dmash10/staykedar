@@ -186,7 +186,7 @@ export default function SEORoutesPage() {
   };
 
   const filteredRoutes = routes
-    .filter(route => 
+    .filter(route =>
       route.from_city.toLowerCase().includes(searchTerm.toLowerCase()) ||
       route.to_city.toLowerCase().includes(searchTerm.toLowerCase()) ||
       route.slug.toLowerCase().includes(searchTerm.toLowerCase())
@@ -195,7 +195,7 @@ export default function SEORoutesPage() {
       const aVal = a[sortField];
       const bVal = b[sortField];
       if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return sortDirection === 'asc' 
+        return sortDirection === 'asc'
           ? aVal.localeCompare(bVal)
           : bVal.localeCompare(aVal);
       }
@@ -243,9 +243,27 @@ export default function SEORoutesPage() {
     });
   };
 
+  const checkSlugAvailability = async (slug: string, currentId?: string): Promise<boolean> => {
+    try {
+      let query = supabase.from('seo_routes').select('id').eq('slug', slug);
+
+      if (currentId) {
+        query = query.neq('id', currentId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      return data && data.length > 0;
+    } catch (error) {
+      console.error('Error checking slug:', error);
+      return false;
+    }
+  };
+
   const handleSave = async () => {
     if (!editingRoute) return;
-    
+
     if (!editingRoute.from_city || !editingRoute.to_city || !editingRoute.slug) {
       toast({
         title: 'Validation Error',
@@ -257,6 +275,18 @@ export default function SEORoutesPage() {
 
     setIsSaving(true);
     try {
+      // Check for duplicate slug
+      const slugExists = await checkSlugAvailability(editingRoute.slug, editingRoute.id);
+      if (slugExists) {
+        toast({
+          title: 'Validation Error',
+          description: `The slug "${editingRoute.slug}" is already in use. Please choose another one.`,
+          variant: 'destructive',
+        });
+        setIsSaving(false);
+        return;
+      }
+
       const dataToSave = {
         ...editingRoute,
         updated_at: new Date().toISOString(),
@@ -380,7 +410,7 @@ export default function SEORoutesPage() {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="SEO Routes Manager">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -540,7 +570,7 @@ export default function SEORoutesPage() {
                         />
                       </TableCell>
                       <TableCell>
-                        <a 
+                        <a
                           href={`/route/${route.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
