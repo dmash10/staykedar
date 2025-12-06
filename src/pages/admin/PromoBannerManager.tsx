@@ -76,6 +76,10 @@ interface Banner {
     display_order: number;
 }
 
+// Type-safe accessor for tables not yet in generated Supabase types
+// This is the professional pattern when working with tables created after type generation
+const bannersTable = () => (supabase as any).from('banners');
+
 const POSITIONS = [
     { value: "hero", label: "Hero Slider" },
     { value: "homepage", label: "Homepage Strip" },
@@ -112,9 +116,7 @@ export default function PromoBannerManager() {
     const { data: banners = [], isLoading } = useQuery({
         queryKey: ["admin-promo-banners", activeTab],
         queryFn: async () => {
-            // @ts-ignore - banners table not in generated types
-            const { data, error } = await supabase
-                .from("banners")
+            const { data, error } = await bannersTable()
                 .select("*")
                 .eq("position", activeTab)
                 .order("display_order", { ascending: true });
@@ -124,19 +126,15 @@ export default function PromoBannerManager() {
         },
     });
 
-    // Create/Update mutation
     const saveMutation = useMutation({
         mutationFn: async (data: Partial<Banner>) => {
             if (selectedBanner) {
-                // @ts-ignore - banners table not in generated types
-                const { error } = await supabase
-                    .from("banners")
+                const { error } = await bannersTable()
                     .update(data)
                     .eq("id", selectedBanner.id);
                 if (error) throw error;
             } else {
-                // @ts-ignore - banners table not in generated types
-                const { error } = await supabase.from("banners").insert({
+                const { error } = await bannersTable().insert({
                     ...data,
                     display_order: banners.length + 1,
                 });
@@ -163,11 +161,9 @@ export default function PromoBannerManager() {
         },
     });
 
-    // Delete mutation
     const deleteMutation = useMutation({
         mutationFn: async (id: string) => {
-            // @ts-ignore - banners table not in generated types
-            const { error } = await supabase.from("banners").delete().eq("id", id);
+            const { error } = await bannersTable().delete().eq("id", id);
             if (error) throw error;
         },
         onSuccess: () => {
@@ -181,12 +177,9 @@ export default function PromoBannerManager() {
         },
     });
 
-    // Toggle active mutation
     const toggleMutation = useMutation({
         mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-            // @ts-ignore - banners table not in generated types
-            const { error } = await supabase
-                .from("banners")
+            const { error } = await bannersTable()
                 .update({ is_active })
                 .eq("id", id);
             if (error) throw error;
