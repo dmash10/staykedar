@@ -11,6 +11,7 @@ import CustomerRoute from "@/components/CustomerRoute";
 import PropertyOwnerRoute from "@/components/PropertyOwnerRoute";
 import AdminRoute from "@/components/AdminRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Weather from "./pages/Weather";
@@ -136,6 +137,7 @@ const App = () => {
                   <Toaster />
                   <Sonner />
                   <WhatsAppButton />
+                  <SpeedInsights />
                   <Routes>
                     {/* Auth callback route */}
                     <Route path="/auth/callback" element={<AuthCallback />} />

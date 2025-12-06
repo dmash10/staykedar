@@ -31,9 +31,7 @@ const Nav = () => {
     { name: "Car Rentals", path: "/car-rentals", icon: <Car className="w-4 h-4" /> },
     { name: "Attractions", path: "/attractions", icon: <MapPin className="w-4 h-4" /> },
     { name: "Packages", path: "/packages", icon: <Package className="w-4 h-4" /> },
-    { name: "Do Dham", path: "/do-dham", icon: <Globe className="w-4 h-4" /> },
     { name: "Blog", path: "/blog", icon: <FileText className="w-4 h-4" /> },
-    { name: "Urgent Deals", path: "/urgent-stays", icon: <Clock className="w-4 h-4 text-red-500 animate-pulse" /> },
   ];
 
   const adminNavLinks = [
