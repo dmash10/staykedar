@@ -484,3 +484,202 @@
     height: 2px;
   }
 }
+
+/* ============================================
+   VIEW TRANSITIONS API - Premium Page Animations
+   ============================================ */
+
+/* Enable View Transitions for same-document navigations */
+@view-transition {
+  navigation: auto;
+}
+
+/* Default crossfade transition for pages */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Page fade-in with slight slide up */
+::view-transition-new(root) {
+  animation-name: page-slide-in;
+}
+
+::view-transition-old(root) {
+  animation-name: page-slide-out;
+}
+
+@keyframes page-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Hero Section Transitions */
+.hero-image {
+  view-transition-name: hero-image;
+}
+
+::view-transition-old(hero-image),
+::view-transition-new(hero-image) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Image Morphing */
+.card-image {
+  view-transition-name: var(--card-id);
+}
+
+::view-transition-old(card-image),
+::view-transition-new(card-image) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Page Title Transitions */
+.page-title {
+  view-transition-name: page-title;
+}
+
+::view-transition-old(page-title),
+::view-transition-new(page-title) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+}
+
+/* Navigation Bar - Keep stable during page transitions */
+.nav-container {
+  view-transition-name: nav;
+}
+
+::view-transition-old(nav),
+::view-transition-new(nav) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Footer - Keep stable */
+.footer-container {
+  view-transition-name: footer;
+}
+
+::view-transition-old(footer),
+::view-transition-new(footer) {
+  animation: none;
+}
+
+/* Tab Content Transitions (for Itinerary Planner, etc.) */
+.tab-content {
+  view-transition-name: tab-content;
+}
+
+::view-transition-old(tab-content),
+::view-transition-new(tab-content) {
+  animation-duration: 0.25s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes tab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tab-fade-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+/* Modal Transitions */
+.modal-content {
+  view-transition-name: modal;
+}
+
+::view-transition-old(modal),
+::view-transition-new(modal) {
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Reduced Motion - Respect user preference */
+@media (prefers-reduced-motion: reduce) {
+
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Utility class for unique view-transition-names */
+.vt-hero {
+  view-transition-name: hero;
+}
+
+.vt-content {
+  view-transition-name: content;
+}
+
+.vt-sidebar {
+  view-transition-name: sidebar;
+}
+
+.vt-card-1 {
+  view-transition-name: card-1;
+}
+
+.vt-card-2 {
+  view-transition-name: card-2;
+}
+
+.vt-card-3 {
+  view-transition-name: card-3;
+}
+
+.vt-card-4 {
+  view-transition-name: card-4;
+}
+
+.vt-card-5 {
+  view-transition-name: card-5;
+}
+
+.vt-card-6 {
+  view-transition-name: card-6;
+}

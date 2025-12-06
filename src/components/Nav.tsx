@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { TransitionLink } from "@/components/TransitionLink";
 import { Menu, X, User, Home, Landmark, UserPlus, Package, FileText, Puzzle, MapPin, Bed, BookOpen, LogOut, Settings, ChevronDown, Car, Clock, Globe } from "lucide-react";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import Container from "./Container";
@@ -198,9 +199,9 @@ const Nav = () => {
         <Container>
           <div className="py-4 flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="text-lg md:text-2xl font-bold">
+            <TransitionLink to="/" className="text-lg md:text-2xl font-bold">
               StayKedarnath.in
-            </Link>
+            </TransitionLink>
 
             {/* Right Side */}
             <div className="flex items-center gap-4">
