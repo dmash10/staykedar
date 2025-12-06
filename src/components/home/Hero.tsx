@@ -173,7 +173,7 @@ const Hero = () => {
                     </Button>
                   )}
                 </div>
-                
+
                 {/* Search Bar - Inside Hero */}
                 <div className="w-full">
                   <MainSearchBar onSearch={handleSearch} />
@@ -228,7 +228,7 @@ const Hero = () => {
             Find Serene Stays and Plan Your Yatra with Ease.
           </p>
         </div>
-        
+
         {/* Search Bar - Inside Hero */}
         <div className="w-full">
           <MainSearchBar onSearch={handleSearch} />

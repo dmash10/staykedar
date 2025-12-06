@@ -5,99 +5,165 @@
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>https://staykedarnath.in/</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/about</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/attractions</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/stays</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/packages</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/car-rentals</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/blog</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/weather</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://staykedarnath.in/live-status</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://staykedarnath.in/contact</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/help</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/terms</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/privacy</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/cancellation</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/partner-with-us</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/become-a-host</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/driver-registration</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/tools/kedarnath-budget-calculator</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/tools/is-it-raining-in-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare-cities</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/content-creator</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/urgent-stays</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/char-dham</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/do-dham</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/badrinath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/tools/itinerary-planner</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/shipping</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/taxi/delhi</loc>
@@ -545,26 +611,296 @@
   </url>
   <url>
     <loc>https://staykedarnath.in/packages/kedarnath-trek-package</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/packages/premium-badrinath-darshan</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/packages/chopta-tungnath-trek</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://staykedarnath.in/packages/kedarnath-helicopter</loc>
-    <lastmod>2025-12-05</lastmod>
+    <lastmod>2025-12-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-rishikesh-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-devprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-rudraprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-guptkashi-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-phata-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-sonprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-gaurikund-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/delhi-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-devprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-rudraprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-guptkashi-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-phata-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-sonprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-gaurikund-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rishikesh-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/devprayag-vs-rudraprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/devprayag-vs-guptkashi-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/devprayag-vs-phata-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/devprayag-vs-sonprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/devprayag-vs-gaurikund-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/devprayag-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/devprayag-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rudraprayag-vs-guptkashi-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rudraprayag-vs-phata-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rudraprayag-vs-sonprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rudraprayag-vs-gaurikund-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rudraprayag-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/rudraprayag-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/guptkashi-vs-phata-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/guptkashi-vs-sonprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/guptkashi-vs-gaurikund-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/guptkashi-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/guptkashi-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/phata-vs-sonprayag-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/phata-vs-gaurikund-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/phata-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/phata-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/sonprayag-vs-gaurikund-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/sonprayag-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/sonprayag-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/gaurikund-vs-kedarnath-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/gaurikund-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://staykedarnath.in/compare/kedarnath-vs-haridwar-stay-for-kedarnath</loc>
+    <lastmod>2025-12-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

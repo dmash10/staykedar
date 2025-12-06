@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Sparkles, Send, User, Bot, Loader2, Globe, 
+import {
+  Sparkles, Send, User, Bot, Loader2, Globe,
   MapPin, FileText, Search, Lightbulb, Car, Package, RouteIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -36,14 +36,18 @@ export interface SEOContentData {
   [key: string]: any;
 }
 
-type ContentType = 'city' | 'route' | 'package' | 'attraction';
-type EditMode = 'full' | 'description' | 'seo' | 'faqs' | 'details';
+type ContentType = 'city' | 'route' | 'package' | 'attraction' | 'itinerary';
+type EditMode = 'full' | 'description' | 'seo' | 'faqs' | 'details' | 'itinerary';
 
 interface AISEOAssistantProps {
   contentType: ContentType;
   onContentGenerated: (data: Partial<SEOContentData>, mode: 'merge' | 'replace') => void;
   currentData?: Partial<SEOContentData>;
   buttonText?: string;
+  context?: {
+    destination?: string;
+    [key: string]: any;
+  };
 }
 
 // Content type specific prompts
@@ -118,7 +122,22 @@ For attractions, focus on:
 - Best time and duration needed
 - What to expect (experience, facilities)
 - Photography tips
-- Nearby places to combine`
+- Nearby places to combine`,
+
+    itinerary: `${baseContext}
+
+You are creating a DAY-BY-DAY ITINERARY.
+Itinerary: ${data?.title || data?.duration_days + ' Days' || 'Custom Plan'}
+Destination Context: ${data?.destination_slug || 'Kedarnath'}
+Duration: ${data?.duration_days || 'X'} Days
+Start: ${data?.start_location || 'Start'} -> End: ${data?.end_location || 'End'}
+
+For itineraries, focus on:
+- Logical flow of travel to ${data?.destination_slug || 'the destination'}
+- Specific night halts tailored to the route
+- Activities for each day (Morning, Afternoon, Evening)
+- Altitude acclimatization awareness (crucial for Himalayan dhams)
+- Practical feasibility (don't suggest impossible travel)`
   };
 
   return typeSpecificPrompts[contentType];
@@ -154,15 +173,20 @@ const getQuickActions = (contentType: ContentType, hasData: boolean) => {
     attraction: [
       ...commonActions,
       { label: 'Location Details', icon: MapPin, action: 'details' },
+    ],
+    itinerary: [
+      ...commonActions,
+      { label: 'Generate Day Plan', icon: RouteIcon, action: 'full' },
+      { label: 'Update Inclusions', icon: Package, action: 'details' },
     ]
   };
 
   return typeSpecificActions[contentType];
 };
 
-export function AISEOAssistant({ 
-  contentType, 
-  onContentGenerated, 
+export function AISEOAssistant({
+  contentType,
+  onContentGenerated,
   currentData,
   buttonText = 'AI Assistant'
 }: AISEOAssistantProps) {
@@ -178,15 +202,15 @@ export function AISEOAssistant({
   // Detect edit mode from user input
   const detectEditMode = (userInput: string): EditMode => {
     const lower = userInput.toLowerCase();
-    
+
     if (/\b(seo|meta|title|meta.?title|meta.?desc|search engine|google)\b/.test(lower)) {
       return 'seo';
     }
     if (/\b(faq|question|answer|common.?question)\b/.test(lower)) {
       return 'faqs';
     }
-    if (/\b(description|content|text|rewrite|improve|enhance|story)\b/.test(lower) && 
-        !/\b(short.?desc|meta.?desc)\b/.test(lower)) {
+    if (/\b(description|content|text|rewrite|improve|enhance|story)\b/.test(lower) &&
+      !/\b(short.?desc|meta.?desc)\b/.test(lower)) {
       return 'description';
     }
     if (/\b(detail|info|location|distance|time|price|inclusion|feature)\b/.test(lower)) {
@@ -243,15 +267,15 @@ What would you like to create?`;
   const sendMessage = async (quickAction?: string) => {
     const userInput = quickAction || input;
     if (!userInput.trim()) return;
-    if (!apiKey) { 
-      toast.error('Gemini API Key missing. Add VITE_GEMINI_API_KEY to your .env file.'); 
-      return; 
+    if (!apiKey) {
+      toast.error('Gemini API Key missing. Add VITE_GEMINI_API_KEY to your .env file.');
+      return;
     }
 
-    const userMessage: Message = { 
-      role: 'user', 
-      content: userInput, 
-      timestamp: Date.now() 
+    const userMessage: Message = {
+      role: 'user',
+      content: userInput,
+      timestamp: Date.now()
     };
     setMessages(p => [...p, userMessage]);
     setInput('');
@@ -262,10 +286,10 @@ What would you like to create?`;
       await generateContent(userInput, editMode);
     } catch (e: any) {
       console.error('Generation error:', e);
-      setMessages(p => [...p, { 
-        role: 'assistant', 
-        content: `❌ Error: ${e.message}\n\nPlease try again with a different request.`, 
-        timestamp: Date.now() 
+      setMessages(p => [...p, {
+        role: 'assistant',
+        content: `❌ Error: ${e.message}\n\nPlease try again with a different request.`,
+        timestamp: Date.now()
       }]);
     } finally {
       setIsGenerating(false);
@@ -281,22 +305,22 @@ What would you like to create?`;
 
     // Use Gemini 2.5 Flash with Google Search grounding
     const modelName = 'gemini-2.5-flash-preview-05-20';
-    
+
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         tools: isSearchEnabled ? [{ googleSearch: {} }] : undefined,
-        generationConfig: { 
-          temperature: 0.7, 
-          maxOutputTokens: editMode === 'full' ? 8192 : 4096 
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: editMode === 'full' ? 8192 : 4096
         }
       })
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.error?.message || `API Error: ${response.status}`);
     }
@@ -308,7 +332,7 @@ What would you like to create?`;
 
     // Parse JSON response
     const parsedData = parseJsonResponse(text);
-    
+
     if (!parsedData || Object.keys(parsedData).length === 0) {
       throw new Error('Could not parse AI response');
     }
@@ -323,15 +347,16 @@ What would you like to create?`;
       description: `✅ Description updated! Review the new content.`,
       seo: `✅ SEO metadata generated! Check meta title & description.`,
       faqs: `✅ FAQs generated! Review the questions & answers.`,
-      details: `✅ Details updated! Review the changes.`
+      details: `✅ Details updated! Review the changes.`,
+      itinerary: `✨ Itinerary generated! Review the day-by-day plan.`
     };
 
-    setMessages(p => [...p, { 
-      role: 'assistant', 
-      content: modeMessages[editMode], 
-      timestamp: Date.now() 
+    setMessages(p => [...p, {
+      role: 'assistant',
+      content: modeMessages[editMode],
+      timestamp: Date.now()
     }]);
-    
+
     toast.success(editMode === 'full' ? 'Content generated!' : 'Content updated!');
   };
 
@@ -371,7 +396,41 @@ ${JSON.stringify(currentData || {}, null, 2)}
   "features": ["Feature 1", "Feature 2"],
   "inclusions": ["Inclusion 1", "Inclusion 2"]
 }`,
-      full: `{
+      itinerary: `{
+  "overview": "Rich HTML summary of the trip",
+  "inclusions": ["Transport", "Meals"],
+  "exclusions": ["Airfare", "Personal Expenses"],
+  "price_estimate": 15000,
+  "day_wise_plan": [
+    {
+      "day": 1,
+      "title": "Haridwar to Guptkashi",
+      "description": "Drive 210km via Devprayag...",
+      "activity": "Evening Aarti at Vishwanath Temple",
+      "stay_location": "Guptkashi",
+      "distance_km": "210",
+      "travel_time": "7-8 hours"
+    }
+  ]
+}`,
+      full: contentType === 'itinerary' ? `{
+  "title": "SEO Title for Itinerary",
+  "meta_title": "Meta Title",
+  "meta_description": "Meta Description",
+  "overview": "Overview text...",
+  "price_estimate": 12000,
+  "day_wise_plan": [
+    {
+      "day": 1, 
+      "title": "Day Title", 
+      "description": "Details...", 
+      "stay_location": "City",
+      "activity": "Main activity"
+    }
+  ],
+  "inclusions": ["Item 1", "Item 2"],
+  "exclusions": ["Item 1", "Item 2"]
+}` : `{
   "name": "Name of the content",
   "meta_title": "SEO optimized title (max 60 chars)",
   "meta_description": "Compelling meta description (max 160 chars)",
@@ -434,7 +493,7 @@ OUTPUT ONLY JSON:`;
       console.error('JSON parse failed:', e);
       // Try manual extraction for simple fields
       const result: Partial<SEOContentData> = {};
-      
+
       const extractStr = (field: string): string => {
         const match = text.match(new RegExp(`"${field}"\\s*:\\s*"([^"]*)"`, 's'));
         return match ? match[1].replace(/\\n/g, '\n') : '';
@@ -455,9 +514,9 @@ OUTPUT ONLY JSON:`;
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           className="gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 border-0 shadow-sm"
         >
           <Sparkles className="h-4 w-4" />
@@ -494,19 +553,17 @@ OUTPUT ONLY JSON:`;
           <div className="space-y-6">
             {messages.map((m, i) => (
               <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-                  m.role === 'user' ? 'bg-purple-100' : 'bg-white border shadow-sm'
-                }`}>
-                  {m.role === 'user' 
-                    ? <User className="h-4 w-4 text-purple-600" /> 
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-purple-100' : 'bg-white border shadow-sm'
+                  }`}>
+                  {m.role === 'user'
+                    ? <User className="h-4 w-4 text-purple-600" />
                     : <Bot className="h-4 w-4 text-purple-500" />
                   }
                 </div>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
-                  m.role === 'user'
-                    ? 'bg-purple-600 text-white rounded-tr-none'
-                    : 'bg-white border text-slate-700 rounded-tl-none'
-                }`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${m.role === 'user'
+                  ? 'bg-purple-600 text-white rounded-tr-none'
+                  : 'bg-white border text-slate-700 rounded-tl-none'
+                  }`}>
                   <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                 </div>
               </div>
@@ -534,15 +591,14 @@ OUTPUT ONLY JSON:`;
             {quickActions.map((action) => {
               const Icon = action.icon;
               return (
-                <Button 
+                <Button
                   key={action.action}
-                  variant="outline" 
-                  size="sm" 
+                  variant="outline"
+                  size="sm"
                   onClick={() => sendMessage(action.action === 'full' ? 'Generate complete content' : action.label)}
-                  disabled={isGenerating} 
-                  className={`shrink-0 text-xs rounded-full h-7 ${
-                    action.action === 'full' ? 'border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100' : ''
-                  }`}
+                  disabled={isGenerating}
+                  className={`shrink-0 text-xs rounded-full h-7 ${action.action === 'full' ? 'border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100' : ''
+                    }`}
                 >
                   <Icon className="h-3 w-3 mr-1.5" />
                   {action.label}

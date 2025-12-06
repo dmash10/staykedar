@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, User, Home, Landmark, UserPlus, Package, FileText, Puzzle, MapPin, Bed, BookOpen, LogOut, Settings, ChevronDown, Car } from "lucide-react";
+import { Menu, X, User, Home, Landmark, UserPlus, Package, FileText, Puzzle, MapPin, Bed, BookOpen, LogOut, Settings, ChevronDown, Car, Clock, Globe } from "lucide-react";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import Container from "./Container";
 import { EditableButton } from "./editable";
@@ -23,22 +23,23 @@ import {
 // List of admin email addresses
 const ADMIN_EMAILS: string[] = [];
 
-// Regular navigation links visible to all users
-const publicNavLinks = [
-  { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
-  { name: "Stays", path: "/stays", icon: <Bed className="w-4 h-4" /> },
-  { name: "Car Rentals", path: "/car-rentals", icon: <Car className="w-4 h-4" /> },
-  { name: "Attractions", path: "/attractions", icon: <MapPin className="w-4 h-4" /> },
-  { name: "Packages", path: "/packages", icon: <Package className="w-4 h-4" /> },
-  { name: "Blog", path: "/blog", icon: <FileText className="w-4 h-4" /> },
-];
-
-// Admin-only navigation links
-const adminNavLinks = [
-  { name: "Plugins", path: "/plugins", icon: <Puzzle className="w-4 h-4" /> },
-];
-
 const Nav = () => {
+  // Navigation links
+  const publicNavLinks = [
+    { name: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
+    { name: "Stays", path: "/stays", icon: <Bed className="w-4 h-4" /> },
+    { name: "Car Rentals", path: "/car-rentals", icon: <Car className="w-4 h-4" /> },
+    { name: "Attractions", path: "/attractions", icon: <MapPin className="w-4 h-4" /> },
+    { name: "Packages", path: "/packages", icon: <Package className="w-4 h-4" /> },
+    { name: "Do Dham", path: "/do-dham", icon: <Globe className="w-4 h-4" /> },
+    { name: "Blog", path: "/blog", icon: <FileText className="w-4 h-4" /> },
+    { name: "Urgent Deals", path: "/urgent-stays", icon: <Clock className="w-4 h-4 text-red-500 animate-pulse" /> },
+  ];
+
+  const adminNavLinks = [
+    { name: "Plugins", path: "/plugins", icon: <Puzzle className="w-4 h-4" /> },
+  ];
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -48,6 +49,7 @@ const Nav = () => {
   const [showNavFade, setShowNavFade] = useState(true);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -204,6 +206,7 @@ const Nav = () => {
 
             {/* Right Side */}
             <div className="flex items-center gap-4">
+
               {/* List Property */}
               {!user && (
                 <Link
@@ -400,7 +403,6 @@ const Nav = () => {
                     className="w-full text-center py-2 text-white border border-white rounded-md font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    List your property
                   </Link>
                 </div>
               )}

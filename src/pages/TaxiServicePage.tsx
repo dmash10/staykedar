@@ -45,8 +45,26 @@ import {
   CloudSun,
   Utensils,
   BookOpen,
-  Map
+
+  Map,
+  Download,
+  FileText
 } from "lucide-react";
+
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import CityGuidePDF from "@/components/pdf/CityGuidePDF";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -60,11 +78,11 @@ import { supabase } from "@/integrations/supabase/client";
 // Import fallback data (used if Supabase fails)
 import citiesDataJson from "@/data/cities.json";
 import servicesData from "@/data/services.json";
-import { 
-  generateTaxiServiceSchema, 
-  generateFAQSchema, 
+import {
+  generateTaxiServiceSchema,
+  generateFAQSchema,
   generateBreadcrumbSchema,
-  combineSchemas 
+  combineSchemas
 } from "@/utils/seoSchemas";
 
 // Types
@@ -135,12 +153,60 @@ const getFallbackImage = (index: number) => {
 };
 
 const TaxiServicePage = () => {
-  const { citySlug } = useParams<{ citySlug: string }>();
+  const { lang, citySlug } = useParams<{ lang?: string; citySlug: string }>();
+  // Validate language
+  const currentLang = ['hi', 'ta', 'te', 'kn', 'ml'].includes(lang || '') ? lang : null;
+
   const [city, setCity] = useState<CityData | null>(null);
   const [allCities, setAllCities] = useState<CityData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const taxiService = servicesData.taxi;
+
+  // Lead Capture State
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [leadName, setLeadName] = useState("");
+  const [leadPhone, setLeadPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      if (!leadPhone || leadPhone.length < 10) {
+        throw new Error("Please enter a valid phone number");
+      }
+
+      // Save lead to Supabase
+      const { error } = await supabase.from("leads").insert({
+        phone: leadPhone,
+        name: leadName,
+        city_slug: citySlug,
+        lead_type: "offline_guide_pdf",
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Your guide is ready to download!",
+      });
+
+      // Close dialog after a short delay (user will click the download link inside)
+      // Actually, we want them to click the download link which will be revealed
+    } catch (error: any) {
+      console.error("Error saving lead:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to submit. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Fetch city data from Supabase
   useEffect(() => {
@@ -165,13 +231,27 @@ const TaxiServicePage = () => {
             setError(true);
           }
         } else {
+          // Vernacular Logic
+          let description = cityData.description;
+          let meta_title = cityData.meta_title;
+          let faqs = cityData.faqs;
+
+          if (currentLang) {
+            description = cityData[`description_${currentLang}`] || cityData.description; // Fallback to English
+            meta_title = cityData[`meta_title_${currentLang}`] || cityData.meta_title;
+            faqs = cityData[`faq_${currentLang}`] || cityData.faqs;
+            // Note: Meta description etc can be added similarly
+          }
+
           // Transform Supabase data to match component interface
           const transformedCity: CityData = {
             ...cityData,
+            description: description, // Override with localized
+            meta_title: meta_title,
             coordinates: cityData.coordinates as { lat: number; lng: number },
             connectivity: cityData.connectivity as CityData['connectivity'],
             taxi_rates: cityData.taxi_rates as TaxiRates,
-            faqs: cityData.faqs as { question: string; answer: string }[],
+            faqs: faqs as { question: string; answer: string }[],
             is_major_hub: cityData.is_featured || false,
             distance_from_delhi: '',
             distance_from_kedarnath: cityData.connectivity?.distance_to_next || '',
@@ -237,10 +317,10 @@ const TaxiServicePage = () => {
   }
 
   // Get next and previous cities for navigation
-  const nextCity = city.connectivity?.next_stop 
+  const nextCity = city.connectivity?.next_stop
     ? allCities.find(c => c.name === city.connectivity?.next_stop || c.slug === city.connectivity?.next_stop?.toLowerCase().replace(/\s+/g, '-'))
     : null;
-  
+
   const prevCity = allCities.find(
     c => c.connectivity?.next_stop === city.name || c.connectivity?.next_stop === city.slug
   );
@@ -258,7 +338,7 @@ const TaxiServicePage = () => {
 
   // Check if this is a hill area (elevation > 1500m)
   const isHillArea = parseInt(city.elevation) > 1500;
-  
+
   // Check if taxi service is available (price > 0)
   const hasTaxiService = sedanPrice > 0;
 
@@ -270,7 +350,7 @@ const TaxiServicePage = () => {
   const canonicalUrl = `https://staykedarnath.in/taxi/${city.slug}`;
 
   // Generate schemas
-  const taxiSchema = hasTaxiService 
+  const taxiSchema = hasTaxiService
     ? generateTaxiServiceSchema(city, city.taxi_rates, taxiService.vehicle_types)
     : null;
   const faqSchema = city.faqs ? generateFAQSchema(city.faqs) : null;
@@ -292,7 +372,7 @@ const TaxiServicePage = () => {
   const displayTip = city.taxi_tip || genericTip;
 
   const handleWhatsAppEnquiry = (vehicleType?: string) => {
-    const message = vehicleType 
+    const message = vehicleType
       ? `Hi! I want to book a ${vehicleType} taxi from ${city.name} for Kedarnath trip. Please share availability and rates.`
       : `Hi! I need taxi service from ${city.name} for Kedarnath Yatra. Please share available options.`;
     window.open(`https://wa.me/919027475942?text=${encodeURIComponent(message)}`, '_blank');
@@ -311,6 +391,9 @@ const TaxiServicePage = () => {
         <meta property="og:description" content={pageDescription} />
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content={`/api/og/taxi-rate?from=${encodeURIComponent(city.name)}&to=Kedarnath&price=${sedanPrice}&distance=${encodeURIComponent(city.distance_from_kedarnath)}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={`/api/og/taxi-rate?from=${encodeURIComponent(city.name)}&to=Kedarnath&price=${sedanPrice}&distance=${encodeURIComponent(city.distance_from_kedarnath)}`} />
 
         {/* JSON-LD Schemas - Critical for AI Search */}
         {allSchemas && (
@@ -360,11 +443,11 @@ const TaxiServicePage = () => {
                 </Badge>
               )}
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               {pageH1}
             </h1>
-            
+
             <p className="text-xl text-blue-100/80 mb-6">
               {city.description}
             </p>
@@ -410,7 +493,7 @@ const TaxiServicePage = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
-              <Button 
+              <Button
                 size="lg"
                 className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={() => handleWhatsAppEnquiry()}
@@ -418,7 +501,7 @@ const TaxiServicePage = () => {
                 <MessageCircle className="w-5 h-5 mr-2" />
                 Get Quote on WhatsApp
               </Button>
-              <Button 
+              <Button
                 size="lg"
                 variant="outline"
                 className="border-white/30 text-white hover:bg-white/10"
@@ -428,9 +511,106 @@ const TaxiServicePage = () => {
                 Call Now
               </Button>
             </div>
+
+            {/* Download Rate Card - NEW */}
+            <div className="mt-6">
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-white/10 hover:text-white"
+                onClick={() => {
+                  const url = `/api/og/taxi-rate?from=${encodeURIComponent(city.name)}&to=Kedarnath&price=${sedanPrice}&distance=${encodeURIComponent(city.distance_from_kedarnath)}`;
+                  window.open(url, '_blank');
+                }}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download Rate Card
+              </Button>
+            </div>
           </motion.div>
         </Container>
       </section>
+
+      {/* Offline Guide Lead Magnet FAB */}
+      {city && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Dialog open={isGuideOpen} onOpenChange={setIsGuideOpen}>
+            <DialogTrigger asChild>
+              <Button
+                size="lg"
+                className="rounded-full shadow-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 h-14 animate-bounce hover:animate-none"
+              >
+                <FileText className="w-5 h-5 mr-2" />
+                Download Offline Guide
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Download {city.name} Travel Guide</DialogTitle>
+                <DialogDescription>
+                  Get the complete offline PDF with taxi rates, hotel contacts, and emergency numbers.
+                </DialogDescription>
+              </DialogHeader>
+
+              {!leadPhone || submitting ? (
+                <form onSubmit={handleLeadSubmit} className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name (Optional)</Label>
+                    <Input
+                      id="name"
+                      placeholder="Your Name"
+                      value={leadName}
+                      onChange={(e) => setLeadName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">WhatsApp Number</Label>
+                    <Input
+                      id="phone"
+                      placeholder="+91 98765 43210"
+                      required
+                      type="tel"
+                      value={leadPhone}
+                      onChange={(e) => setLeadPhone(e.target.value)}
+                    />
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" className="w-full" disabled={submitting}>
+                      {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Download className="w-4 h-4 mr-2" />}
+                      Get Free Guide
+                    </Button>
+                  </DialogFooter>
+                </form>
+              ) : (
+                <div className="py-6 text-center space-y-4">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-8 h-8 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Success!</h3>
+                    <p className="text-gray-500">Your number is saved. Download your guide now.</p>
+                  </div>
+
+                  <PDFDownloadLink
+                    document={<CityGuidePDF city={city} />}
+                    fileName={`${city.slug}-travel-guide.pdf`}
+                    className="w-full"
+                  >
+                    {({ loading }) => (
+                      <Button className="w-full bg-green-600 hover:bg-green-700">
+                        {loading ? "Preparing PDF..." : "Download PDF Now"}
+                      </Button>
+                    )}
+                  </PDFDownloadLink>
+
+                  <Button variant="ghost" size="sm" onClick={() => { setIsGuideOpen(false); setLeadPhone(""); }}>
+                    Close
+                  </Button>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
 
       {/* Alert Banner (if applicable) */}
       {(city.warning_tip || city.alert) && (
@@ -479,10 +659,10 @@ const TaxiServicePage = () => {
                       </div>
                       <Badge variant="secondary">Most Popular</Badge>
                     </div>
-                    
+
                     <h3 className="text-xl font-bold text-gray-900 mb-1">Sedan</h3>
                     <p className="text-gray-500 text-sm mb-4">Swift Dzire / Toyota Etios</p>
-                    
+
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Users className="w-4 h-4 text-blue-500" />
@@ -508,7 +688,7 @@ const TaxiServicePage = () => {
                       <p className="text-xs text-gray-400">+ ₹{city.taxi_rates.per_km_rate_hills}/km extra</p>
                     </div>
 
-                    <Button 
+                    <Button
                       className="w-full bg-green-600 hover:bg-green-700"
                       onClick={() => handleWhatsAppEnquiry('Sedan')}
                     >
@@ -537,10 +717,10 @@ const TaxiServicePage = () => {
                       </div>
                       <Badge className="bg-amber-100 text-amber-700">Best Value</Badge>
                     </div>
-                    
+
                     <h3 className="text-xl font-bold text-gray-900 mb-1">SUV</h3>
                     <p className="text-gray-500 text-sm mb-4">Toyota Innova / Ertiga</p>
-                    
+
                     <div className="space-y-2 mb-6">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Users className="w-4 h-4 text-blue-500" />
@@ -562,7 +742,7 @@ const TaxiServicePage = () => {
                       <p className="text-xs text-gray-400">+ ₹{city.taxi_rates.per_km_rate_hills}/km extra</p>
                     </div>
 
-                    <Button 
+                    <Button
                       className="w-full bg-blue-600 hover:bg-blue-700"
                       onClick={() => handleWhatsAppEnquiry('SUV (Innova/Ertiga)')}
                     >
@@ -588,10 +768,10 @@ const TaxiServicePage = () => {
                       </div>
                       <Badge variant="secondary">Groups</Badge>
                     </div>
-                    
+
                     <h3 className="text-xl font-bold text-gray-900 mb-1">Tempo Traveller</h3>
                     <p className="text-gray-500 text-sm mb-4">12-17 Seater</p>
-                    
+
                     <div className="space-y-2 mb-6">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Users className="w-4 h-4 text-blue-500" />
@@ -609,7 +789,7 @@ const TaxiServicePage = () => {
                       <p className="text-xs text-gray-400">+ ₹{city.taxi_rates.per_km_rate_hills}/km extra</p>
                     </div>
 
-                    <Button 
+                    <Button
                       className="w-full bg-purple-600 hover:bg-purple-700"
                       onClick={() => handleWhatsAppEnquiry('Tempo Traveller')}
                     >
@@ -784,8 +964,8 @@ const TaxiServicePage = () => {
               <div className="mt-8 p-6 bg-white rounded-xl shadow-sm">
                 <div className="prose prose-sm max-w-none text-gray-600">
                   {city.how_to_reach.split('\n\n').map((paragraph, index) => (
-                    <p key={index} className="mb-3" dangerouslySetInnerHTML={{ 
-                      __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                    <p key={index} className="mb-3" dangerouslySetInnerHTML={{
+                      __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     }} />
                   ))}
                 </div>
@@ -912,9 +1092,9 @@ const TaxiServicePage = () => {
             </h2>
             <div className="flex flex-wrap gap-3">
               {city.nearby_attractions.map((attraction) => (
-                <Badge 
-                  key={attraction} 
-                  variant="outline" 
+                <Badge
+                  key={attraction}
+                  variant="outline"
                   className="px-4 py-2 text-base border-gray-300 text-gray-700 bg-white"
                 >
                   <MapPin className="w-4 h-4 mr-2 text-blue-500" />
@@ -1034,16 +1214,16 @@ const TaxiServicePage = () => {
               </p>
             </div>
             <div className="flex gap-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={() => handleWhatsAppEnquiry()}
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
                 WhatsApp Us
               </Button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
                 className="border-white/30 text-white hover:bg-white/10"
                 onClick={() => window.location.href = 'tel:+919027475942'}

@@ -77,7 +77,7 @@ const HowItWorks = () => {
                                     {/* Step Number Circle */}
                                     <div className="relative inline-flex items-center justify-center w-14 h-14 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-[#0071c2] to-[#005999] shadow-xl shadow-blue-500/30 mb-3 md:mb-4 group">
                                         <step.icon className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                                        
+
                                         {/* Step number badge */}
                                         <span className="absolute -top-1 -right-1 w-6 h-6 md:w-7 md:h-7 rounded-full bg-white text-[#0071c2] text-xs md:text-sm font-bold flex items-center justify-center shadow-lg">
                                             {step.number}

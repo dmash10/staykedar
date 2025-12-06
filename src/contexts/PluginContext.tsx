@@ -41,7 +41,7 @@ const mockPlugins: Plugin[] = [
     name: 'Live Chat',
     description: 'Adds a live chat support feature to your website',
     version: '1.0.0',
-    status: 'enabled',
+    status: 'disabled', // Disabled - using WhatsAppButton instead
     icon: '',
     component_name: 'LiveChat',
     created_at: new Date().toISOString()
@@ -67,11 +67,11 @@ export const PluginProvider = ({ children }: { children: ReactNode }) => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // In a real app, we would fetch from Supabase
       // For now, use mock data
       setPlugins(mockPlugins);
-      
+
       // When the plugins table exists, uncomment this code:
       /*
       const { data, error } = await supabase

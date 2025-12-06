@@ -109,16 +109,15 @@ const CuratedPackages = () => {
                                         className="w-full h-full object-cover"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                    
+
                                     {/* Badge */}
-                                    <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-semibold ${
-                                        pkg.popular 
-                                            ? 'bg-[#0071c2] text-white' 
+                                    <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-semibold ${pkg.popular
+                                            ? 'bg-[#0071c2] text-white'
                                             : 'bg-white/90 text-gray-700'
-                                    }`}>
+                                        }`}>
                                         {pkg.highlight}
                                     </div>
-                                    
+
                                     {/* Price */}
                                     <div className="absolute bottom-2 right-2 text-right">
                                         <div className="text-white/70 text-[10px] line-through">₹{pkg.originalPrice}</div>
@@ -154,7 +153,7 @@ const CuratedPackages = () => {
                                     </div>
 
                                     {/* View Details Button */}
-                                    <Link 
+                                    <Link
                                         to={`/packages/${pkg.slug}`}
                                         className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-center transition-colors bg-[#0071c2] text-white hover:bg-[#005999]"
                                     >

@@ -114,7 +114,7 @@ const FeaturedDestinations = () => {
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                                    
+
                                     <div className="absolute bottom-2 left-2 right-2">
                                         <h3 className="font-semibold text-white text-sm truncate">
                                             {destination.name}

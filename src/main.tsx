@@ -10,4 +10,10 @@ localStorage.removeItem('kedarnath_forecast_data');
 localStorage.removeItem('kedarnath_weather_data_v2');
 localStorage.removeItem('kedarnath_forecast_data_v2');
 
-createRoot(document.getElementById("root")!).render(<App />);
+import { HelmetProvider } from 'react-helmet-async';
+
+createRoot(document.getElementById("root")!).render(
+    <HelmetProvider>
+        <App />
+    </HelmetProvider>
+);

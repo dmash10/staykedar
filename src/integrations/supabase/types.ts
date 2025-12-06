@@ -530,265 +530,507 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_cities: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          type: string
+          state: string | null
+          elevation: string | null
+          position_on_route: number | null
+          coordinates: Json | null
+          meta_title: string | null
+          meta_description: string | null
+          description: string | null
+          route_description: string | null
+          images: string[] | null
+          connectivity: Json | null
+          base_taxi_price: number | null
+          taxi_rates: Json | null
+          taxi_tip: string | null
+          stay_tip: string | null
+          highlight: string | null
+          nearby_attractions: string[] | null
+          faqs: Json | null
+          is_active: boolean
+          is_featured: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          type: string
+          state?: string | null
+          elevation?: string | null
+          position_on_route?: number | null
+          coordinates?: Json | null
+          meta_title?: string | null
+          meta_description?: string | null
+          description?: string | null
+          route_description?: string | null
+          images?: string[] | null
+          connectivity?: Json | null
+          base_taxi_price?: number | null
+          taxi_rates?: Json | null
+          taxi_tip?: string | null
+          stay_tip?: string | null
+          highlight?: string | null
+          nearby_attractions?: string[] | null
+          faqs?: Json | null
+          is_active?: boolean
+          is_featured?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          type?: string
+          state?: string | null
+          elevation?: string | null
+          position_on_route?: number | null
+          coordinates?: Json | null
+          meta_title?: string | null
+          meta_description?: string | null
+          description?: string | null
+          route_description?: string | null
+          images?: string[] | null
+          connectivity?: Json | null
+          base_taxi_price?: number | null
+          taxi_rates?: Json | null
+          taxi_tip?: string | null
+          stay_tip?: string | null
+          highlight?: string | null
+          nearby_attractions?: string[] | null
+          faqs?: Json | null
+          is_active?: boolean
+          is_featured?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      live_status_updates: {
+        Row: {
+          id: string
+          title: string
+          content: string
+          category: string
+          is_pinned: boolean
+          is_active: boolean
+          published_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          content: string
+          category: string
+          is_pinned?: boolean
+          is_active?: boolean
+          published_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          content?: string
+          category?: string
+          is_pinned?: boolean
+          is_active?: boolean
+          published_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      live_status_faqs: {
+        Row: {
+          id: string
+          question: string
+          answer: string
+          category: string
+          display_order: number
+          is_active: boolean
+          last_verified_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          question: string
+          answer: string
+          category: string
+          display_order?: number
+          is_active?: boolean
+          last_verified_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          question?: string
+          answer?: string
+          category?: string
+          display_order?: number
+          is_active?: boolean
+          last_verified_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      live_status_settings: {
+        Row: {
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      seo_itineraries: {
+        Row: {
+          id: string
+          slug: string
+          destination_slug: string
+          title: string
+          duration_days: number
+          start_location: string
+          end_location: string
+          overview: string | null
+          day_wise_plan: Json | null
+          inclusions: string[] | null
+          exclusions: string[] | null
+          price_estimate: number | null
+          meta_title: string | null
+          meta_description: string | null
+          is_active: boolean
+          is_featured: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          destination_slug?: string
+          title: string
+          duration_days: number
+          start_location: string
+          end_location?: string
+          overview?: string | null
+          day_wise_plan?: Json | null
+          inclusions?: string[] | null
+          exclusions?: string[] | null
+          price_estimate?: number | null
+          meta_title?: string | null
+          meta_description?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          destination_slug?: string
+          title?: string
+          duration_days?: number
+          start_location?: string
+          end_location?: string
+          overview?: string | null
+          day_wise_plan?: Json | null
+          inclusions?: string[] | null
+          exclusions?: string[] | null
+          price_estimate?: number | null
+          meta_title?: string | null
+          meta_description?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      get_user_profile: {
+        Args: {
+          firebase_uid: string
+        }
+        Returns: Json
+      }
+      update_customer_details: {
+        Args: {
+          firebase_uid: string
+          user_name: string
+          user_email: string
+          user_phone: string
+        }
+        Returns: undefined
+      }
+      update_user_profile: {
+        Args: {
+          firebase_uid: string
+          user_name: string
+          user_phone: string
+        }
+        Returns: undefined
+      }
+      check_room_availability: {
+        Args: {
+          room_id: string
+          check_in: string
+          check_out: string
+        }
+        Returns: boolean
+      }
+      find_available_rooms: {
+        Args: {
+          check_in: string
+          check_out: string
+          capacity?: number
+          location_text?: string
+        }
+        Returns: {
+          room_id: string
+          property_id: string
+          room_name: string
+          property_name: string
+          price: number
+          room_capacity: number
+          room_type: string
+        }[]
+      }
+      update_room_status: {
+        Args: {
+          p_room_id: string
+          p_new_status: string
+          p_user_id: string
+          p_update_type?: string
+          p_notes?: string
+        }
+        Returns: undefined
+      }
+      create_booking: {
+        Args: {
+          p_room_id: string
+          p_customer_id: string
+          p_check_in_date: string
+          p_check_out_date: string
+          p_total_price: number
+          p_special_requests?: string
+        }
+        Returns: string
+      }
+      create_support_ticket: {
+        Args: {
+          p_subject: string
+          p_category: string
+          p_message: string
+        }
+        Returns: Json
+      }
+      get_ticket_by_number: {
+        Args: {
+          p_ticket_number: string
+        }
+        Returns: {
+          access_pin: string | null
+          category: string
+          created_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          id: string
+          priority: string
+          status: string
+          subject: string
+          ticket_number: string | null
+          updated_at: string | null
+          user_id: string | null
+        }[]
+      }
+      get_ticket_messages_by_number: {
+        Args: {
+          p_ticket_number: string
+        }
+        Returns: {
+          created_at: string | null
+          id: string
+          is_admin: boolean | null
+          message: string
+          sender_id: string | null
+          sender_type: string | null
+          ticket_id: string
+        }[]
+      }
+      create_ticket_message: {
+        Args: {
+          p_ticket_number: string
+          p_message: string
+        }
+        Returns: {
+          created_at: string | null
+          id: string
+          is_admin: boolean | null
+          message: string
+          sender_id: string | null
+          sender_type: string | null
+          ticket_id: string
+        }[]
+      }
+      get_all_tickets: {
+        Args: {
+          p_status?: string | null
+          p_category?: string | null
+        }
+        Returns: {
+          access_pin: string | null
+          category: string
+          created_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          id: string
+          priority: string
+          status: string
+          subject: string
+          ticket_number: string | null
+          updated_at: string | null
+          user_id: string | null
+        }[]
+      }
+      create_admin_message: {
+        Args: {
+          p_ticket_id: string
+          p_message: string
+        }
+        Returns: {
+          created_at: string | null
+          id: string
+          is_admin: boolean | null
+          message: string
+          sender_id: string | null
+          sender_type: string | null
+          ticket_id: string
+        }[]
+      }
+      update_ticket_status: {
+        Args: {
+          p_ticket_number: string
+          p_new_status: string
+        }
+        Returns: {
+          access_pin: string | null
+          category: string
+          created_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          id: string
+          priority: string
+          status: string
+          subject: string
+          ticket_number: string | null
+          updated_at: string | null
+          user_id: string | null
+        }[]
+      }
+      get_tickets_with_profiles: {
+        Args: {
+          p_status?: string | null
+          p_category?: string | null
+        }
+        Returns: {
+          id: string
+          ticket_number: string | null
+          subject: string
+          category: string
+          priority: string
+          status: string
+          created_at: string | null
+          updated_at: string | null
+          user_id: string | null
+          guest_name: string | null
+          guest_email: string | null
+          guest_phone: string | null
+          user_full_name: string | null
+          user_email: string | null
+          user_phone: string | null
+          user_avatar_url: string | null
+          user_created_at: string | null
+        }[]
+      }
+      add_internal_note: {
+        Args: {
+          p_ticket_id: string
+          p_note: string
+        }
+        Returns: {
+          id: string
+          ticket_id: string
+          admin_id: string
+          note: string
+          created_at: string | null
+        }[]
+      }
+      get_internal_notes: {
+        Args: {
+          p_ticket_id: string
+        }
+        Returns: {
+          id: string
+          note: string
+          admin_name: string | null
+          created_at: string | null
+        }[]
+      }
+      get_canned_responses: {
+        Args: {
+          p_category?: string | null
+        }
+        Returns: {
+          id: string
+          title: string
+          content: string
+          category: string | null
+          shortcut: string | null
+          created_at: string | null
+        }[]
+      }
+    }
+    Enums: {
+      news_category: "alert" | "update" | "announcement"
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
-  Views: {
-    [_ in never]: never
-  }
-  Functions: {
-    get_user_profile: {
-      Args: {
-        firebase_uid: string
-      }
-      Returns: Json
-    }
-    update_customer_details: {
-      Args: {
-        firebase_uid: string
-        user_name: string
-        user_email: string
-        user_phone: string
-      }
-      Returns: undefined
-    }
-    update_user_profile: {
-      Args: {
-        firebase_uid: string
-        user_name: string
-        user_phone: string
-      }
-      Returns: undefined
-    }
-    check_room_availability: {
-      Args: {
-        room_id: string
-        check_in: string
-        check_out: string
-      }
-      Returns: boolean
-    }
-    find_available_rooms: {
-      Args: {
-        check_in: string
-        check_out: string
-        capacity?: number
-        location_text?: string
-      }
-      Returns: {
-        room_id: string
-        property_id: string
-        room_name: string
-        property_name: string
-        price: number
-        room_capacity: number
-        room_type: string
-      }[]
-    }
-    update_room_status: {
-      Args: {
-        p_room_id: string
-        p_new_status: string
-        p_user_id: string
-        p_update_type?: string
-        p_notes?: string
-      }
-      Returns: undefined
-    }
-    create_booking: {
-      Args: {
-        p_room_id: string
-        p_customer_id: string
-        p_check_in_date: string
-        p_check_out_date: string
-        p_total_price: number
-        p_special_requests?: string
-      }
-      Returns: string
-    }
-    create_support_ticket: {
-      Args: {
-        p_subject: string
-        p_category: string
-        p_message: string
-      }
-      Returns: Json
-    }
-    get_ticket_by_number: {
-      Args: {
-        p_ticket_number: string
-      }
-      Returns: {
-        access_pin: string | null
-        category: string
-        created_at: string | null
-        guest_email: string | null
-        guest_name: string | null
-        guest_phone: string | null
-        id: string
-        priority: string
-        status: string
-        subject: string
-        ticket_number: string | null
-        updated_at: string | null
-        user_id: string | null
-      }[]
-    }
-    get_ticket_messages_by_number: {
-      Args: {
-        p_ticket_number: string
-      }
-      Returns: {
-        created_at: string | null
-        id: string
-        is_admin: boolean | null
-        message: string
-        sender_id: string | null
-        sender_type: string | null
-        ticket_id: string
-      }[]
-    }
-    create_ticket_message: {
-      Args: {
-        p_ticket_number: string
-        p_message: string
-      }
-      Returns: {
-        created_at: string | null
-        id: string
-        is_admin: boolean | null
-        message: string
-        sender_id: string | null
-        sender_type: string | null
-        ticket_id: string
-      }[]
-    }
-    get_all_tickets: {
-      Args: {
-        p_status?: string | null
-        p_category?: string | null
-      }
-      Returns: {
-        access_pin: string | null
-        category: string
-        created_at: string | null
-        guest_email: string | null
-        guest_name: string | null
-        guest_phone: string | null
-        id: string
-        priority: string
-        status: string
-        subject: string
-        ticket_number: string | null
-        updated_at: string | null
-        user_id: string | null
-      }[]
-    }
-    create_admin_message: {
-      Args: {
-        p_ticket_id: string
-        p_message: string
-      }
-      Returns: {
-        created_at: string | null
-        id: string
-        is_admin: boolean | null
-        message: string
-        sender_id: string | null
-        sender_type: string | null
-        ticket_id: string
-      }[]
-    }
-    update_ticket_status: {
-      Args: {
-        p_ticket_number: string
-        p_new_status: string
-      }
-      Returns: {
-        access_pin: string | null
-        category: string
-        created_at: string | null
-        guest_email: string | null
-        guest_name: string | null
-        guest_phone: string | null
-        id: string
-        priority: string
-        status: string
-        subject: string
-        ticket_number: string | null
-        updated_at: string | null
-        user_id: string | null
-      }[]
-    }
-    get_tickets_with_profiles: {
-      Args: {
-        p_status?: string | null
-        p_category?: string | null
-      }
-      Returns: {
-        id: string
-        ticket_number: string | null
-        subject: string
-        category: string
-        priority: string
-        status: string
-        created_at: string | null
-        updated_at: string | null
-        user_id: string | null
-        guest_name: string | null
-        guest_email: string | null
-        guest_phone: string | null
-        user_full_name: string | null
-        user_email: string | null
-        user_phone: string | null
-        user_avatar_url: string | null
-        user_created_at: string | null
-      }[]
-    }
-    add_internal_note: {
-      Args: {
-        p_ticket_id: string
-        p_note: string
-      }
-      Returns: {
-        id: string
-        ticket_id: string
-        admin_id: string
-        note: string
-        created_at: string | null
-      }[]
-    }
-    get_internal_notes: {
-      Args: {
-        p_ticket_id: string
-      }
-      Returns: {
-        id: string
-        note: string
-        admin_name: string | null
-        created_at: string | null
-      }[]
-    }
-    get_canned_responses: {
-      Args: {
-        p_category?: string | null
-      }
-      Returns: {
-        id: string
-        title: string
-        content: string
-        category: string | null
-        shortcut: string | null
-        created_at: string | null
-      }[]
-    }
-  }
-  Enums: {
-    news_category: "alert" | "update" | "announcement"
-  }
-  CompositeTypes: {
-    [_ in never]: never
-  }
-}
 }
 
 type PublicSchema = Database[Extract<keyof Database, "public">]

@@ -119,6 +119,36 @@ interface SEOCity {
   local_food?: string;
   history?: string;
   route_description?: string;
+
+  // Vernacular Content
+  description_hi?: string;
+  meta_title_hi?: string;
+  meta_description_hi?: string;
+  faq_hi?: Array<{ question: string; answer: string }>;
+
+  description_ta?: string;
+  meta_title_ta?: string;
+  meta_description_ta?: string;
+  faq_ta?: Array<{ question: string; answer: string }>;
+
+  description_te?: string;
+  meta_title_te?: string;
+  meta_description_te?: string;
+  faq_te?: Array<{ question: string; answer: string }>;
+
+  description_kn?: string;
+  meta_title_kn?: string;
+  meta_description_kn?: string;
+  faq_kn?: Array<{ question: string; answer: string }>;
+
+  description_ml?: string;
+  meta_title_ml?: string;
+  meta_description_ml?: string;
+  faq_ml?: Array<{ question: string; answer: string }>;
+
+  // Char Dham classification
+  zone?: string;
+  dham?: string;
 }
 
 const defaultCity: Partial<SEOCity> = {
@@ -166,7 +196,26 @@ const defaultCity: Partial<SEOCity> = {
   local_food: '',
   history: '',
   route_description: '',
+
+  // Vernacular Defaults
+  description_hi: '', meta_title_hi: '', meta_description_hi: '', faq_hi: [],
+  description_ta: '', meta_title_ta: '', meta_description_ta: '', faq_ta: [],
+  description_te: '', meta_title_te: '', meta_description_te: '', faq_te: [],
+  description_kn: '', meta_title_kn: '', meta_description_kn: '', faq_kn: [],
+  description_ml: '', meta_title_ml: '', meta_description_ml: '', faq_ml: [],
+
+  // Char Dham classification
+  zone: 'kedarnath-route',
+  dham: '',
 };
+
+const LANGUAGES = [
+  { code: 'hi', name: 'Hindi' },
+  { code: 'ta', name: 'Tamil' },
+  { code: 'te', name: 'Telugu' },
+  { code: 'kn', name: 'Kannada' },
+  { code: 'ml', name: 'Malayalam' },
+] as const;
 
 export default function SEOCitiesPage() {
   const [cities, setCities] = useState<SEOCity[]>([]);
@@ -176,6 +225,7 @@ export default function SEOCitiesPage() {
   const [editingCity, setEditingCity] = useState<Partial<SEOCity> | null>(null);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+  const [activeLang, setActiveLang] = useState<typeof LANGUAGES[number]['code']>('hi');
   const [sortField, setSortField] = useState<'position_on_route' | 'name'>('position_on_route');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [generatingSitemap, setGeneratingSitemap] = useState(false);
@@ -191,7 +241,7 @@ export default function SEOCitiesPage() {
         .order(sortField, { ascending: sortOrder === 'asc' });
 
       if (error) throw error;
-      setCities(data || []);
+      setCities((data || []) as unknown as SEOCity[]);
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -253,7 +303,8 @@ export default function SEOCitiesPage() {
       // City pages (taxi + stays)
       activeCities?.forEach(city => {
         const lastmod = city.updated_at?.split('T')[0] || today;
-        const hasTaxi = city.taxi_rates?.drop_sonprayag_sedan > 0;
+        const taxiRates = city.taxi_rates as { drop_sonprayag_sedan?: number } | null;
+        const hasTaxi = taxiRates?.drop_sonprayag_sedan && taxiRates.drop_sonprayag_sedan > 0;
 
         if (hasTaxi) {
           programmaticUrls.push({
@@ -606,6 +657,41 @@ export default function SEOCitiesPage() {
     setEditingCity({ ...editingCity, faqs });
   };
 
+  // AI Translation Handler
+  const handleTranslate = async () => {
+    if (!editingCity || !editingCity.description) return;
+    setSaving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('translate-content', {
+        body: {
+          text: {
+            description: editingCity.description,
+            meta_title: editingCity.meta_title,
+            meta_description: editingCity.meta_description,
+            faqs: editingCity.faqs
+          },
+          targetLang: activeLang
+        }
+      });
+
+      if (error) throw error;
+
+      setEditingCity(prev => ({
+        ...prev!,
+        [`description_${activeLang}`]: data.description,
+        [`meta_title_${activeLang}`]: data.meta_title,
+        [`meta_description_${activeLang}`]: data.meta_description,
+        [`faq_${activeLang}`]: data.faqs
+      }));
+
+      toast({ title: 'Translated!', description: `Content auto-translated to ${LANGUAGES.find(l => l.code === activeLang)?.name}.` });
+    } catch (error: any) {
+      toast({ title: 'Translation Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <AdminLayout title="SEO Cities Manager">
       <div className="space-y-6">
@@ -943,6 +1029,7 @@ export default function SEOCitiesPage() {
                 <TabsTrigger value="taxi" className="data-[state=active]:bg-blue-600">Taxi Rates</TabsTrigger>
                 <TabsTrigger value="connectivity" className="data-[state=active]:bg-blue-600">Connectivity</TabsTrigger>
                 <TabsTrigger value="faqs" className="data-[state=active]:bg-blue-600">FAQs</TabsTrigger>
+                <TabsTrigger value="vernacular" className="data-[state=active]:bg-orange-600">Vernacular</TabsTrigger>
               </TabsList>
 
               {/* Basic Info Tab */}
@@ -1423,6 +1510,95 @@ export default function SEOCitiesPage() {
                       <p className="text-xs">Click "Add FAQ" to add questions for Google AI Overview</p>
                     </div>
                   )}
+                </div>
+              </TabsContent>
+
+              {/* Vernacular Tab */}
+              <TabsContent value="vernacular" className="space-y-4 mt-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-orange-500/10 p-4 rounded-lg border border-orange-500/20">
+                  <div className="flex-1">
+                    <h3 className="text-orange-400 font-medium flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Vernacular SEO Manager
+                    </h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Manage content for regional languages. Select a language below to edit.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full md:w-auto">
+                    <Select value={activeLang} onValueChange={(v: any) => setActiveLang(v)}>
+                      <SelectTrigger className="w-[140px] bg-[#1A1A1A] border-[#2A2A2A] text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                        {LANGUAGES.map(lang => (
+                          <SelectItem key={lang.code} value={lang.code}>
+                            {lang.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      onClick={handleTranslate}
+                      disabled={saving}
+                      className="bg-orange-600 hover:bg-orange-700 text-white flex-1 md:flex-none"
+                    >
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                      Auto-Translate
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-4 p-4 border border-[#2A2A2A] rounded-lg bg-[#111111]/50">
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} Description</Label>
+                    <Textarea
+                      value={(editingCity as any)?.[`description_${activeLang}`] || ''}
+                      onChange={(e) => updateField(`description_${activeLang}`, e.target.value)}
+                      placeholder={`Enter ${LANGUAGES.find(l => l.code === activeLang)?.name} description...`}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white min-h-[100px]"
+                      style={{ direction: 'ltr' }}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} Meta Title</Label>
+                    <Input
+                      value={(editingCity as any)?.[`meta_title_${activeLang}`] || ''}
+                      onChange={(e) => updateField(`meta_title_${activeLang}`, e.target.value)}
+                      placeholder={`${LANGUAGES.find(l => l.code === activeLang)?.name} meta title`}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} Meta Description</Label>
+                    <Textarea
+                      value={(editingCity as any)?.[`meta_description_${activeLang}`] || ''}
+                      onChange={(e) => updateField(`meta_description_${activeLang}`, e.target.value)}
+                      placeholder={`${LANGUAGES.find(l => l.code === activeLang)?.name} meta description`}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white min-h-[80px]"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} FAQs (JSON)</Label>
+                    <div className="text-xs text-gray-500 mb-2">Auto-filled by translation. Edit raw JSON if needed.</div>
+                    <Textarea
+                      value={JSON.stringify((editingCity as any)?.[`faq_${activeLang}`] || [], null, 2)}
+                      onChange={(e) => {
+                        try {
+                          const val = JSON.parse(e.target.value);
+                          updateField(`faq_${activeLang}`, val);
+                        } catch (err) {
+                          // ignore parse error while typing
+                        }
+                      }}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white font-mono text-xs min-h-[200px]"
+                    />
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

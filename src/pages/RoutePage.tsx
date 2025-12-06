@@ -32,7 +32,8 @@ import {
   Mountain,
   Camera,
   Milestone,
-  RouteIcon
+  RouteIcon,
+  Download
 } from "lucide-react";
 
 import Nav from "@/components/Nav";
@@ -43,10 +44,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AIOptimizedFAQ, { FAQItem } from "@/components/SEO/AIOptimizedFAQ";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  generateFAQSchema, 
+import {
+  generateFAQSchema,
   generateBreadcrumbSchema,
-  combineSchemas 
+  combineSchemas
 } from "@/utils/seoSchemas";
 
 // Types
@@ -104,7 +105,7 @@ const generateDefaultFAQs = (route: RouteData): FAQItem[] => {
     },
     {
       question: `How much does a taxi cost from ${route.from_city} to ${route.to_city}?`,
-      answer: route.taxi_rates?.sedan > 0 
+      answer: route.taxi_rates?.sedan > 0
         ? `Taxi fares start from ₹${route.taxi_rates.sedan?.toLocaleString()} for a Sedan and ₹${route.taxi_rates.suv?.toLocaleString()} for an SUV (Innova). Prices may vary based on season.`
         : `Taxi fares vary by vehicle type and season. Contact us for current rates and to book your taxi.`
     },
@@ -179,8 +180,8 @@ const RoutePage = () => {
   const canonicalUrl = `https://staykedarnath.in/route/${route.slug}`;
 
   // FAQs
-  const faqItems: FAQItem[] = (route.faqs && route.faqs.length > 0) 
-    ? route.faqs 
+  const faqItems: FAQItem[] = (route.faqs && route.faqs.length > 0)
+    ? route.faqs
     : generateDefaultFAQs(route);
 
   // Generate schemas
@@ -216,6 +217,15 @@ const RoutePage = () => {
 
   const allSchemas = combineSchemas(faqSchema, breadcrumbSchema, travelActionSchema);
 
+  // Generate Map Image URL
+  const stopsList = [
+    route.from_city,
+    ...(route.stops_along_way?.map(s => s.name) || []),
+    route.to_city
+  ].filter(Boolean).join(',');
+
+  const mapImageUrl = `/api/og/route-map?stops=${encodeURIComponent(stopsList)}&title=${encodeURIComponent(`${route.from_city} to ${route.to_city}`)}`;
+
   const handleWhatsAppEnquiry = () => {
     const message = `Hi! I need a taxi from ${route.from_city} to ${route.to_city}. Can you help with booking and fare details?`;
     window.open(`https://wa.me/919027475942?text=${encodeURIComponent(message)}`, '_blank');
@@ -230,6 +240,9 @@ const RoutePage = () => {
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={pageDescription} />
         <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={mapImageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={mapImageUrl} />
         {allSchemas && (
           <script type="application/ld+json">
             {JSON.stringify(allSchemas)}
@@ -273,7 +286,7 @@ const RoutePage = () => {
                   <p className="text-2xl font-bold text-white">{route.from_city}</p>
                 </div>
               </div>
-              
+
               <div className="flex-1 flex items-center justify-center gap-2 px-4">
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-green-500 to-blue-500 rounded" />
                 <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full">
@@ -282,7 +295,7 @@ const RoutePage = () => {
                 </div>
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-blue-500 to-red-500 rounded" />
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <div>
                   <p className="text-red-400 text-sm font-medium text-right">TO</p>
@@ -297,7 +310,7 @@ const RoutePage = () => {
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
               {route.from_city} to {route.to_city} Route Guide
             </h1>
-            
+
             <p className="text-lg text-blue-100/80 mb-6">
               {route.short_description || `Complete travel guide with distance, taxi fares, road conditions, and essential tips for your journey.`}
             </p>
@@ -330,7 +343,7 @@ const RoutePage = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
-              <Button 
+              <Button
                 size="lg"
                 className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={handleWhatsAppEnquiry}
@@ -339,7 +352,7 @@ const RoutePage = () => {
                 Book Taxi Now
               </Button>
               <a href="tel:+919027475942">
-                <Button 
+                <Button
                   size="lg"
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10"
@@ -348,6 +361,16 @@ const RoutePage = () => {
                   Call for Best Rates
                 </Button>
               </a>
+
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10"
+                onClick={() => window.open(mapImageUrl, '_blank')}
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Download Map
+              </Button>
             </div>
           </motion.div>
         </Container>
@@ -360,7 +383,7 @@ const RoutePage = () => {
             <Car className="w-6 h-6 text-blue-600" />
             Taxi Fare: {route.from_city} to {route.to_city}
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Sedan */}
             <Card className="border-2 hover:border-blue-500 transition-colors">
@@ -566,7 +589,7 @@ const RoutePage = () => {
             <div className="relative">
               {/* Timeline */}
               <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-blue-200 hidden md:block" />
-              
+
               <div className="space-y-6">
                 {route.stops_along_way.map((stop, index) => (
                   <motion.div
@@ -579,7 +602,7 @@ const RoutePage = () => {
                   >
                     {/* Timeline Dot */}
                     <div className="absolute left-4 w-4 h-4 bg-blue-600 rounded-full border-4 border-white shadow hidden md:block" />
-                    
+
                     <Card className="border-0 shadow-md">
                       <CardContent className="p-6">
                         <div className="flex flex-wrap items-start justify-between gap-4">

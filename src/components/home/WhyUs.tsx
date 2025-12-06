@@ -44,7 +44,7 @@ const WhyUs = () => {
                             <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-blue-50 flex items-center justify-center mb-1 md:mb-2">
                                 <benefit.icon className="w-4 h-4 md:w-6 md:h-6 text-[#0071c2]" />
                             </div>
-                            
+
                             {/* Text */}
                             <div className="font-semibold text-gray-900 text-[11px] md:text-sm leading-tight">
                                 {benefit.title}

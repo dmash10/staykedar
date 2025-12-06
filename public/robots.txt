@@ -1,39 +1,26 @@
 # StayKedarnath Robots.txt
-# Fixed: Ensures Admin areas are blocked for ALL bots (including Google & AI)
+# Allow search engines & AI bots to crawl the site
+# Block all admin/management areas
 
 User-agent: *
 Allow: /
 Disallow: /admin/
-Disallow: /auth/callback
+Disallow: /auth/
 Disallow: /dashboard/
 Disallow: /property-management/
 Disallow: /property-edit/
 Disallow: /room-edit/
 
-# Google-Extended controls "training" data for Gemini, but not Search.
-# Allowing this helps your data be used to train future models.
+# Google-Extended (Gemini AI training data)
 User-agent: Google-Extended
 Allow: /
 Disallow: /admin/
-Disallow: /auth/callback
-Disallow: /dashboard/
-Disallow: /property-management/
-Disallow: /property-edit/
-Disallow: /room-edit/
 
-# GPTBot controls OpenAI (ChatGPT) training data.
+# GPTBot (OpenAI / ChatGPT training data)
 User-agent: GPTBot
 Allow: /
 Disallow: /admin/
-Disallow: /auth/callback
-Disallow: /dashboard/
-Disallow: /property-management/
-Disallow: /property-edit/
-Disallow: /room-edit/
 
-# Crawl-delay (Ignored by Google, but respected by Bing/others)
-Crawl-delay: 1
-
-# Sitemaps - Static (fast) and Dynamic (all content)
+# Sitemaps
 Sitemap: https://staykedarnath.in/sitemap.xml
 Sitemap: https://staykedarnath.in/api/sitemap.xml

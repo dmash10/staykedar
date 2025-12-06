@@ -26,7 +26,23 @@ import {
   Car,
   Globe,
   RouteIcon,
+
   MapPin,
+  Map,
+  Sparkles,
+  Percent,
+  Mail,
+  MessageSquareQuote,
+  HelpCircle,
+  Zap,
+  Shield,
+  Activity,
+  FileCode,
+  Smartphone,
+  Share2,
+  Layout,
+  AlertOctagon,
+  Clock,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -77,6 +93,7 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
         { name: 'Properties', path: '/admin/properties', icon: Building2 },
         { name: 'Car Drivers', path: '/admin/car-drivers', icon: Car },
         { name: 'Packages', path: '/admin/packages', icon: Package },
+        { name: 'Urgent Inventory', path: '/admin/inventory', icon: Clock },
         { name: 'Bookings', path: '/admin/bookings', icon: Calendar },
         { name: 'Users', path: '/admin/users', icon: Users },
       ]
@@ -84,18 +101,34 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
     {
       label: 'SEO Pages',
       items: [
+        { name: 'Live Status', path: '/admin/live-status', icon: Globe },
         { name: 'SEO Cities', path: '/admin/seo-cities', icon: MapPin },
         { name: 'SEO Routes', path: '/admin/seo-routes', icon: RouteIcon },
+        { name: 'Itineraries', path: '/admin/seo-itineraries', icon: Map },
         { name: 'Attractions', path: '/admin/attractions', icon: Globe },
+      ]
+    },
+    {
+      label: 'Marketing',
+      items: [
+        { name: 'Banners', path: '/admin/banners', icon: Sparkles },
+        { name: 'Promo Codes', path: '/admin/promos', icon: Percent },
+        { name: 'Email Campaigns', path: '/admin/marketing/email', icon: Mail },
+        { name: 'Email Templates', path: '/admin/marketing/templates', icon: FileCode },
+        { name: 'Push Notifications', path: '/admin/marketing/push', icon: Smartphone },
+        { name: 'Referral Program', path: '/admin/marketing/referrals', icon: Share2 },
       ]
     },
     {
       label: 'Content',
       items: [
+        { name: 'Homepage Editor', path: '/admin/content/homepage', icon: Layout },
         { name: 'Blog Manager', path: '/admin/blog', icon: FileText },
         { name: 'Help Articles', path: '/admin/help/articles', icon: FileText },
         { name: 'Media Library', path: '/admin/media', icon: Image },
         { name: 'Reviews', path: '/admin/reviews', icon: Star },
+        { name: 'Testimonials', path: '/admin/testimonials', icon: MessageSquareQuote },
+        { name: 'FAQs', path: '/admin/faqs', icon: HelpCircle },
       ]
     },
     {
@@ -109,7 +142,12 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       label: 'System',
       items: [
         { name: 'Settings', path: '/admin/settings', icon: Settings },
+        { name: 'User Management', path: '/admin/users/manage', icon: Users },
         { name: 'Activity Logs', path: '/admin/logs', icon: ClipboardList },
+        { name: 'Error Logs', path: '/admin/system/errors', icon: AlertOctagon },
+        { name: 'Cache Management', path: '/admin/system/cache', icon: Zap },
+        { name: 'System Health', path: '/admin/system/health', icon: Activity },
+        { name: 'Roles & Permissions', path: '/admin/system/roles', icon: Shield },
         { name: 'Plugins', path: '/admin/plugins', icon: Puzzle },
       ]
     },

@@ -64,6 +64,7 @@ import {
   Clock,
   Navigation,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 
 interface RouteStop {
@@ -106,6 +107,13 @@ interface SEORoute {
   is_active: boolean;
   is_featured: boolean;
   is_popular: boolean;
+
+  // Vernacular Content
+  short_description_hi?: string; meta_title_hi?: string; meta_description_hi?: string; faq_hi?: Array<{ question: string; answer: string }>;
+  short_description_ta?: string; meta_title_ta?: string; meta_description_ta?: string; faq_ta?: Array<{ question: string; answer: string }>;
+  short_description_te?: string; meta_title_te?: string; meta_description_te?: string; faq_te?: Array<{ question: string; answer: string }>;
+  short_description_kn?: string; meta_title_kn?: string; meta_description_kn?: string; faq_kn?: Array<{ question: string; answer: string }>;
+  short_description_ml?: string; meta_title_ml?: string; meta_description_ml?: string; faq_ml?: Array<{ question: string; answer: string }>;
 }
 
 const defaultRoute: Partial<SEORoute> = {
@@ -136,7 +144,22 @@ const defaultRoute: Partial<SEORoute> = {
   is_active: true,
   is_featured: false,
   is_popular: false,
+
+  // Vernacular Defaults
+  short_description_hi: '', meta_title_hi: '', meta_description_hi: '', faq_hi: [],
+  short_description_ta: '', meta_title_ta: '', meta_description_ta: '', faq_ta: [],
+  short_description_te: '', meta_title_te: '', meta_description_te: '', faq_te: [],
+  short_description_kn: '', meta_title_kn: '', meta_description_kn: '', faq_kn: [],
+  short_description_ml: '', meta_title_ml: '', meta_description_ml: '', faq_ml: [],
 };
+
+const LANGUAGES = [
+  { code: 'hi', name: 'Hindi' },
+  { code: 'ta', name: 'Tamil' },
+  { code: 'te', name: 'Telugu' },
+  { code: 'kn', name: 'Kannada' },
+  { code: 'ml', name: 'Malayalam' },
+] as const;
 
 export default function SEORoutesPage() {
   const [routes, setRoutes] = useState<SEORoute[]>([]);
@@ -146,6 +169,7 @@ export default function SEORoutesPage() {
   const [editingRoute, setEditingRoute] = useState<Partial<SEORoute> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+  const [activeLang, setActiveLang] = useState<typeof LANGUAGES[number]['code']>('hi');
   const [sortField, setSortField] = useState<keyof SEORoute>('from_city');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const { toast } = useToast();
@@ -407,6 +431,41 @@ export default function SEORoutesPage() {
       if (!prev || !prev.stops_along_way) return prev;
       return { ...prev, stops_along_way: prev.stops_along_way.filter((_, i) => i !== index) };
     });
+  };
+
+  // AI Translation Handler
+  const handleTranslate = async () => {
+    if (!editingRoute || !editingRoute.short_description) return;
+    setIsSaving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('translate-content', {
+        body: {
+          text: {
+            description: editingRoute.short_description,
+            meta_title: editingRoute.meta_title,
+            meta_description: editingRoute.meta_description,
+            faqs: editingRoute.faqs
+          },
+          targetLang: 'hi'
+        }
+      });
+
+      if (error) throw error;
+
+      setEditingRoute(prev => ({
+        ...prev!,
+        short_description_hi: data.description,
+        meta_title_hi: data.meta_title,
+        meta_description_hi: data.meta_description,
+        faq_hi: data.faqs
+      }));
+
+      toast({ title: 'Translated!', description: 'Content auto-translated to Hindi.' });
+    } catch (error: any) {
+      toast({ title: 'Translation Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -681,6 +740,7 @@ export default function SEORoutesPage() {
                 <TabsTrigger value="content" className="data-[state=active]:bg-blue-600">Content</TabsTrigger>
                 <TabsTrigger value="stops" className="data-[state=active]:bg-blue-600">Stops</TabsTrigger>
                 <TabsTrigger value="faqs" className="data-[state=active]:bg-blue-600">FAQs</TabsTrigger>
+                <TabsTrigger value="vernacular" className="data-[state=active]:bg-orange-600">Vernacular</TabsTrigger>
               </TabsList>
 
               {/* Basic Tab */}
@@ -1011,6 +1071,94 @@ export default function SEORoutesPage() {
                 {(editingRoute?.faqs || []).length === 0 && (
                   <p className="text-gray-500 text-center py-4">No FAQs added yet. Use AI Assistant to generate them!</p>
                 )}
+              </TabsContent>
+
+              {/* Vernacular Tab */}
+              <TabsContent value="vernacular" className="space-y-4 mt-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-orange-500/10 p-4 rounded-lg border border-orange-500/20">
+                  <div className="flex-1">
+                    <h3 className="text-orange-400 font-medium flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Vernacular SEO Manager
+                    </h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Manage content for regional languages. Select a language below to edit.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full md:w-auto">
+                    <Select value={activeLang} onValueChange={(v: any) => setActiveLang(v)}>
+                      <SelectTrigger className="w-[140px] bg-[#1A1A1A] border-[#2A2A2A] text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                        {LANGUAGES.map(lang => (
+                          <SelectItem key={lang.code} value={lang.code}>
+                            {lang.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      onClick={handleTranslate}
+                      disabled={isSaving}
+                      className="bg-orange-600 hover:bg-orange-700 text-white flex-1 md:flex-none"
+                    >
+                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                      Auto-Translate
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-4 p-4 border border-[#2A2A2A] rounded-lg bg-[#111111]/50">
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} Short Description (Hero)</Label>
+                    <Textarea
+                      value={(editingRoute as any)?.[`short_description_${activeLang}`] || ''}
+                      onChange={(e) => updateField(`short_description_${activeLang}` as any, e.target.value)}
+                      placeholder={`Enter ${LANGUAGES.find(l => l.code === activeLang)?.name} hero description...`}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white min-h-[80px]"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} Meta Title</Label>
+                    <Input
+                      value={(editingRoute as any)?.[`meta_title_${activeLang}`] || ''}
+                      onChange={(e) => updateField(`meta_title_${activeLang}` as any, e.target.value)}
+                      placeholder={`${LANGUAGES.find(l => l.code === activeLang)?.name} meta title`}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} Meta Description</Label>
+                    <Textarea
+                      value={(editingRoute as any)?.[`meta_description_${activeLang}`] || ''}
+                      onChange={(e) => updateField(`meta_description_${activeLang}` as any, e.target.value)}
+                      placeholder={`${LANGUAGES.find(l => l.code === activeLang)?.name} meta description`}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white min-h-[80px]"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">{LANGUAGES.find(l => l.code === activeLang)?.name} FAQs (JSON)</Label>
+                    <div className="text-xs text-gray-500 mb-2">Auto-filled by translation. Edit raw JSON if needed.</div>
+                    <Textarea
+                      value={JSON.stringify((editingRoute as any)?.[`faq_${activeLang}`] || [], null, 2)}
+                      onChange={(e) => {
+                        try {
+                          const val = JSON.parse(e.target.value);
+                          updateField(`faq_${activeLang}` as any, val);
+                        } catch (err) {
+                          // ignore
+                        }
+                      }}
+                      className="bg-[#1A1A1A] border-[#2A2A2A] text-white font-mono text-xs min-h-[150px]"
+                    />
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
 

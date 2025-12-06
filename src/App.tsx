@@ -14,6 +14,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Weather from "./pages/Weather";
+import LiveStatusPage from "./pages/LiveStatusPage";
 import Attractions from "./pages/Attractions";
 import NotFound from "./pages/NotFound";
 import ContentCreator from "./pages/ContentCreator";
@@ -35,6 +36,7 @@ import DriverDetail from "./pages/DriverDetail";
 import DriverRegistration from "./pages/DriverRegistration";
 import { Helmet } from "react-helmet";
 import WhatsAppButton from "./components/WhatsAppButton";
+import ItineraryPage from "./pages/ItineraryPage";
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import AuthCallback from "./pages/AuthCallback";
@@ -58,6 +60,26 @@ import ActivityLogsPage from '@/pages/admin/ActivityLogsPage';
 import PluginsPage from '@/pages/admin/PluginsPage';
 import CarDriversPage from '@/pages/admin/CarDriversPage';
 import SEOCitiesPage from '@/pages/admin/SEOCitiesPage';
+import LiveStatusAdminPage from '@/pages/admin/LiveStatusAdminPage';
+import SEOItinerariesPage from '@/pages/admin/SEOItinerariesPage';
+import BannersPage from '@/pages/admin/BannersPage';
+import UrgentStaysPage from '@/pages/UrgentStaysPage';
+import InventoryManager from '@/pages/admin/InventoryManager';
+import AttractionEditorPage from '@/pages/admin/AttractionEditorPage';
+import MarqueeBannerManager from '@/pages/admin/MarqueeBannerManager';
+import PromoCodesPage from '@/pages/admin/PromoCodesPage';
+import TestimonialsPage from '@/pages/admin/TestimonialsPage';
+import FAQPage from '@/pages/admin/FAQPage';
+import EmailCampaignsPage from '@/pages/admin/EmailCampaignsPage';
+import CacheManagementPage from '@/pages/admin/CacheManagementPage';
+import EmailTemplatesPage from '@/pages/admin/EmailTemplatesPage';
+import ErrorLogsPage from '@/pages/admin/ErrorLogsPage';
+import HomepageEditorPage from '@/pages/admin/HomepageEditorPage';
+import PushNotificationsPage from '@/pages/admin/PushNotificationsPage';
+import ReferralProgramPage from '@/pages/admin/ReferralProgramPage';
+import RolesPage from '@/pages/admin/RolesPage';
+import SystemHealthPage from '@/pages/admin/SystemHealthPage';
+import UserManagementPage from '@/pages/admin/UserManagementPage';
 import PluginDemo from './pages/PluginDemo';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -76,6 +98,11 @@ import RoomEdit from './pages/RoomEdit';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import PropertyOwnerSignup from './pages/PropertyOwnerSignup';
+import BudgetCalculatorPage from "./pages/tools/BudgetCalculatorPage";
+import WeatherCheckPage from "./pages/tools/WeatherCheckPage";
+import ItineraryPlannerPage from "./pages/tools/ItineraryPlannerPage";
+import CompareCitiesPage from "./pages/compare/CompareCitiesPage";
+import CompareDirectoryPage from "./pages/compare/CompareDirectoryPage";
 import EmailVerification from './pages/EmailVerification';
 import RaiseTicket from './pages/support/RaiseTicket';
 import TrackTicket from './pages/support/TrackTicket';
@@ -83,6 +110,11 @@ import PublicTicketDetail from './pages/support/PublicTicketDetail';
 import HelpHome from './pages/help/HelpHome';
 import HelpCategory from './pages/help/HelpCategory';
 import HelpArticle from './pages/help/HelpArticle';
+
+// Char Dham Hub Pages
+import BadrinathPage from './pages/BadrinathPage';
+import CharDhamPage from './pages/CharDhamPage';
+import DoDhamPage from './pages/DoDhamPage';
 
 const queryClient = new QueryClient();
 
@@ -112,6 +144,7 @@ const App = () => {
                     <Route path="/" element={<Index />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/weather" element={<Weather />} />
+                    <Route path="/live-status" element={<LiveStatusPage />} />
                     <Route path="/attractions" element={<Attractions />} />
                     <Route path="/content-creator" element={<ContentCreator />} />
                     <Route path="/partner-with-us" element={<PartnerWithUs />} />
@@ -121,8 +154,19 @@ const App = () => {
                     <Route path="/packages" element={<Packages />} />
                     <Route path="/packages/:slug" element={<PackageDetail />} />
                     <Route path="/car-rentals" element={<CarRentals />} />
+                    <Route path="/car-rentals" element={<CarRentals />} />
                     <Route path="/car-rentals/driver/:slug" element={<DriverDetail />} />
-                    
+
+                    {/* Localized Main Routes */}
+                    <Route path="/:lang" element={<Index />} />
+                    <Route path="/:lang/stays" element={<StayListing />} />
+
+                    {/* Vernacular SEO Routes */}
+                    <Route path="/:lang/taxi/:citySlug" element={<TaxiServicePage />} />
+                    <Route path="/:lang/stays/location/:citySlug" element={<StaysLocationPage />} />
+                    <Route path="/:lang/route/:routeSlug" element={<RoutePage />} />
+                    <Route path="/:lang/itinerary/:slug" element={<ItineraryPage />} />
+
                     {/* Programmatic SEO Routes - Dynamic city pages */}
                     <Route path="/taxi/:citySlug" element={<TaxiServicePage />} />
                     <Route path="/stays/location/:citySlug" element={<StaysLocationPage />} />
@@ -131,6 +175,7 @@ const App = () => {
                     <Route path="/route/:routeSlug" element={<RoutePage />} />
                     <Route path="/packages/from/:citySlug" element={<PackagesFromCityPage />} />
                     <Route path="/driver-registration" element={<DriverRegistration />} />
+                    <Route path="/itinerary/:slug" element={<ItineraryPage />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blogs" element={<Navigate to="/blog" replace />} />
                     <Route path="/blog/:slug" element={<BlogPost />} />
@@ -142,6 +187,12 @@ const App = () => {
                     <Route path="/property-owner-signup" element={<Signup />} />
                     <Route path="/become-a-host" element={<PropertyOwnerSignup />} />
                     <Route path="/email-verification" element={<EmailVerification />} />
+
+                    {/* Char Dham Hub Routes */}
+                    <Route path="/badrinath" element={<BadrinathPage />} />
+                    <Route path="/char-dham" element={<CharDhamPage />} />
+                    <Route path="/do-dham" element={<DoDhamPage />} />
+                    <Route path="/tools/itinerary-planner" element={<ItineraryPlannerPage />} />
 
                     {/* Support Routes */}
                     <Route path="/support/raise" element={<RaiseTicket />} />
@@ -220,6 +271,32 @@ const App = () => {
                     <Route path="/admin/car-drivers" element={<CarDriversPage />} />
                     <Route path="/admin/seo-cities" element={<SEOCitiesPage />} />
                     <Route path="/admin/seo-routes" element={<SEORoutesPage />} />
+                    <Route path="/admin/seo-itineraries" element={<SEOItinerariesPage />} />
+                    <Route path="/admin/seo-itineraries" element={<SEOItinerariesPage />} />
+                    <Route path="/admin/live-status" element={<LiveStatusAdminPage />} />
+                    <Route path="/admin/attractions" element={<AttractionsLocationPage />} />
+                    <Route path="/admin/attractions/new" element={<AttractionEditorPage />} />
+                    <Route path="/admin/attractions/:id" element={<AttractionEditorPage />} />
+                    <Route path="/admin/banners" element={<BannersPage />} />
+                    <Route path="/admin/promos" element={<PromoCodesPage />} />
+                    <Route path="/admin/inventory" element={<InventoryManager />} />
+                    <Route path="/urgent-stays" element={<UrgentStaysPage />} />
+                    <Route path="/tools/kedarnath-budget-calculator" element={<BudgetCalculatorPage />} />
+                    <Route path="/tools/is-it-raining-in-kedarnath" element={<WeatherCheckPage />} />
+                    <Route path="/compare/:slug" element={<CompareCitiesPage />} />
+                    <Route path="/compare-cities" element={<CompareDirectoryPage />} />
+                    <Route path="/admin/testimonials" element={<TestimonialsPage />} />
+                    <Route path="/admin/faqs" element={<FAQPage />} />
+                    <Route path="/admin/marketing/email" element={<EmailCampaignsPage />} />
+                    <Route path="/admin/marketing/templates" element={<EmailTemplatesPage />} />
+                    <Route path="/admin/marketing/push" element={<PushNotificationsPage />} />
+                    <Route path="/admin/marketing/referrals" element={<ReferralProgramPage />} />
+                    <Route path="/admin/content/homepage" element={<HomepageEditorPage />} />
+                    <Route path="/admin/system/cache" element={<CacheManagementPage />} />
+                    <Route path="/admin/system/errors" element={<ErrorLogsPage />} />
+                    <Route path="/admin/system/roles" element={<RolesPage />} />
+                    <Route path="/admin/system/health" element={<SystemHealthPage />} />
+                    <Route path="/admin/users/manage" element={<UserManagementPage />} />
 
                     <Route path="*" element={<NotFound />} />
                   </Routes>

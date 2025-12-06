@@ -87,14 +87,34 @@ export const OrganizationSchema = {
     "@type": "ContactPoint",
     "telephone": "+91-9876543210",
     "contactType": "customer service",
-    "availableLanguage": ["English", "Hindi"],
-    "areaServed": "IN"
+    "areaServed": "IN",
+    "availableLanguage": ["English", "Hindi"]
   },
-  "sameAs": [
-    "https://www.facebook.com/staykedarnath",
-    "https://www.instagram.com/staykedarnath",
-    "https://twitter.com/staykedarnath"
-  ]
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Kedarnath Road",
+    "addressLocality": "Gaurikund",
+    "addressRegion": "Uttarakhand",
+    "postalCode": "246471",
+    "addressCountry": "IN"
+  }
+};
+
+// ===== WEBSITE SCHEMA =====
+export const WebsiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "StayKedarnath",
+  "url": "https://staykedarnath.in",
+  "description": "Book stays, helicopter services, and pilgrimage packages for Kedarnath Yatra",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://staykedarnath.in/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
 };
 
 // ===== LOCAL BUSINESS SCHEMA =====
@@ -105,6 +125,7 @@ export const LocalBusinessSchema = {
   "image": "https://staykedarnath.in/og-image.png",
   "url": "https://staykedarnath.in",
   "telephone": "+91-9876543210",
+  "description": "Official booking partner for Kedarnath stays, helicopter services, and pilgrimage packages.",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Kedarnath Road",
@@ -127,23 +148,6 @@ export const LocalBusinessSchema = {
   }
 };
 
-// ===== WEBSITE SCHEMA =====
-export const WebsiteSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "StayKedarnath",
-  "url": "https://staykedarnath.in",
-  "description": "Book stays, helicopter services, and pilgrimage packages for Kedarnath Yatra",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": {
-      "@type": "EntryPoint",
-      "urlTemplate": "https://staykedarnath.in/search?q={search_term_string}"
-    },
-    "query-input": "required name=search_term_string"
-  }
-};
-
 // ===== SCHEMA GENERATORS =====
 
 /**
@@ -152,7 +156,7 @@ export const WebsiteSchema = {
  */
 export function generateFAQSchema(faqs: FAQ[]) {
   if (!faqs || faqs.length === 0) return null;
-  
+
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",

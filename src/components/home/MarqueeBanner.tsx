@@ -3,14 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useBannerTracking } from '@/hooks/useBannerTracking';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Sparkles, 
-  MapPin, 
-  Calendar, 
-  Phone, 
-  Star, 
-  Zap, 
-  Gift, 
+import {
+  Sparkles,
+  MapPin,
+  Calendar,
+  Phone,
+  Star,
+  Zap,
+  Gift,
   AlertCircle,
   Flame,
   Clock,
@@ -44,7 +44,7 @@ const parseConfig = (subtitle?: string): BannerConfig => {
     if (subtitle) {
       return JSON.parse(subtitle);
     }
-  } catch (e) {}
+  } catch (e) { }
   return {
     displayMode: 'icon',
     fontSize: 'base',
@@ -97,20 +97,20 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const defaultContent: MarqueeBannerItem[] = [
-  { id: 'default-1', title: '🏔️ Kedarnath Yatra 2025 Registrations Open', icon: 'calendar' },
-  { id: 'default-2', title: '⭐ Best Price Guarantee on All Stays', icon: 'tag' },
-  { id: 'default-3', title: '🚁 Helicopter Booking Available', icon: 'zap' },
-  { id: 'default-4', title: '📞 24/7 Customer Support', icon: 'phone' },
-  { id: 'default-5', title: '🎁 Special Monsoon Discounts - Up to 30% Off', icon: 'gift' },
-  { id: 'default-6', title: '🔥 Limited Rooms Available for Peak Season', icon: 'flame' },
+  { id: 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', title: '🏔️ Kedarnath Yatra 2025 Registrations Open', icon: 'calendar' },
+  { id: 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', title: '⭐ Best Price Guarantee on All Stays', icon: 'tag' },
+  { id: 'c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f', title: '🚁 Helicopter Booking Available', icon: 'zap' },
+  { id: 'd4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a', title: '📞 24/7 Customer Support', icon: 'phone' },
+  { id: 'e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b', title: '🎁 Special Monsoon Discounts - Up to 30% Off', icon: 'gift' },
+  { id: 'f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c', title: '🔥 Limited Rooms Available for Peak Season', icon: 'flame' },
 ];
 
 // Single item renderer (no tracking for clones)
-const MarqueeItemDisplay = ({ 
-  item, 
-  onClick 
-}: { 
-  item: MarqueeBannerItem; 
+const MarqueeItemDisplay = ({
+  item,
+  onClick
+}: {
+  item: MarqueeBannerItem;
   onClick: () => void;
 }) => {
   const config = parseConfig(item.subtitle);
@@ -134,11 +134,11 @@ const MarqueeItemDisplay = ({
 };
 
 // Tracked item for analytics
-const MarqueeItemTracked = ({ 
-  item, 
-  onNavigate 
-}: { 
-  item: MarqueeBannerItem; 
+const MarqueeItemTracked = ({
+  item,
+  onNavigate
+}: {
+  item: MarqueeBannerItem;
   onNavigate: (url: string) => void;
 }) => {
   const { ref, trackClick } = useBannerTracking({
@@ -219,27 +219,30 @@ export default function MarqueeBanner() {
   const speed = Math.max(18, content.length * 10);
 
   return (
-    <div 
+    <div
       className="relative overflow-hidden bg-slate-900"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Top accent line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
-      
+
       {/* Left fade */}
       <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-slate-900 to-transparent z-10 pointer-events-none" />
-      
+
       {/* Right fade */}
       <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-900 to-transparent z-10 pointer-events-none" />
 
       {/* Marquee Container */}
       <div className="py-3 overflow-hidden">
-        <div 
+        <div
           ref={trackRef}
           className="flex w-max"
           style={{
-            animation: `marquee-scroll ${speed}s linear infinite`,
+            animationName: 'marquee-scroll',
+            animationDuration: `${speed}s`,
+            animationTimingFunction: 'linear',
+            animationIterationCount: 'infinite',
             animationPlayState: isPaused ? 'paused' : 'running',
           }}
         >
@@ -248,15 +251,15 @@ export default function MarqueeBanner() {
             <div key={repeatIndex} className="flex">
               {content.map((item, itemIndex) => (
                 repeatIndex === 0 ? (
-                  <MarqueeItemTracked 
-                    key={`tracked-${item.id}-${itemIndex}`} 
-                    item={item} 
+                  <MarqueeItemTracked
+                    key={`tracked-${item.id}-${itemIndex}`}
+                    item={item}
                     onNavigate={handleNavigate}
                   />
                 ) : (
-                  <MarqueeItemDisplay 
-                    key={`clone-${repeatIndex}-${item.id}-${itemIndex}`} 
-                    item={item} 
+                  <MarqueeItemDisplay
+                    key={`clone-${repeatIndex}-${item.id}-${itemIndex}`}
+                    item={item}
                     onClick={() => item.link_url && handleNavigate(item.link_url)}
                   />
                 )

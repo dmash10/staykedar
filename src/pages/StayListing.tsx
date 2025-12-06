@@ -11,9 +11,12 @@ import stayService, { PropertySearchResult } from '@/api/stayService';
 import { useToast } from '@/components/ui/use-toast';
 import AIOptimizedFAQ, { StaysFAQs } from '@/components/SEO/AIOptimizedFAQ';
 import { Link } from 'react-router-dom';
-import { MapPin, Mountain, Bed, ArrowRight } from 'lucide-react';
+import { MapPin, Mountain, Bed, ArrowRight, Clock, Phone, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import citiesData from '@/data/cities.json';
+import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
+import { formatDistanceToNow } from 'date-fns';
 
 const StayListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -40,6 +43,32 @@ const StayListing = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
+
+  // Urgent Deals State
+  const [urgentDeals, setUrgentDeals] = useState<any[]>([]);
+  const [showUrgentDeals, setShowUrgentDeals] = useState(false);
+
+  useEffect(() => {
+    const fetchUrgentDeals = async () => {
+      // 1. Check Config
+      const { data: config } = await supabase.from('app_config').select('value').eq('key', 'urgent_deals_enabled').single();
+      if (config?.value !== true) return;
+
+      setShowUrgentDeals(true);
+
+      // 2. Fetch Listings
+      const { data } = await supabase
+        .from('inventory_listings')
+        .select('*')
+        .eq('is_verified', true)
+        .gt('expires_at', new Date().toISOString())
+        .order('discounted_price', { ascending: true })
+        .limit(3);
+
+      if (data) setUrgentDeals(data);
+    };
+    fetchUrgentDeals();
+  }, []);
 
   // Constants for filters
   const amenitiesList = ['Wi-Fi', 'Parking', 'Restaurant', 'Room Service', 'Power Backup', 'Geyser'];
@@ -151,7 +180,7 @@ const StayListing = () => {
         <meta name="keywords" content="Kedarnath hotel, Kedarnath stay, Gaurikund hotel, Sonprayag hotel, Guptkashi hotel, Kedarnath accommodation, Char Dham stay" />
         <link rel="canonical" href="https://staykedarnath.in/stays" />
       </Helmet>
-      
+
       <Nav />
       <main className="min-h-screen bg-gray-50">
         {/* Header with Search Bar */}
@@ -167,6 +196,67 @@ const StayListing = () => {
             />
           </Container>
         </div>
+
+        {/* Urgent Deals Widget */}
+        {showUrgentDeals && urgentDeals.length > 0 && (
+          <div className="bg-red-50 border-y border-red-100 py-6 mb-8">
+            <Container>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-red-600 text-white hover:bg-red-700 animate-pulse">LIVE NOW</Badge>
+                  <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-red-600" />
+                    Last Minute Lightning Deals
+                  </h2>
+                </div>
+                <Link to="/urgent-stays" className="text-sm font-medium text-red-600 hover:text-red-700 flex items-center">
+                  View All <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {urgentDeals.map((deal: any) => (
+                  <div key={deal.id} className="bg-white rounded-lg shadow-sm border border-red-100 p-4 hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">
+                      {Math.round(((deal.original_price - deal.discounted_price) / deal.original_price) * 100)}% OFF
+                    </div>
+
+                    <div className="mb-2">
+                      <h3 className="font-bold text-gray-900">{deal.hotel_name}</h3>
+                      <p className="text-xs text-gray-500 flex items-center">
+                        <MapPin className="w-3 h-3 mr-1" /> {deal.location}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-between items-end mb-3">
+                      <div>
+                        <p className="text-xs text-gray-400 line-through">₹{deal.original_price}</p>
+                        <p className="text-xl font-bold text-red-600">₹{deal.discounted_price}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded">
+                          {deal.available_rooms} Left
+                        </p>
+                      </div>
+                    </div>
+
+                    <a
+                      href={`tel:${deal.contact_phone}`}
+                      className="flex items-center justify-center w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-md text-sm transition-colors"
+                    >
+                      <Phone className="w-3 h-3 mr-2 animate-bounce" />
+                      Call to Grab Deal
+                    </a>
+
+                    <p className="text-[10px] text-gray-400 text-center mt-2 flex items-center justify-center gap-1">
+                      <Clock className="w-3 h-3" /> Expires {formatDistanceToNow(new Date(deal.expires_at))}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Container>
+          </div>
+        )}
 
         <Container className="py-8">
           <div className="flex flex-col lg:flex-row gap-8">
@@ -308,7 +398,7 @@ const StayListing = () => {
                   </div>
 
                   <div className="space-y-6">
-                    {properties.map((property) => (
+                    {properties.map((property: any) => (
                       <div
                         key={property.id}
                         onClick={() => navigateToPropertyDetail(property.id)}
@@ -415,7 +505,7 @@ const StayListing = () => {
             </div>
           </div>
         </Container>
-        
+
         {/* Stays by Location - Internal Linking for SEO */}
         <section className="py-12 bg-gray-50 border-t">
           <Container>
@@ -477,7 +567,7 @@ const StayListing = () => {
 
         {/* FAQ Section for SEO */}
         <Container className="py-12 bg-white border-t">
-          <AIOptimizedFAQ 
+          <AIOptimizedFAQ
             title="Frequently Asked Questions About Kedarnath Accommodation"
             description="Everything you need to know before booking your stay"
             faqs={StaysFAQs}
