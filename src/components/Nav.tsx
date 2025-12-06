@@ -327,7 +327,7 @@ const Nav = () => {
               `}</style>
               <div className="flex gap-2 px-4">
                 {navLinks.map((link) => (
-                  <Link
+                  <TransitionLink
                     key={link.path}
                     to={link.path}
                     className={cn(
@@ -339,7 +339,7 @@ const Nav = () => {
                   >
                     {link.icon}
                     <span className="font-medium text-sm">{link.name}</span>
-                  </Link>
+                  </TransitionLink>
                 ))}
               </div>
             </div>
@@ -352,7 +352,7 @@ const Nav = () => {
           {/* Bottom Navigation (Desktop) */}
           <div className="hidden md:flex items-center space-x-6 py-2 relative">
             {navLinks.map((link) => (
-              <Link
+              <TransitionLink
                 key={link.path}
                 to={link.path}
                 className={cn(
@@ -362,7 +362,7 @@ const Nav = () => {
               >
                 {link.icon}
                 <span className="font-medium">{link.name}</span>
-              </Link>
+              </TransitionLink>
             ))}
           </div>
         </Container>
@@ -372,7 +372,7 @@ const Nav = () => {
           <div className="md:hidden bg-[#003580] border-t border-[#004cb8] py-4 px-4 animate-fade-in">
             <div className="flex flex-col space-y-2">
               {navLinks.map((link) => (
-                <Link
+                <TransitionLink
                   key={link.path}
                   to={link.path}
                   className={cn(
@@ -383,7 +383,7 @@ const Nav = () => {
                 >
                   {link.icon}
                   <span className="font-medium">{link.name}</span>
-                </Link>
+                </TransitionLink>
               ))}
 
               {!user && (
