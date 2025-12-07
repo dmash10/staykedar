@@ -24,8 +24,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { 
-    Loader2, CheckCircle2, Copy, Ticket, ArrowLeft, 
+import {
+    Loader2, CheckCircle2, Copy, Ticket, ArrowLeft,
     AlertCircle, Clock, Shield
 } from "lucide-react";
 import { Helmet } from "react-helmet";
@@ -99,14 +99,14 @@ export default function RaiseTicket() {
 
     const fetchCategories = async () => {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .from("support_categories")
                 .select("*")
                 .eq("is_active", true)
                 .order("display_order");
-            
+
             if (!error && data && data.length > 0) {
-                setCategories(data);
+                setCategories(data as Category[]);
             } else {
                 // Use default categories if fetch fails
                 setCategories(defaultCategories);
@@ -118,12 +118,12 @@ export default function RaiseTicket() {
     };
 
     const fetchUserProfile = async (userId: string) => {
-        const { data } = await supabase
+        const { data } = await (supabase as any)
             .from("profiles")
             .select("full_name")
             .eq("id", userId)
             .single();
-        
+
         if (data?.full_name) {
             form.setValue("name", data.full_name);
         }
@@ -139,23 +139,23 @@ export default function RaiseTicket() {
     // Auto-detect priority based on subject and description
     const detectPriority = (subject: string, description: string, categoryId: string): string => {
         const text = `${subject} ${description}`.toLowerCase();
-        
+
         // Check for urgent keywords
         if (urgentKeywords.some(keyword => text.includes(keyword))) {
             return "urgent";
         }
-        
+
         // Check for high priority keywords
         if (highKeywords.some(keyword => text.includes(keyword))) {
             return "high";
         }
-        
+
         // Payment & Refund category defaults to high
         const category = categories.find(c => c.id === categoryId);
         if (category?.name.toLowerCase().includes("payment") || category?.name.toLowerCase().includes("refund")) {
             return "high";
         }
-        
+
         return "medium";
     };
 
@@ -164,11 +164,11 @@ export default function RaiseTicket() {
         try {
             const ticketNumber = generateTicketNumber();
             const priority = detectPriority(values.subject, values.description, values.category);
-            
+
             // Get category name from selected category
             const selectedCategory = categories.find(c => c.id === values.category);
             const categoryName = selectedCategory?.name || values.category;
-            
+
             // Create the ticket
             const { data: ticket, error: ticketError } = await supabase
                 .from("support_tickets")
@@ -201,7 +201,7 @@ export default function RaiseTicket() {
                 });
 
             // Log activity
-            await supabase
+            await (supabase as any)
                 .from("ticket_activity_log")
                 .insert({
                     ticket_id: ticket.id,
@@ -306,14 +306,14 @@ export default function RaiseTicket() {
 
                                 {/* Actions */}
                                 <div className="space-y-3">
-                                    <Button 
+                                    <Button
                                         onClick={() => navigate(`/support/ticket/${ticketData.ticket_number}`)}
                                         className="w-full bg-[#0071c2] hover:bg-[#005999] h-12"
                                     >
                                         <Ticket className="w-4 h-4 mr-2" />
                                         View Ticket Details
                                     </Button>
-                                    <Button 
+                                    <Button
                                         variant="outline"
                                         onClick={() => navigate("/help")}
                                         className="w-full h-12 border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -340,13 +340,13 @@ export default function RaiseTicket() {
                 <meta name="description" content="Submit a support request and get help from our team" />
             </Helmet>
             <Nav />
-            
+
             <div className="min-h-screen bg-gray-50">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-[#0A1628] via-[#0F2167] to-[#1E3A8A] py-10 md:py-14">
                     <div className="max-w-3xl mx-auto px-4">
-                        <Link 
-                            to="/help" 
+                        <Link
+                            to="/help"
                             className="inline-flex items-center gap-2 text-white hover:text-white/90 mb-5 transition-colors text-sm bg-white/15 px-3 py-1.5 rounded-full border border-white/20"
                         >
                             <ArrowLeft className="w-4 h-4" />
@@ -378,10 +378,10 @@ export default function RaiseTicket() {
                                                     <FormItem>
                                                         <FormLabel className="text-gray-700">Full Name *</FormLabel>
                                                         <FormControl>
-                                                            <Input 
-                                                                placeholder="Your name" 
+                                                            <Input
+                                                                placeholder="Your name"
                                                                 className={inputStyle}
-                                                                {...field} 
+                                                                {...field}
                                                             />
                                                         </FormControl>
                                                         <FormMessage />
@@ -395,11 +395,11 @@ export default function RaiseTicket() {
                                                     <FormItem>
                                                         <FormLabel className="text-gray-700">Email Address *</FormLabel>
                                                         <FormControl>
-                                                            <Input 
+                                                            <Input
                                                                 type="email"
-                                                                placeholder="your@email.com" 
+                                                                placeholder="your@email.com"
                                                                 className={inputStyle}
-                                                                {...field} 
+                                                                {...field}
                                                             />
                                                         </FormControl>
                                                         <FormMessage />
@@ -423,8 +423,8 @@ export default function RaiseTicket() {
                                                         </FormControl>
                                                         <SelectContent className="bg-white border border-gray-200 shadow-lg">
                                                             {categories.map((cat) => (
-                                                                <SelectItem 
-                                                                    key={cat.id} 
+                                                                <SelectItem
+                                                                    key={cat.id}
                                                                     value={cat.id}
                                                                     className="hover:bg-gray-100 focus:bg-[#0071c2] focus:text-white cursor-pointer"
                                                                 >
@@ -446,10 +446,10 @@ export default function RaiseTicket() {
                                                 <FormItem>
                                                     <FormLabel className="text-gray-700">Booking Reference (Optional)</FormLabel>
                                                     <FormControl>
-                                                        <Input 
-                                                            placeholder="e.g., BK-12345" 
+                                                        <Input
+                                                            placeholder="e.g., BK-12345"
                                                             className={inputStyle}
-                                                            {...field} 
+                                                            {...field}
                                                         />
                                                     </FormControl>
                                                     <FormDescription className="text-xs text-gray-500">
@@ -467,10 +467,10 @@ export default function RaiseTicket() {
                                                 <FormItem>
                                                     <FormLabel className="text-gray-700">Subject *</FormLabel>
                                                     <FormControl>
-                                                        <Input 
-                                                            placeholder="e.g., Unable to complete booking" 
+                                                        <Input
+                                                            placeholder="e.g., Unable to complete booking"
                                                             className={inputStyle}
-                                                            {...field} 
+                                                            {...field}
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -486,10 +486,10 @@ export default function RaiseTicket() {
                                                 <FormItem>
                                                     <FormLabel className="text-gray-700">Describe your issue *</FormLabel>
                                                     <FormControl>
-                                                        <Textarea 
+                                                        <Textarea
                                                             placeholder="Please provide as much detail as possible..."
                                                             className="min-h-[120px] resize-none border-gray-300 focus:border-gray-400 focus:ring-0 outline-none"
-                                                            {...field} 
+                                                            {...field}
                                                         />
                                                     </FormControl>
                                                     <FormDescription className="text-xs text-gray-500">
@@ -531,8 +531,8 @@ export default function RaiseTicket() {
                                 <p className="text-xs text-gray-600 mb-3">
                                     Track the status of your existing support request
                                 </p>
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="outline"
                                     className="w-full h-10 border-[#0071c2] text-[#0071c2] hover:bg-[#0071c2]/5"
                                     onClick={() => navigate("/support/track")}
                                 >

@@ -11,10 +11,10 @@ const TermsAndConditions = () => {
         <title>Terms and Conditions | Staykedar</title>
         <meta name="description" content="Terms and conditions for using Staykedar's services" />
       </Helmet>
-      
+
       <div className="min-h-screen flex flex-col">
         <Nav />
-        
+
         <main className="flex-grow">
           {/* Header Banner */}
           <section className="bg-gradient-primary py-16 px-4">
@@ -35,8 +35,8 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">1. Introduction</h2>
                   <p className="text-gray-600 mb-4">
-                    Welcome to Staykedar. These Terms and Conditions govern your use of our website, 
-                    services, and products. By accessing or using our services, you agree to be bound 
+                    Welcome to Staykedar. These Terms and Conditions govern your use of our website,
+                    services, and products. By accessing or using our services, you agree to be bound
                     by these Terms.
                   </p>
                 </section>
@@ -57,12 +57,12 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">3. Account Registration</h2>
                   <p className="text-gray-600 mb-4">
-                    To use certain features of our Service, you may be required to register for an account. 
-                    You agree to provide accurate information during the registration process and to keep 
+                    To use certain features of our Service, you may be required to register for an account.
+                    You agree to provide accurate information during the registration process and to keep
                     your account details updated.
                   </p>
                   <p className="text-gray-600 mb-4">
-                    You are responsible for maintaining the confidentiality of your account credentials 
+                    You are responsible for maintaining the confidentiality of your account credentials
                     and for all activities that occur under your account.
                   </p>
                 </section>
@@ -70,11 +70,11 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">4. Booking and Payments</h2>
                   <p className="text-gray-600 mb-4">
-                    All bookings are subject to availability and confirmation. Payment terms vary 
+                    All bookings are subject to availability and confirmation. Payment terms vary
                     depending on the type of service booked.
                   </p>
                   <p className="text-gray-600 mb-4">
-                    Prices displayed on our website are subject to change without notice. We reserve 
+                    Prices displayed on our website are subject to change without notice. We reserve
                     the right to modify or discontinue services without liability.
                   </p>
                 </section>
@@ -82,7 +82,7 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">5. Cancellations and Refunds</h2>
                   <p className="text-gray-600 mb-4">
-                    Cancellation and refund policies vary based on the type of service booked. Please 
+                    Cancellation and refund policies vary based on the type of service booked. Please
                     refer to our Cancellation and Refunds Policy for detailed information.
                   </p>
                 </section>
@@ -90,7 +90,7 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">6. User Conduct</h2>
                   <p className="text-gray-600 mb-4">
-                    You agree not to use our services for any unlawful purpose or in any way that could 
+                    You agree not to use our services for any unlawful purpose or in any way that could
                     damage, disable, or impair our services.
                   </p>
                 </section>
@@ -98,7 +98,7 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">7. Intellectual Property</h2>
                   <p className="text-gray-600 mb-4">
-                    All content on our website, including text, graphics, logos, and software, is the 
+                    All content on our website, including text, graphics, logos, and software, is the
                     property of Staykedar and is protected by copyright and other intellectual property laws.
                   </p>
                 </section>
@@ -106,7 +106,7 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">8. Limitation of Liability</h2>
                   <p className="text-gray-600 mb-4">
-                    To the maximum extent permitted by law, Staykedar shall not be liable for any indirect, 
+                    To the maximum extent permitted by law, Staykedar shall not be liable for any indirect,
                     incidental, special, consequential, or punitive damages arising from or related to your use of our services.
                   </p>
                 </section>
@@ -114,7 +114,7 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">9. Governing Law</h2>
                   <p className="text-gray-600 mb-4">
-                    These Terms shall be governed by and construed in accordance with the laws of India, 
+                    These Terms shall be governed by and construed in accordance with the laws of India,
                     without regard to its conflict of law provisions.
                   </p>
                 </section>
@@ -122,8 +122,8 @@ const TermsAndConditions = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">10. Changes to Terms</h2>
                   <p className="text-gray-600 mb-4">
-                    We reserve the right to modify these Terms at any time. Changes will be effective 
-                    immediately upon posting on our website. Your continued use of our services following 
+                    We reserve the right to modify these Terms at any time. Changes will be effective
+                    immediately upon posting on our website. Your continued use of our services following
                     any changes indicates your acceptance of the modified Terms.
                   </p>
                 </section>
@@ -142,7 +142,7 @@ const TermsAndConditions = () => {
             </Container>
           </div>
         </main>
-        
+
         <Footer />
       </div>
     </>

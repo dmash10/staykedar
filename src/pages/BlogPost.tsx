@@ -223,7 +223,7 @@ export default function BlogPostPage() {
         <meta name="description" content={post.meta_description || post.excerpt} />
         {post.meta_keywords && <meta name="keywords" content={post.meta_keywords} />}
         <link rel="canonical" href={`https://staykedarnath.in/blog/${post.slug}`} />
-        
+
         {/* Open Graph */}
         <meta property="og:type" content="article" />
         <meta property="og:title" content={post.title} />
@@ -238,18 +238,18 @@ export default function BlogPostPage() {
         {post.tags?.map((tag, i) => (
           <meta key={i} property="article:tag" content={tag} />
         ))}
-        
+
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.excerpt} />
         {post.featured_image && <meta name="twitter:image" content={post.featured_image} />}
-        
+
         {/* Article Schema for AI Search */}
         <script type="application/ld+json">
           {JSON.stringify(articleSchema)}
         </script>
-        
+
         {/* Breadcrumb Schema */}
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbSchema)}

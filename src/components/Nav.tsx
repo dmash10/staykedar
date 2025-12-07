@@ -53,7 +53,25 @@ const Nav = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isEditMode } = useEdit();
-  const [userName, setUserName] = useState<string | null>(null);
+
+  // Cache initials for avatar to prevent 'U' flash
+  const cachedInitials = (() => {
+    try {
+      const cached = localStorage.getItem('cached_user_name');
+      return cached ? cached.slice(0, 2).toUpperCase() : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  // Initialize userName from localStorage cache to prevent flash during navigation
+  const [userName, setUserName] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('cached_user_name');
+    } catch {
+      return null;
+    }
+  });
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -75,7 +93,7 @@ const Nav = () => {
       if (!user?.id) {
         setIsAdmin(false);
         setUserRole(null);
-        setUserName(null);
+        // Don't clear userName here - auth context handles cache clearing
         return;
       }
 
@@ -96,7 +114,13 @@ const Nav = () => {
           console.log("User details from Supabase:", data);
           // Use type assertion to handle missing properties in TypeScript
           const userData = data as any;
-          setUserName(userData.name || user.email?.split('@')[0] || 'User');
+          const name = userData.name || user.email?.split('@')[0] || 'User';
+          setUserName(name);
+          // Cache the name and login status for instant display on navigation
+          try {
+            localStorage.setItem('cached_user_name', name);
+            localStorage.setItem('cached_is_logged_in', 'true');
+          } catch { }
           setUserRole(userData.role || 'customer');
 
           // Check admin status 
@@ -105,12 +129,16 @@ const Nav = () => {
           }
         } else {
           console.log("User not found in customer_details table");
-          setUserName(user.email?.split('@')[0] || 'User');
+          const name = user.email?.split('@')[0] || 'User';
+          setUserName(name);
+          try { localStorage.setItem('cached_user_name', name); } catch { }
           setUserRole('customer');
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
-        setUserName(user.email?.split('@')[0] || 'User');
+        const name = user.email?.split('@')[0] || 'User';
+        setUserName(name);
+        try { localStorage.setItem('cached_user_name', name); } catch { }
         setUserRole('customer');
       }
     };
@@ -195,7 +223,7 @@ const Nav = () => {
 
   return (
     <>
-      <nav className="bg-[#003580] text-white">
+      <nav className="nav-container bg-[#003580] text-white">
         <Container>
           <div className="py-4 flex items-center justify-between">
             {/* Logo */}
@@ -208,27 +236,27 @@ const Nav = () => {
 
               {/* List Property */}
               {!user && (
-                <Link
+                <TransitionLink
                   to="/become-a-host"
                   className="hidden lg:inline-flex items-center justify-center rounded-md bg-transparent border border-white px-3 py-2 text-white font-medium hover:bg-white hover:text-[#003580] transition-colors"
                 >
                   <span className="text-sm font-semibold">List your property</span>
-                </Link>
+                </TransitionLink>
               )}
 
               {/* Button Group - Show only when not logged in */}
               {!user ? (
                 <div className="hidden md:flex">
-                  <Link to="/auth">
+                  <TransitionLink to="/auth">
                     <Button className="bg-white text-[#003580] hover:bg-gray-100 rounded-l-lg rounded-r-none border-r border-gray-300">
                       Register
                     </Button>
-                  </Link>
-                  <Link to="/auth">
+                  </TransitionLink>
+                  <TransitionLink to="/auth">
                     <Button className="bg-white text-[#003580] hover:bg-gray-100 rounded-l-none rounded-r-lg">
                       Sign in
                     </Button>
-                  </Link>
+                  </TransitionLink>
                 </div>
               ) : (
                 /* User Profile */
@@ -240,10 +268,10 @@ const Nav = () => {
                     <Avatar className="h-8 w-8 border-2 border-white">
                       <AvatarImage src="" />
                       <AvatarFallback className="bg-[#004cb8]">
-                        {userName?.slice(0, 2).toUpperCase() || 'U'}
+                        {userName?.slice(0, 2).toUpperCase() || cachedInitials || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="font-medium">{userName}</span>
+                    <span className="font-medium">{userName || localStorage.getItem('cached_user_name')}</span>
                     <ChevronDown className="h-4 w-4" />
                   </div>
 
@@ -251,22 +279,22 @@ const Nav = () => {
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                       <div className="py-1" role="menu" aria-orientation="vertical">
-                        <Link
+                        <TransitionLink
                           to={getDashboardRoute()}
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowUserMenu(false)}
                         >
                           <User className="mr-2 h-4 w-4" />
                           Dashboard
-                        </Link>
-                        <Link
+                        </TransitionLink>
+                        <TransitionLink
                           to="/profile"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setShowUserMenu(false)}
                         >
                           <Settings className="mr-2 h-4 w-4" />
                           Account Settings
-                        </Link>
+                        </TransitionLink>
                         <button
                           className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={handleSignOut}
@@ -284,11 +312,11 @@ const Nav = () => {
               <div className="md:hidden flex items-center gap-2">
                 {/* Profile Icon for Mobile */}
                 {!user ? (
-                  <Link to="/auth">
+                  <TransitionLink to="/auth">
                     <div className="p-2 rounded-full border-2 border-white hover:bg-white/10 transition-colors">
                       <User className="h-5 w-5" />
                     </div>
-                  </Link>
+                  </TransitionLink>
                 ) : (
                   <div
                     className="p-2 rounded-full border-2 border-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -388,7 +416,7 @@ const Nav = () => {
 
               {!user && (
                 <div className="pt-4 mt-2 border-t border-[#004cb8] flex flex-col gap-3">
-                  <Link
+                  <TransitionLink
                     to="/auth"
                     className="w-full"
                     onClick={() => setMobileMenuOpen(false)}
@@ -396,13 +424,14 @@ const Nav = () => {
                     <Button className="w-full bg-white text-[#003580] hover:bg-gray-100">
                       Sign In / Register
                     </Button>
-                  </Link>
-                  <Link
+                  </TransitionLink>
+                  <TransitionLink
                     to="/property-owner-signup"
                     className="w-full text-center py-2 text-white border border-white rounded-md font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                  </Link>
+                    List Your Property
+                  </TransitionLink>
                 </div>
               )}
             </div>

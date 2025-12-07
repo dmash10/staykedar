@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Hotel, Home, Building, Wifi, Coffee, Snowflake, Car } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TransitionLink } from "../TransitionLink";
 import { motion } from "framer-motion";
 import Container from "../Container";
 import { EditableRichText, EditableText, EditableButton } from "../editable";
@@ -187,7 +188,7 @@ const ExploreStays = () => {
               </div>
 
               <div className="mt-auto">
-                <Link
+                <TransitionLink
                   to={`/stays/${stay.id}`}
                   className="w-full block"
                   onClick={handleLinkClick}
@@ -198,7 +199,7 @@ const ExploreStays = () => {
                     defaultValue="View Details"
                     className="btn-primary w-full justify-center"
                   />
-                </Link>
+                </TransitionLink>
               </div>
             </motion.div>
           ))}
@@ -222,7 +223,7 @@ const ExploreStays = () => {
         </div>
 
         <div className="mt-12 text-center">
-          <Link
+          <TransitionLink
             to="/stays"
             className="inline-block"
             onClick={handleLinkClick}
@@ -233,7 +234,7 @@ const ExploreStays = () => {
               defaultValue="View All Stays"
               className="btn-primary"
             />
-          </Link>
+          </TransitionLink>
         </div>
       </Container>
     </section>

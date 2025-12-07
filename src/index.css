@@ -494,26 +494,48 @@
   navigation: auto;
 }
 
-/* Default crossfade transition for pages */
+/* Default crossfade transition for pages - Butter smooth! */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.35s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
 }
 
-/* Page fade-in with slight slide up */
-::view-transition-new(root) {
-  animation-name: page-slide-in;
-}
-
+/* Old page stays FULLY visible, no opacity change - prevents white flash */
 ::view-transition-old(root) {
-  animation-name: page-slide-out;
+  animation: none;
+  z-index: 1;
 }
 
+/* New page fades in ON TOP of the old page */
+::view-transition-new(root) {
+  animation-name: page-crossfade-in;
+  z-index: 2;
+}
+
+/* Smooth crossfade - new page appears over old, no white gap */
+@keyframes page-crossfade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Disable root animation for in-page transitions (tabs, modals, etc.) */
+.vt-no-root::view-transition-old(root),
+.vt-no-root::view-transition-new(root) {
+  animation: none !important;
+}
+
+/* Slide animation keyframes (for explicit .vt-slide use) */
 @keyframes page-slide-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(20px);
   }
 
   to {
@@ -530,8 +552,17 @@
 
   to {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-20px);
   }
+}
+
+/* Slide animation style class */
+.vt-slide ::view-transition-new(root) {
+  animation-name: page-slide-in;
+}
+
+.vt-slide ::view-transition-old(root) {
+  animation-name: page-slide-out;
 }
 
 /* Hero Section Transitions */
@@ -572,12 +603,17 @@
 /* Navigation Bar - Keep stable during page transitions */
 .nav-container {
   view-transition-name: nav;
+  contain: layout style;
+  position: relative;
+  z-index: 100;
 }
 
 ::view-transition-old(nav),
 ::view-transition-new(nav) {
-  animation: none;
+  animation: none !important;
   mix-blend-mode: normal;
+  /* Hide the old snapshot completely to prevent flash */
+  display: block;
 }
 
 /* Footer - Keep stable */
@@ -595,16 +631,25 @@
   view-transition-name: tab-content;
 }
 
-::view-transition-old(tab-content),
+::view-transition-old(tab-content) {
+  animation-name: tab-fade-out;
+  animation-duration: 0.2s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
 ::view-transition-new(tab-content) {
+  animation-name: tab-fade-in;
   animation-duration: 0.25s;
   animation-timing-function: ease-out;
+  animation-fill-mode: both;
+  animation-delay: 0.05s;
 }
 
 @keyframes tab-fade-in {
   from {
     opacity: 0;
-    transform: translateX(10px);
+    transform: translateX(20px);
   }
 
   to {
@@ -621,8 +666,36 @@
 
   to {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-20px);
   }
+}
+
+/* Tab slide-in animation - triggers on React mount (reliable fallback) */
+.tab-slide-in {
+  animation: tab-slide-enter 0.3s ease-out forwards;
+}
+
+@keyframes tab-slide-enter {
+  from {
+    opacity: 0;
+    transform: translateX(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Timeline stays stable during transitions */
+.timeline-stable {
+  view-transition-name: timeline;
+}
+
+::view-transition-old(timeline),
+::view-transition-new(timeline) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 /* Modal Transitions */
@@ -682,4 +755,151 @@
 
 .vt-card-6 {
   view-transition-name: card-6;
+}
+
+/* ============================================
+   ADDITIONAL ANIMATION STYLES
+   ============================================ */
+
+/* Blur Transition Keyframes */
+@keyframes page-blur-in {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes page-blur-out {
+  from {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 0;
+    filter: blur(12px);
+  }
+}
+
+/* Scale Transition Keyframes */
+@keyframes page-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes page-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+/* Slide Left Transition Keyframes */
+@keyframes page-slide-left-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes page-slide-left-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+/* Animation Style Classes - Old page stays, new page animates in */
+
+/* Blur: New page blurs in, old stays visible */
+.vt-blur ::view-transition-old(root) {
+  animation: none;
+  z-index: 1;
+}
+
+.vt-blur ::view-transition-new(root) {
+  animation-name: page-blur-in;
+  animation-duration: 0.35s;
+  animation-timing-function: ease-out;
+  z-index: 2;
+}
+
+/* Scale: New page scales in, old stays visible */
+.vt-scale ::view-transition-old(root) {
+  animation: none;
+  z-index: 1;
+}
+
+.vt-scale ::view-transition-new(root) {
+  animation-name: page-scale-in;
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+/* Slide Left: New page slides in, old stays visible */
+.vt-slide-left ::view-transition-old(root) {
+  animation: none;
+  z-index: 1;
+}
+
+.vt-slide-left ::view-transition-new(root) {
+  animation-name: page-slide-left-in;
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+}
+
+/* Card morphing animation */
+@keyframes card-morph-in {
+  from {
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  to {
+    object-fit: cover;
+    border-radius: 0;
+  }
+}
+
+/* Smooth card image transitions */
+.card-morphable {
+  view-transition-name: var(--card-transition-id);
+}
+
+::view-transition-old(.card-morphable),
+::view-transition-new(.card-morphable) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 }

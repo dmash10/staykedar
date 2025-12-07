@@ -3,8 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { 
-    ArrowLeft, Send, Loader2, User, 
+import {
+    ArrowLeft, Send, Loader2, User,
     Headphones, AlertCircle, CheckCircle2, MessageSquare,
     Clock, RefreshCw, Check, CheckCheck
 } from "lucide-react";
@@ -126,7 +126,7 @@ export default function PublicTicketDetail() {
 
                 setMessages(messagesData || []);
                 setIsLoading(false);
-                
+
                 // Scroll after messages load (force scroll on initial load)
                 setTimeout(() => scrollToBottom(true), 100);
 
@@ -202,7 +202,7 @@ export default function PublicTicketDetail() {
                     })
                     .subscribe();
                 typingChannelRef.current = typingChannel;
-                
+
                 // Broadcast that user is viewing (to mark admin messages as read)
                 // Only send when tab is visible and focused (like WhatsApp)
                 const sendReadReceipt = () => {
@@ -215,25 +215,25 @@ export default function PublicTicketDetail() {
                         });
                     }
                 };
-                
+
                 // Send read receipt when tab becomes visible
                 const handleVisibilityChange = () => {
                     if (document.visibilityState === 'visible') {
                         sendReadReceipt();
                     }
                 };
-                
+
                 // Send read receipt when window gains focus
                 const handleFocus = () => sendReadReceipt();
-                
+
                 document.addEventListener('visibilitychange', handleVisibilityChange);
                 window.addEventListener('focus', handleFocus);
-                
+
                 // Send initial read receipt if already visible
                 if (document.visibilityState === 'visible' && document.hasFocus()) {
                     setTimeout(sendReadReceipt, 1000);
                 }
-                
+
                 // Store cleanup functions
                 (window as any).readReceiptCleanup = () => {
                     document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -247,7 +247,7 @@ export default function PublicTicketDetail() {
                         .select("*")
                         .eq("ticket_id", ticketData.id)
                         .order("created_at", { ascending: true });
-                    
+
                     if (newMessages) {
                         setMessages(prev => {
                             if (JSON.stringify(prev) !== JSON.stringify(newMessages)) {
@@ -256,13 +256,13 @@ export default function PublicTicketDetail() {
                             return prev;
                         });
                     }
-                    
+
                     const { data: updatedTicket } = await supabase
                         .from("support_tickets")
                         .select("*")
                         .eq("id", ticketData.id)
                         .single();
-                        
+
                     if (updatedTicket) {
                         setTicket(prev => {
                             if (JSON.stringify(prev) !== JSON.stringify(updatedTicket)) {
@@ -318,7 +318,7 @@ export default function PublicTicketDetail() {
         const messageText = newMessage.trim();
         setNewMessage("");
         setIsSending(true);
-        
+
         // Focus back on input
         inputRef.current?.focus();
 
@@ -333,7 +333,7 @@ export default function PublicTicketDetail() {
             sender_id: user?.id || null,
             created_at: new Date().toISOString(),
         };
-        
+
         // Add optimistic message immediately
         setMessages(prev => [...prev, optimisticMessage]);
         setTimeout(scrollToBottom, 10);
@@ -366,7 +366,7 @@ export default function PublicTicketDetail() {
             if (newMsg) {
                 setMessages(prev => prev.map(m => m.id === tempId ? newMsg : m));
             }
-            
+
             // Broadcast that message was sent (to stop typing indicator on admin side)
             if (typingChannelRef.current) {
                 typingChannelRef.current.send({
@@ -381,12 +381,12 @@ export default function PublicTicketDetail() {
             if (newStatus !== ticket.status) {
                 await supabase
                     .from("support_tickets")
-                    .update({ 
+                    .update({
                         status: newStatus,
                         updated_at: new Date().toISOString()
                     })
                     .eq("id", ticket.id);
-                
+
                 setTicket(prev => prev ? { ...prev, status: newStatus } : null);
             }
 
@@ -412,12 +412,12 @@ export default function PublicTicketDetail() {
         const date = new Date(dateString);
         const now = new Date();
         const isToday = date.toDateString() === now.toDateString();
-        
+
         if (isToday) {
             return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
         }
-        return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) + 
-               " · " + date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+        return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) +
+            " · " + date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
     };
 
     const formatDate = (dateString: string) => {
@@ -455,15 +455,15 @@ export default function PublicTicketDetail() {
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">Ticket Not Found</h1>
                         <p className="text-gray-600 mb-6">Please check the ticket number and try again.</p>
                         <div className="flex gap-3 justify-center flex-wrap">
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 onClick={() => navigate("/support/track")}
                                 className="border-gray-300 text-gray-700"
                             >
                                 Track Another
                             </Button>
-                            <Button 
-                                onClick={() => navigate("/support/raise")} 
+                            <Button
+                                onClick={() => navigate("/support/raise")}
                                 className="bg-[#0071c2] hover:bg-[#005999] text-white"
                             >
                                 New Ticket
@@ -485,11 +485,11 @@ export default function PublicTicketDetail() {
                 <title>{ticket.ticket_number} | StayKedarnath Support</title>
             </Helmet>
             <Nav />
-            
+
             <div className="min-h-screen bg-gray-100">
                 <div className="max-w-5xl mx-auto px-3 md:px-4 pt-2 pb-4">
-                    <Link 
-                        to="/help" 
+                    <Link
+                        to="/help"
                         className="inline-flex items-center gap-2 text-[#0071c2] hover:text-[#005999] mb-2 text-sm font-medium"
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -517,8 +517,8 @@ export default function PublicTicketDetail() {
                                 </div>
 
                                 {/* Messages */}
-                                <div 
-                                    ref={messagesContainerRef} 
+                                <div
+                                    ref={messagesContainerRef}
                                     className="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-50"
                                 >
                                     {messages.length === 0 ? (
@@ -536,18 +536,17 @@ export default function PublicTicketDetail() {
                                                 // 1. They replied after this message, OR
                                                 // 2. They viewed the chat AFTER this message was sent
                                                 const hasReplyAfter = isUser && messages.slice(index + 1).some(m => m.is_admin);
-                                                const wasReadByAdmin = isUser && !isTemp && adminLastReadAt && 
+                                                const wasReadByAdmin = isUser && !isTemp && adminLastReadAt &&
                                                     new Date(msg.created_at) <= new Date(adminLastReadAt);
                                                 const isRead = hasReplyAfter || wasReadByAdmin;
-                                                
+
                                                 return (
-                                                    <div 
-                                                        key={msg.id} 
+                                                    <div
+                                                        key={msg.id}
                                                         className={`flex gap-2 ${isUser ? "flex-row-reverse" : ""}`}
                                                     >
-                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                                            isUser ? "bg-[#0071c2]" : "bg-slate-700"
-                                                        }`}>
+                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${isUser ? "bg-[#0071c2]" : "bg-slate-700"
+                                                            }`}>
                                                             {isUser ? (
                                                                 <User className="w-3.5 h-3.5 text-white" />
                                                             ) : (
@@ -555,11 +554,10 @@ export default function PublicTicketDetail() {
                                                             )}
                                                         </div>
                                                         <div className={`max-w-[80%] ${isUser ? "text-right" : ""}`}>
-                                                            <div className={`inline-block px-3 py-1.5 rounded-2xl text-sm ${
-                                                                isUser 
-                                                                    ? "bg-[#0071c2] text-white rounded-tr-sm" 
+                                                            <div className={`inline-block px-3 py-1.5 rounded-2xl text-sm ${isUser
+                                                                    ? "bg-[#0071c2] text-white rounded-tr-sm"
                                                                     : "bg-slate-200 text-gray-900 rounded-tl-sm"
-                                                            } ${isTemp ? "opacity-70" : ""}`}>
+                                                                } ${isTemp ? "opacity-70" : ""}`}>
                                                                 <p className="whitespace-pre-wrap break-words">{msg.message}</p>
                                                             </div>
                                                             {/* Time and read receipt for user messages */}
@@ -583,7 +581,7 @@ export default function PublicTicketDetail() {
                                                     </div>
                                                 );
                                             })}
-                                            
+
                                             {/* Typing Indicator */}
                                             {isTyping && (
                                                 <div className="flex gap-2 items-end">
@@ -621,9 +619,9 @@ export default function PublicTicketDetail() {
                                                 disabled={isSending}
                                                 className="flex-1 px-3 py-2 rounded-full border border-gray-200 focus:border-[#0071c2] outline-none text-sm bg-gray-50 focus:bg-white"
                                             />
-                                            <Button 
-                                                onClick={handleSendMessage} 
-                                                disabled={!newMessage.trim() || isSending} 
+                                            <Button
+                                                onClick={handleSendMessage}
+                                                disabled={!newMessage.trim() || isSending}
                                                 className="bg-[#0071c2] hover:bg-[#005999] h-9 w-9 rounded-full p-0 flex-shrink-0"
                                             >
                                                 {isSending ? (
@@ -637,7 +635,7 @@ export default function PublicTicketDetail() {
                                 ) : (
                                     <div className="border-t p-3 bg-gray-50 text-center">
                                         <p className="text-sm text-gray-600">
-                                            This ticket is closed. 
+                                            This ticket is closed.
                                             <Link to="/support/raise" className="text-[#0071c2] ml-1 hover:underline">Create new →</Link>
                                         </p>
                                     </div>

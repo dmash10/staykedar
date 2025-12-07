@@ -4,7 +4,7 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import Container from '@/components/Container';
 import { getWeatherData, WeatherData, ForecastDay } from '@/utils/weatherApi';
-import { 
+import {
   Cloud, Sun, CloudRain, Loader2, CloudSnow, CloudLightning, CloudSun,
   Thermometer, Droplets, Wind, Eye, Calendar, MapPin, RefreshCw
 } from 'lucide-react';
@@ -213,11 +213,11 @@ const Weather = () => {
                       <p className="text-sm text-blue-200">
                         Last updated: {weather.lastUpdated}
                       </p>
-                      <Button 
-                        onClick={fetchWeather} 
+                      <Button
+                        onClick={fetchWeather}
                         disabled={isRefreshing}
-                        variant="ghost" 
-                        size="sm" 
+                        variant="ghost"
+                        size="sm"
                         className="text-white hover:bg-white/10"
                       >
                         <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -249,9 +249,8 @@ const Weather = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 * index }}
-                          className={`p-4 rounded-xl text-center ${
-                            index === 0 ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50'
-                          }`}
+                          className={`p-4 rounded-xl text-center ${index === 0 ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50'
+                            }`}
                         >
                           <p className="text-sm font-medium text-gray-600 mb-2">
                             {index === 0 ? 'Today' : day.date.split(',')[0]}

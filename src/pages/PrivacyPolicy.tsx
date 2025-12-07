@@ -11,10 +11,10 @@ const PrivacyPolicy = () => {
         <title>Privacy Policy | Staykedar</title>
         <meta name="description" content="Privacy policy for Staykedar services - learn how we collect, use, and protect your data" />
       </Helmet>
-      
+
       <div className="min-h-screen flex flex-col">
         <Nav />
-        
+
         <main className="flex-grow">
           {/* Header Banner */}
           <section className="bg-gradient-primary py-16 px-4">
@@ -35,11 +35,11 @@ const PrivacyPolicy = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">1. Introduction</h2>
                   <p className="text-gray-600 mb-4">
-                    Staykedar ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains 
+                    Staykedar ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains
                     how we collect, use, disclose, and safeguard your information when you visit our website or use our services.
                   </p>
                   <p className="text-gray-600 mb-4">
-                    Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, 
+                    Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy,
                     please do not access the site.
                   </p>
                 </section>
@@ -87,11 +87,11 @@ const PrivacyPolicy = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">4. Cookies and Tracking Technologies</h2>
                   <p className="text-gray-600 mb-4">
-                    We use cookies and similar tracking technologies to track activity on our website and 
+                    We use cookies and similar tracking technologies to track activity on our website and
                     store certain information. These technologies help us deliver a better and more personalized service.
                   </p>
                   <p className="text-gray-600 mb-4">
-                    You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. 
+                    You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.
                     However, if you do not accept cookies, you may not be able to use some portions of our website.
                   </p>
                 </section>
@@ -108,7 +108,7 @@ const PrivacyPolicy = () => {
                     <li>Legal authorities when required by law</li>
                   </ul>
                   <p className="text-gray-600 mb-4">
-                    We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties 
+                    We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties
                     except as described in this policy.
                   </p>
                 </section>
@@ -116,7 +116,7 @@ const PrivacyPolicy = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">6. Data Security</h2>
                   <p className="text-gray-600 mb-4">
-                    We implement appropriate technical and organizational measures to maintain the security of your personal data. 
+                    We implement appropriate technical and organizational measures to maintain the security of your personal data.
                     However, please note that no method of transmission over the internet or electronic storage is 100% secure.
                   </p>
                 </section>
@@ -139,8 +139,8 @@ const PrivacyPolicy = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">8. Children's Privacy</h2>
                   <p className="text-gray-600 mb-4">
-                    Our services are not intended for individuals under the age of 18. We do not knowingly collect 
-                    personal information from children under 18. If we learn we have collected personal information 
+                    Our services are not intended for individuals under the age of 18. We do not knowingly collect
+                    personal information from children under 18. If we learn we have collected personal information
                     from a child under 18, we will delete that information.
                   </p>
                 </section>
@@ -148,7 +148,7 @@ const PrivacyPolicy = () => {
                 <section className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-800 mb-4">9. Changes to This Privacy Policy</h2>
                   <p className="text-gray-600 mb-4">
-                    We may update our Privacy Policy from time to time. We will notify you of any changes by posting 
+                    We may update our Privacy Policy from time to time. We will notify you of any changes by posting
                     the new Privacy Policy on this page and updating the "Last Updated" date at the top.
                   </p>
                 </section>
@@ -167,7 +167,7 @@ const PrivacyPolicy = () => {
             </Container>
           </div>
         </main>
-        
+
         <Footer />
       </div>
     </>

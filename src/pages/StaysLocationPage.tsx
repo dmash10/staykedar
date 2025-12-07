@@ -52,12 +52,12 @@ import { supabase } from "@/integrations/supabase/client";
 // Import data (fallback)
 import citiesDataJson from "@/data/cities.json";
 import servicesData from "@/data/services.json";
-import { 
-  generateLodgingSchema, 
-  generateFAQSchema, 
+import {
+  generateLodgingSchema,
+  generateFAQSchema,
   generateBreadcrumbSchema,
   generateItemListSchema,
-  combineSchemas 
+  combineSchemas
 } from "@/utils/seoSchemas";
 
 // Types
@@ -126,7 +126,7 @@ const getFallbackImage = (index: number) => {
 // Location-specific stay FAQs
 const generateStayFAQs = (city: CityData): FAQItem[] => {
   const highlightTag = (servicesData.stays.highlight_tags as Record<string, string>)?.[city.slug] || '';
-  
+
   return [
     {
       question: `What is the best hotel to stay in ${city.name} for Kedarnath trip?`,
@@ -151,9 +151,9 @@ const StaysLocationPage = () => {
   const [allCities, setAllCities] = useState<CityData[]>([]);
   const [cityLoading, setCityLoading] = useState(true);
   const [error, setError] = useState(false);
-  
+
   const stayService = servicesData.stays;
-  
+
   // Fetch city data from Supabase
   useEffect(() => {
     const fetchCityData = async () => {
@@ -226,12 +226,12 @@ const StaysLocationPage = () => {
       fetchCityData();
     }
   }, [citySlug]);
-  
+
   // Fetch properties for this location
   useEffect(() => {
     const fetchProperties = async () => {
       if (!city) return;
-      
+
       try {
         const { data, error } = await supabase
           .from('properties')
@@ -265,7 +265,7 @@ const StaysLocationPage = () => {
       </div>
     );
   }
-  
+
   // 404 if city not found
   if (error || !city) {
     return <Navigate to="/stays" replace />;
@@ -283,7 +283,7 @@ const StaysLocationPage = () => {
   // Generate SEO data - use custom titles if available
   const pageTitle = city.stays_hero_title || stayService.title_template.replace("{city}", city.name);
   const pageDescription = city.stays_hero_description || stayService.description_template.replace("{city}", city.name);
-  const pageH1 = city.stays_hero_title || (highlightTag 
+  const pageH1 = city.stays_hero_title || (highlightTag
     ? `${stayService.h1_template.replace("{city}", city.name)} ${highlightTag}`
     : stayService.h1_template.replace("{city}", city.name));
   const canonicalUrl = `https://staykedarnath.in/stays/location/${city.slug}`;
@@ -299,19 +299,19 @@ const StaysLocationPage = () => {
   ]);
 
   // ItemList Schema for property listings (triggers Google carousels)
-  const propertyListSchema = properties.length > 0 
+  const propertyListSchema = properties.length > 0
     ? generateItemListSchema(
-        properties.map(p => ({
-          name: p.name,
-          id: p.id,
-          image: p.images?.[0],
-          price: p.price_per_night,
-          rating: p.rating,
-          location: p.location
-        })),
-        city.name,
-        city.state
-      )
+      properties.map(p => ({
+        name: p.name,
+        id: p.id,
+        image: p.images?.[0],
+        price: p.price_per_night,
+        rating: p.rating,
+        location: p.location
+      })),
+      city.name,
+      city.state
+    )
     : null;
 
   const allSchemas = combineSchemas(lodgingSchema, faqSchema, breadcrumbSchema, propertyListSchema);
@@ -387,13 +387,13 @@ const StaysLocationPage = () => {
                 </Badge>
               )}
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               {pageH1}
             </h1>
-            
+
             <p className="text-xl text-blue-100/80 mb-6">
-              Find comfortable accommodations in {city.name} for your Kedarnath pilgrimage. 
+              Find comfortable accommodations in {city.name} for your Kedarnath pilgrimage.
               {city.description}
             </p>
 
@@ -416,7 +416,7 @@ const StaysLocationPage = () => {
             </div>
 
             {/* CTA */}
-            <Button 
+            <Button
               size="lg"
               className="bg-white text-[#003580] hover:bg-gray-100"
               onClick={() => handleWhatsAppEnquiry()}
@@ -449,8 +449,8 @@ const StaysLocationPage = () => {
                 Available Stays in {city.name}
               </h2>
               <p className="text-gray-600">
-                {properties.length > 0 
-                  ? `${properties.length} properties found` 
+                {properties.length > 0
+                  ? `${properties.length} properties found`
                   : 'Contact us for the best options'}
               </p>
             </div>
@@ -501,7 +501,7 @@ const StaysLocationPage = () => {
                           <MapPin className="w-3 h-3" />
                           {property.location}
                         </div>
-                        
+
                         {property.amenities && property.amenities.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-3">
                             {property.amenities.slice(0, 3).map((amenity) => (
@@ -511,7 +511,7 @@ const StaysLocationPage = () => {
                             ))}
                           </div>
                         )}
-                        
+
                         {/* Updated: Quick Book Button + Price */}
                         <div className="flex items-center justify-between pt-3 border-t gap-2">
                           <div>
@@ -520,10 +520,10 @@ const StaysLocationPage = () => {
                               ₹{property.price_per_night?.toLocaleString() || '999'}
                             </p>
                           </div>
-                          
+
                           {/* Quick Book Button - Prevents link navigation */}
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             className="bg-green-600 hover:bg-green-700 text-white h-8 px-3"
                             onClick={(e) => {
                               e.preventDefault();
@@ -718,8 +718,8 @@ const StaysLocationPage = () => {
               <div className="mt-8 p-6 bg-white rounded-xl shadow-sm">
                 <div className="prose prose-sm max-w-none text-gray-600">
                   {city.how_to_reach.split('\n\n').map((paragraph, index) => (
-                    <p key={index} className="mb-3" dangerouslySetInnerHTML={{ 
-                      __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                    <p key={index} className="mb-3" dangerouslySetInnerHTML={{
+                      __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     }} />
                   ))}
                 </div>
@@ -842,8 +842,8 @@ const StaysLocationPage = () => {
               </p>
             </div>
             <div className="flex gap-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-white text-[#003580] hover:bg-gray-100"
                 onClick={() => handleWhatsAppEnquiry()}
               >

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Check, ArrowRight, Calendar, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TransitionLink } from "../TransitionLink";
 import Container from "../Container";
 
 const packages = [
@@ -79,13 +80,13 @@ const CuratedPackages = () => {
                             Hassle-free pilgrimage experiences
                         </p>
                     </div>
-                    <Link
+                    <TransitionLink
                         to="/packages"
                         className="inline-flex items-center gap-1 text-[#0071c2] font-medium hover:gap-2 transition-all text-sm flex-shrink-0"
                     >
                         View all
                         <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    </TransitionLink>
                 </motion.div>
 
                 {/* Horizontal Scrollable Packages */}
@@ -112,8 +113,8 @@ const CuratedPackages = () => {
 
                                     {/* Badge */}
                                     <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-semibold ${pkg.popular
-                                            ? 'bg-[#0071c2] text-white'
-                                            : 'bg-white/90 text-gray-700'
+                                        ? 'bg-[#0071c2] text-white'
+                                        : 'bg-white/90 text-gray-700'
                                         }`}>
                                         {pkg.highlight}
                                     </div>
@@ -153,12 +154,12 @@ const CuratedPackages = () => {
                                     </div>
 
                                     {/* View Details Button */}
-                                    <Link
+                                    <TransitionLink
                                         to={`/packages/${pkg.slug}`}
                                         className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-center transition-colors bg-[#0071c2] text-white hover:bg-[#005999]"
                                     >
                                         View Details
-                                    </Link>
+                                    </TransitionLink>
                                 </div>
                             </div>
                         </motion.div>

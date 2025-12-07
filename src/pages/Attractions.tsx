@@ -1,33 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { 
-  MapPin, 
-  Clock, 
-  Star, 
-  Heart, 
-  ArrowRight, 
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  MapPin,
+  Clock,
+  Star,
+  ArrowRight,
   Search,
   Mountain,
   Sparkles,
-  TreePine,
-  Compass,
-  Sun,
   Camera,
-  Users,
-  Shield,
-  Footprints,
-  Navigation,
-  Loader2
+  TreePine,
+  Grid3X3,
+  List,
+  ChevronDown
 } from "lucide-react";
-
 import Container from "../components/Container";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { supabase } from "@/integrations/supabase/client";
+import { TransitionLink } from "@/components/TransitionLink";
 
-// Define attraction data interface matching database
+// Define attraction data interface
 interface Attraction {
   id: string;
   slug: string;
@@ -51,555 +45,381 @@ interface Attraction {
 
 const categories = [
   { id: "all", label: "All Places", icon: <Sparkles className="w-4 h-4" /> },
-  { id: "Religious", label: "Temples & Shrines", icon: <Mountain className="w-4 h-4" /> },
-  { id: "Natural", label: "Lakes & Nature", icon: <TreePine className="w-4 h-4" /> },
-  { id: "Historical", label: "Historical Sites", icon: <Compass className="w-4 h-4" /> },
+  { id: "Religious", label: "Temples", icon: <Mountain className="w-4 h-4" /> },
+  { id: "Nature", label: "Nature", icon: <TreePine className="w-4 h-4" /> },
+  { id: "Adventure", label: "Adventure", icon: <Camera className="w-4 h-4" /> },
 ];
 
-const difficultyColors = {
-  "Easy": "bg-emerald-100 text-emerald-700",
-  "Moderate": "bg-amber-100 text-amber-700",
-  "Moderate to Difficult": "bg-orange-100 text-orange-700",
-  "Difficult": "bg-red-100 text-red-700"
+const difficultyConfig: Record<string, { bg: string; text: string }> = {
+  "Easy": { bg: "bg-emerald-500/30", text: "text-emerald-300" },
+  "Moderate": { bg: "bg-amber-500/30", text: "text-amber-300" },
+  "Moderate to Difficult": { bg: "bg-orange-500/30", text: "text-orange-300" },
+  "Difficult": { bg: "bg-red-500/30", text: "text-red-300" }
+};
+
+const DEFAULT_BG = "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2070";
+
+// Helper to get cached attractions
+const getCachedAttractions = (): Attraction[] => {
+  try {
+    const cached = localStorage.getItem('attractions_cache');
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      // Return cache if less than 5 minutes old
+      if (Date.now() - timestamp < 5 * 60 * 1000) {
+        return data;
+      }
+    }
+  } catch (e) { }
+  return [];
 };
 
 const Attractions = () => {
-  const [attractions, setAttractions] = useState<Attraction[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize from cache for instant display
+  const [attractions, setAttractions] = useState<Attraction[]>(() => getCachedAttractions());
+  const [loading, setLoading] = useState(() => getCachedAttractions().length === 0);
+  // Initialize from localStorage to prevent flash/loading delay
+  const [bgLoading, setBgLoading] = useState(() => !localStorage.getItem('attractions_bg_style'));
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  const [backgroundImage, setBackgroundImage] = useState(() => localStorage.getItem('attractions_bg') || DEFAULT_BG);
+  const [backgroundStyle, setBackgroundStyle] = useState<'image' | 'white'>(() =>
+    (localStorage.getItem('attractions_bg_style') as 'image' | 'white') || 'white'
+  );
+  const [heroImage, setHeroImage] = useState<string>(() => localStorage.getItem('attractions_hero_image') || "");
 
   useEffect(() => {
     fetchAttractions();
+    fetchBackground();
   }, []);
+
+  const fetchBackground = async () => {
+    try {
+      const { data } = await supabase
+        .from('site_content')
+        .select('value, key')
+        .in('key', ['attractions_background', 'attractions_bg_style', 'attractions_hero_image']);
+
+      if (data) {
+        const bgImage = data.find((d: any) => d.key === 'attractions_background');
+        if (bgImage?.value) {
+          setBackgroundImage(bgImage.value);
+          localStorage.setItem('attractions_bg', bgImage.value);
+        }
+
+        const bgStyle = data.find((d: any) => d.key === 'attractions_bg_style');
+        if (bgStyle?.value) {
+          setBackgroundStyle(bgStyle.value as 'image' | 'white');
+          localStorage.setItem('attractions_bg_style', bgStyle.value);
+        }
+
+        const hero = data.find((d: any) => d.key === 'attractions_hero_image');
+        if (hero?.value) {
+          setHeroImage(hero.value);
+          localStorage.setItem('attractions_hero_image', hero.value);
+        }
+      }
+    } catch (error) {
+      // Use default if not set
+    } finally {
+      setBgLoading(false);
+    }
+  };
 
   const fetchAttractions = async () => {
     try {
-      const { data, error } = await supabase
+      // Try to load from cache first for instant display
+      const cached = localStorage.getItem('attractions_cache');
+      if (cached) {
+        const { data: cachedData, timestamp } = JSON.parse(cached);
+        // Use cache if less than 5 minutes old - skip fresh fetch
+        if (Date.now() - timestamp < 5 * 60 * 1000) {
+          setAttractions(cachedData);
+          setLoading(false);
+          return; // Don't fetch again, use cache
+        }
+      }
+
+      // Fetch fresh data only if cache is stale or missing
+      const { data, error } = await (supabase as any)
         .from('attractions')
         .select('*')
         .eq('is_active', true)
         .order('is_featured', { ascending: false })
-        .order('rating', { ascending: false });
+        .order('rating', { ascending: false })
+        .order('id', { ascending: true }); // Stable sort by id
 
       if (error) throw error;
-      setAttractions(data || []);
+      if (data) {
+        setAttractions(data as any);
+        // Cache the results
+        localStorage.setItem('attractions_cache', JSON.stringify({
+          data,
+          timestamp: Date.now()
+        }));
+      }
     } catch (error) {
       console.error('Error fetching attractions:', error);
     } finally {
       setLoading(false);
     }
   };
-  
-  // Get featured attraction
-  const featuredAttraction = attractions.find(a => a.is_featured);
-  
-  // Filter attractions based on search and type
+
   const filteredAttractions = attractions.filter(attraction => {
-    const matchesSearch = attraction.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         attraction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (attraction.tags || []).some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+    const matchesSearch = attraction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      attraction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (attraction.tags || []).some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesType = activeCategory === "all" ? true : attraction.type === activeCategory;
-    
-    return matchesSearch && matchesType && !attraction.is_featured;
+    return matchesSearch && matchesType;
   });
-  
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
-      <Helmet>
-        <title>Attractions Near Kedarnath | StayKedarnath</title>
-        <meta name="description" content="Explore the most beautiful and sacred attractions near Kedarnath. Plan your visit to these must-see destinations during your pilgrimage." />
-      </Helmet>
-      
-      <Nav />
-      
-      {/* Hero Section - Compact */}
-      <section className="relative bg-[#003580] pt-6 pb-12 md:pt-8 md:pb-16 overflow-hidden">
-        {/* Background Image - Subtle */}
-        <div className="absolute inset-0 opacity-20">
+
+  // Card Component - Clean Minimal Design with smooth image loading
+  const AttractionCard = ({ attraction }: { attraction: Attraction }) => {
+    // Check if image was already loaded in this session (sessionStorage clears on refresh)
+    const imageKey = `img_loaded_${attraction.id}`;
+    const wasLoadedInSession = typeof window !== 'undefined' && sessionStorage.getItem(imageKey) === 'true';
+
+    const [imageLoaded, setImageLoaded] = useState(wasLoadedInSession);
+
+    const handleImageLoad = () => {
+      setImageLoaded(true);
+      // Mark as loaded in session so it shows instantly on navigation back
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(imageKey, 'true');
+      }
+    };
+
+    return (
+      <TransitionLink to={`/attractions/${attraction.slug}`} className="block" transitionStyle="scale">
+        {/* Compact Card with Full-Bleed Image */}
+        <div className="group relative aspect-[4/3] sm:aspect-[3/2] rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] bg-slate-200">
+          {/* Full Background Image with fade-in */}
           <img
-            src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=2070"
-            alt="Kedarnath Valley"
-            className="w-full h-full object-cover"
+            src={attraction.main_image}
+            alt={attraction.name}
+            loading="lazy"
+            onLoad={handleImageLoad}
+            className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
           />
+
+          {/* Gradient Overlay - Simpler */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`} />
+
+          {/* Rating Badge - Top Right */}
+          <div className="absolute top-2 sm:top-3 right-2 sm:right-3 flex items-center gap-1 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-md">
+            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 fill-amber-400" />
+            <span className="text-amber-400 text-xs sm:text-sm font-bold">{attraction.rating}</span>
+          </div>
+
+          {/* Featured Badge */}
+          {attraction.is_featured && (
+            <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
+              <span className="px-2 py-0.5 bg-amber-500 text-white text-[10px] sm:text-xs font-bold rounded-md flex items-center gap-1">
+                <Star className="w-2.5 h-2.5 fill-white" /> Featured
+              </span>
+            </div>
+          )}
+
+          {/* Bottom - Title Only */}
+          <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-4">
+            <h3 className="text-sm sm:text-lg font-bold text-white line-clamp-2 group-hover:text-blue-300 transition-colors duration-300 drop-shadow-lg">
+              {attraction.name}
+            </h3>
+          </div>
         </div>
-        
-        {/* Content */}
-        <Container className="relative z-10">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mb-2"
+      </TransitionLink>
+    );
+  };
+
+  return (
+    <>
+      <Nav />
+      <div className="min-h-screen relative">
+        <Helmet>
+          <title>Attractions Near Kedarnath | StayKedarnath</title>
+          <meta name="description" content="Explore the most beautiful and sacred attractions near Kedarnath. Plan your visit to these must-see destinations during your pilgrimage." />
+        </Helmet>
+
+        {/* Background - Conditional based on style (only render after loaded) */}
+        {!bgLoading && (
+          backgroundStyle === 'image' ? (
+            <div
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: `url(${backgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed'
+              }}
             >
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full text-white/90 text-xs font-medium">
-                <MapPin className="w-3 h-3" />
+              <div className="absolute inset-0 bg-black/50" />
+            </div>
+          ) : (
+            <div className="absolute inset-0 z-0 bg-white" />
+          )
+        )}
+
+        {/* Content */}
+        <div className="relative z-10 pb-16">
+          {/* Hero Banner Section */}
+          <section className="relative pt-16 pb-8">
+            {/* Hero Image Container */}
+            {heroImage && (
+              <div className="absolute inset-0 overflow-hidden">
+                <img
+                  src={heroImage}
+                  alt="Hero Banner"
+                  className="w-full h-full object-cover"
+                />
+                {/* Subtle dark overlay for text visibility */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40" />
+              </div>
+            )}
+
+            <Container className="relative z-10">
+              {/* Badge */}
+              <span
+                className={`inline-flex items-center gap-2 px-4 py-2 backdrop-blur-md border rounded-full text-sm font-medium mb-4 ${heroImage
+                  ? 'bg-white/20 border-white/30 text-white'
+                  : backgroundStyle === 'white'
+                    ? 'bg-blue-50 border-blue-200 text-blue-700'
+                    : 'bg-white/10 border-white/20 text-white/80'
+                  }`}
+              >
+                <MapPin className="w-4 h-4" />
                 Discover Sacred Destinations
               </span>
-            </motion.div>
-            
-            <motion.h1 
-              className="text-2xl md:text-4xl font-bold text-white mb-2 leading-tight"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              Explore the{" "}
-              <span className="text-amber-300">Divine Himalayas</span>
-            </motion.h1>
-            
-            <motion.p 
-              className="text-sm text-white/70 max-w-lg mb-4"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-            >
-              From ancient temples to pristine glacial lakes, discover sacred attractions around Kedarnath
-            </motion.p>
-            
-            {/* Stats - Inline Flex */}
-            <motion.div 
-              className="inline-flex items-center gap-4 md:gap-6 text-white"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div>
-                <div className="text-lg md:text-2xl font-bold">{attractions.length}</div>
-                <div className="text-[10px] md:text-xs text-white/60">Places</div>
-              </div>
-              <div className="w-px h-8 bg-white/20" />
-              <div>
-                <div className="text-lg md:text-2xl font-bold">3,583m</div>
-                <div className="text-[10px] md:text-xs text-white/60">Elevation</div>
-              </div>
-              <div className="w-px h-8 bg-white/20" />
-              <div>
-                <div className="text-lg md:text-2xl font-bold">1000+</div>
-                <div className="text-[10px] md:text-xs text-white/60">Years</div>
-              </div>
-            </motion.div>
-          </div>
-        </Container>
-        
-        {/* Bottom Curve */}
-        <div className="absolute -bottom-px left-0 right-0">
-          <svg viewBox="0 0 1440 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
-            <path d="M0 40H1440V20C1440 20 1320 0 1200 0C1080 0 960 15 720 15C480 15 360 0 240 0C120 0 0 20 0 20V40Z" fill="rgb(248 250 252)" />
-          </svg>
-        </div>
-      </section>
-      
-      {/* Search and Filter Section */}
-      <section className="py-4 relative z-20">
-        <Container>
-          <motion.div 
-            className="flex flex-col gap-3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#0071c2]" size={18} />
-              <input
-                type="text"
-                placeholder="Search temples, lakes, treks..."
-                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border-2 border-[#0071c2] focus:border-[#003580] focus:ring-2 focus:ring-[#003580]/10 transition-all duration-300 text-slate-700 placeholder:text-slate-400 outline-none shadow-sm text-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            {/* Category Pills - 2x2 Grid on mobile, inline on desktop */}
-            <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:justify-center md:gap-3">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`
-                    flex items-center justify-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all duration-300 text-sm
-                    ${activeCategory === category.id
-                      ? 'bg-[#0071c2] text-white shadow-md'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:border-[#0071c2] hover:text-[#0071c2]'
-                    }
-                  `}
-                >
-                  {category.icon}
-                  <span>{category.label}</span>
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        </Container>
-      </section>
-      
-      {/* Loading State */}
-      {loading && (
-        <section className="py-20">
-          <Container>
-            <div className="flex flex-col items-center justify-center">
-              <Loader2 className="w-10 h-10 text-[#0071c2] animate-spin mb-4" />
-              <p className="text-gray-500">Loading attractions...</p>
-            </div>
-          </Container>
-        </section>
-      )}
 
-      {!loading && (
-        <>
-          {/* Featured Attraction - Spotlight */}
-          {featuredAttraction && activeCategory === "all" && !searchQuery && (
-            <section className="py-12">
-              <Container>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className="mb-8"
-                >
-                  <h2 className="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-3">
-                    <Star className="w-7 h-7 text-amber-500 fill-amber-500" />
-                    Must Visit Destination
-                  </h2>
-                </motion.div>
-                
-                <Link to={`/attractions/${featuredAttraction.slug}`}>
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="relative rounded-3xl overflow-hidden group cursor-pointer"
-                >
-                  {/* Large Featured Image */}
-                  <div className="aspect-[21/9] md:aspect-[21/8] relative overflow-hidden">
-                    <img
-                      src={featuredAttraction.main_image}
-                      alt={featuredAttraction.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
-                  </div>
-                  
-                  {/* Content Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-                    <div className="max-w-2xl">
-                      <div className="flex flex-wrap items-center gap-3 mb-4">
-                        <span className="px-3 py-1 bg-amber-500 text-white text-xs font-bold rounded-full uppercase tracking-wide">
-                          Featured
-                        </span>
-                        <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-full">
-                          {featuredAttraction.type}
-                        </span>
-                        <div className="flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                          <span className="text-white text-xs font-medium">{featuredAttraction.rating}</span>
-                        </div>
-                      </div>
-                      
-                      <h3 className="text-3xl md:text-5xl font-bold text-white mb-3">
-                        {featuredAttraction.name}
-                      </h3>
-                      
-                      <p className="text-white/80 text-base md:text-lg mb-6 line-clamp-2">
-                        {featuredAttraction.short_description}
-                      </p>
-                      
-                      <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white/70 text-sm">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>{featuredAttraction.location}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Mountain className="w-4 h-4" />
-                          <span>{featuredAttraction.elevation}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          <span>{featuredAttraction.time_required}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Explore Button */}
-                  <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10">
-                    <motion.button 
-                      className="flex items-center gap-2 px-6 py-3 bg-white text-[#003580] font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Explore
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.button>
-                  </div>
-                </motion.div>
-                </Link>
-              </Container>
-            </section>
-          )}
-          
-          {/* Attractions Grid */}
-          <section className="py-12">
-            <Container>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="flex items-center justify-between mb-8"
+              <div className="mb-6">
+                <h1 className={`text-3xl md:text-5xl font-bold mb-3 ${heroImage ? 'text-white drop-shadow-lg' : backgroundStyle === 'white' ? 'text-slate-800' : 'text-white'}`}>
+                  Explore the <span className={`${heroImage ? 'text-sky-300' : 'text-[#0071c2]'}`}>Divine Himalayas</span>
+                </h1>
+                <p className={`max-w-2xl ${heroImage ? 'text-white/90 drop-shadow' : backgroundStyle === 'white' ? 'text-slate-600' : 'text-white/60'}`}>
+                  Discover breathtaking temples, pristine valleys, and sacred destinations near Kedarnath
+                </p>
+              </div>
+
+              {/* Filter Bar */}
+              <div
+                className={`flex flex-col md:flex-row items-center gap-4 justify-between p-4 backdrop-blur-md rounded-xl border transition-all duration-300 ${backgroundStyle === 'white'
+                  ? 'bg-white border-slate-200 shadow-sm'
+                  : 'bg-white/5 border-white/10'
+                  }`}
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
-                  {activeCategory === "all" ? "All Attractions" : categories.find(c => c.id === activeCategory)?.label}
-                </h2>
-                <span className="text-slate-500 text-sm">
-                  {filteredAttractions.length} {filteredAttractions.length === 1 ? 'place' : 'places'} found
-                </span>
-              </motion.div>
-              
-              {filteredAttractions.length === 0 ? (
-                <motion.div 
-                  className="text-center py-16"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Search className="w-10 h-10 text-gray-300" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-700 mb-2">No attractions found</h3>
-                  <p className="text-gray-500">Try adjusting your search or filters</p>
-                </motion.div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-                  {filteredAttractions.map((attraction, index) => (
-                    <motion.div
-                      key={attraction.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="group"
-                      whileHover={{ y: -8 }}
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className={`text-sm font-medium ${backgroundStyle === 'white' ? 'text-slate-500' : 'text-white/60'}`}>Filter by</span>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all duration-200 ${activeCategory === cat.id
+                        ? "bg-[#0071c2] text-white shadow-md scale-105"
+                        : backgroundStyle === 'white'
+                          ? "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:scale-102"
+                          : "bg-white/10 text-white/70 hover:bg-white/20 hover:scale-102"
+                        }`}
                     >
-                      <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl border border-gray-100 transition-all duration-300 h-full flex flex-col">
-                        {/* Image Container */}
-                        <div className="relative aspect-[4/3] overflow-hidden">
-                          <img
-                            src={attraction.main_image}
-                            alt={attraction.name}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          
-                          {/* Overlay Content */}
-                          <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                            <div className="text-white">
-                              <div className="flex items-center gap-2 text-sm mb-1">
-                                <MapPin className="w-4 h-4" />
-                                <span>{attraction.distance}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                              <span className="text-white text-sm font-medium">{attraction.rating}</span>
-                            </div>
-                          </div>
-                          
-                          {/* Type Badge */}
-                          <div className="absolute top-4 left-4">
-                            <span className="px-3 py-1 bg-[#0071c2] text-white text-xs font-semibold rounded-full">
-                              {attraction.type}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="p-5 flex flex-col flex-grow">
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {attraction.name}
-                          </h3>
-                          
-                          <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
-                            {attraction.short_description}
-                          </p>
-                          
-                          {/* Info Row */}
-                          <div className="flex items-center gap-4 text-gray-500 text-xs mb-4">
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-4 h-4 text-[#0071c2]" />
-                              <span>{attraction.time_required}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Mountain className="w-4 h-4 text-[#0071c2]" />
-                              <span>{attraction.elevation || 'N/A'}</span>
-                            </div>
-                            <span className={`ml-auto px-2 py-0.5 text-xs font-medium rounded-full ${difficultyColors[attraction.difficulty]}`}>
-                              {attraction.difficulty}
-                            </span>
-                          </div>
-                          
-                          {/* CTA Button - Matching Homepage */}
-                          <Link to={`/attractions/${attraction.slug}`} className="block">
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="w-full bg-[#0071c2] hover:bg-[#005a9c] text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors duration-300"
-                            >
-                              View Details
-                              <ArrowRight className="w-5 h-5" />
-                            </motion.button>
-                          </Link>
-                        </div>
-                      </div>
-                    </motion.div>
+                      {cat.icon}
+                      {cat.label}
+                    </button>
                   ))}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${backgroundStyle === 'white' ? 'text-slate-400' : 'text-white/40'}`} />
+                    <input
+                      type="text"
+                      placeholder="Search attractions..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className={`w-full md:w-56 pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none transition-all ${backgroundStyle === 'white'
+                        ? 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 focus:border-blue-400'
+                        : 'bg-white/10 border-white/10 text-white placeholder-white/40 focus:border-white/30'
+                        }`}
+                    />
+                  </div>
+
+                  <div className={`flex rounded-lg p-1 ${backgroundStyle === 'white' ? 'bg-slate-100' : 'bg-white/10'}`}>
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`p-2 rounded transition-colors ${viewMode === "grid"
+                        ? backgroundStyle === 'white' ? "bg-white text-slate-800 shadow-sm" : "bg-white/20 text-white"
+                        : backgroundStyle === 'white' ? "text-slate-500 hover:text-slate-800" : "text-white/60 hover:text-white"
+                        }`}
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`p-2 rounded transition-colors ${viewMode === "list"
+                        ? backgroundStyle === 'white' ? "bg-white text-slate-800 shadow-sm" : "bg-white/20 text-white"
+                        : backgroundStyle === 'white' ? "text-slate-500 hover:text-slate-800" : "text-white/60 hover:text-white"
+                        }`}
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Container>
+          </section>
+
+          {/* Results */}
+          <section className="py-8">
+            <Container>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-xl font-bold flex items-center gap-2 ${backgroundStyle === 'white' ? 'text-slate-800' : 'text-white'}`}>
+                  Top Results
+                  <span className={`font-normal text-base transition-all duration-300 ${backgroundStyle === 'white' ? 'text-slate-400' : 'text-white/40'}`}>
+                    ({filteredAttractions.length})
+                  </span>
+                </h2>
+              </div>
+
+              {loading && (
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className={`aspect-[4/3] sm:aspect-[3/2] rounded-xl sm:rounded-2xl overflow-hidden animate-pulse ${backgroundStyle === 'white' ? 'bg-slate-200' : 'bg-white/10'}`} />
+                  ))}
+                </div>
+              )}
+
+              {!loading && (
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                  {filteredAttractions.map((attraction) => (
+                    <AttractionCard key={attraction.id} attraction={attraction} />
+                  ))}
+                </div>
+              )}
+
+              {!loading && filteredAttractions.length === 0 && (
+                <div className="text-center py-16">
+                  <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${backgroundStyle === 'white' ? 'bg-slate-100' : 'bg-white/5'}`}>
+                    <Search className={`w-8 h-8 ${backgroundStyle === 'white' ? 'text-slate-400' : 'text-white/30'}`} />
+                  </div>
+                  <h3 className={`text-xl font-semibold mb-2 ${backgroundStyle === 'white' ? 'text-slate-800' : 'text-white'}`}>No attractions found</h3>
+                  <p className={`mb-6 ${backgroundStyle === 'white' ? 'text-slate-500' : 'text-white/50'}`}>Try adjusting your search or filters</p>
+                  <button
+                    onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
+                    className="px-6 py-2.5 bg-[#0071c2] hover:bg-[#005a9c] text-white font-medium rounded-lg transition-colors"
+                  >
+                    Clear Filters
+                  </button>
                 </div>
               )}
             </Container>
           </section>
-          
-          {/* Travel Tips Section */}
-          <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
-            <Container>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="text-center mb-12"
-              >
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#003580]/10 rounded-full text-[#003580] text-sm font-medium mb-4">
-                  <Compass className="w-4 h-4" />
-                  Travel Guide
-                </span>
-                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                  Essential Tips for Your Journey
-                </h2>
-                <p className="text-slate-600 max-w-2xl mx-auto">
-                  Make the most of your visit to Kedarnath with these helpful tips from experienced travelers
-                </p>
-              </motion.div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  {
-                    icon: <Sun className="w-6 h-6" />,
-                    title: "Best Time to Visit",
-                    description: "Plan your visit between May-June or September-October for the best weather and clear mountain views.",
-                    color: "from-amber-500 to-orange-500"
-                  },
-                  {
-                    icon: <Footprints className="w-6 h-6" />,
-                    title: "Physical Preparation",
-                    description: "Start light exercises 2-3 weeks before. The trek requires moderate fitness levels.",
-                    color: "from-emerald-500 to-teal-500"
-                  },
-                  {
-                    icon: <Shield className="w-6 h-6" />,
-                    title: "Altitude Acclimatization",
-                    description: "Spend a day at Gaurikund to acclimatize. Stay hydrated and avoid rushing.",
-                    color: "from-blue-500 to-indigo-500"
-                  },
-                  {
-                    icon: <Camera className="w-6 h-6" />,
-                    title: "Photography Tips",
-                    description: "Early mornings offer the best light. Some temples restrict photography inside.",
-                    color: "from-purple-500 to-pink-500"
-                  },
-                  {
-                    icon: <Users className="w-6 h-6" />,
-                    title: "Hire Local Guides",
-                    description: "Local guides provide valuable insights about religious significance and hidden spots.",
-                    color: "from-rose-500 to-red-500"
-                  },
-                  {
-                    icon: <Heart className="w-6 h-6" />,
-                    title: "Respect Sacred Sites",
-                    description: "Dress modestly, remove footwear when required, and maintain silence in temples.",
-                    color: "from-cyan-500 to-blue-500"
-                  }
-                ].map((tip, index) => (
-                  <motion.div
-                    key={tip.title}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg border border-slate-100 transition-all duration-300"
-                    whileHover={{ y: -4 }}
-                  >
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tip.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                      {tip.icon}
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">{tip.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{tip.description}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </Container>
-          </section>
-          
-          {/* CTA Section */}
-          <section className="py-20 relative overflow-hidden">
-            {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#003580] via-[#004494] to-[#0071c2]" />
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-400 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-            </div>
-            
-            <Container className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="text-center max-w-3xl mx-auto"
-              >
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-                  Ready to Begin Your
-                  <span className="block text-amber-300">Spiritual Journey?</span>
-                </h2>
-                <p className="text-white/80 text-lg mb-10 leading-relaxed">
-                  Book your stay with us and get personalized recommendations for attractions 
-                  based on your interests and schedule.
-                </p>
-                
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Link to="/stays">
-                    <motion.button 
-                      className="px-8 py-4 bg-white text-[#003580] font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Find Your Stay
-                      <ArrowRight className="w-5 h-5" />
-                    </motion.button>
-                  </Link>
-                  <Link to="/packages">
-                    <motion.button 
-                      className="px-8 py-4 bg-transparent border-2 border-white/50 text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300 flex items-center gap-2"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      View Packages
-                      <Navigation className="w-5 h-5" />
-                    </motion.button>
-                  </Link>
-                </div>
-              </motion.div>
-            </Container>
-          </section>
-        </>
-      )}
-      
+        </div>
+      </div>
+
       <Footer />
-    </div>
+    </>
   );
 };
 

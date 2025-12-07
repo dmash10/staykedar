@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { TransitionLink } from '@/components/TransitionLink';
 import Container from '@/components/Container';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -259,7 +260,7 @@ function TimelineView({ days }: { days: any[] }) {
             }}
         >
             {/* Horizontal scrollable timeline */}
-            <div className="relative mb-6">
+            <div className="relative mb-6 timeline-stable">
                 {/* Scroll hint for mobile */}
                 <p className="text-xs text-muted-foreground text-center mb-3 md:hidden">
                     ← Swipe to see all days →
@@ -280,7 +281,6 @@ function TimelineView({ days }: { days: any[] }) {
                             data-day={index}
                             className="flex items-center flex-shrink-0 snap-center"
                         >
-                            {/* Day node */}
                             <button
                                 onClick={() => setActiveDay(index)}
                                 className="relative flex flex-col items-center group transition-all duration-300 px-1"
@@ -319,7 +319,7 @@ function TimelineView({ days }: { days: any[] }) {
             {/* Active day details card */}
             <div
                 key={activeDay}
-                className="glass-card p-6 border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent animate-in fade-in-50 slide-in-from-bottom-2 duration-300"
+                className="glass-card p-6 border border-primary/20 bg-gradient-to-br from-primary/5 to-transparent tab-slide-in"
             >
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-border/50">
@@ -785,10 +785,10 @@ export default function ItineraryPlannerPage() {
                                         {/* CTA */}
                                         <div className="mt-8 flex flex-col sm:flex-row gap-4">
                                             <Button asChild size="lg" className="btn-primary flex-1">
-                                                <Link to="/packages">Browse Packages</Link>
+                                                <TransitionLink to="/packages">Browse Packages</TransitionLink>
                                             </Button>
                                             <Button asChild size="lg" variant="outline" className="flex-1">
-                                                <Link to="/contact">Get Custom Quote</Link>
+                                                <TransitionLink to="/contact">Get Custom Quote</TransitionLink>
                                             </Button>
                                         </div>
                                     </div>

@@ -14,10 +14,10 @@ const ContentCreator = () => {
         <title>Content Creator Program | StayKedarnath</title>
         <meta name="description" content="Join our content creator program and share your Kedarnath journey. Collaborate with us to create authentic travel content and earn rewards." />
       </Helmet>
-      
+
       <div className="min-h-screen flex flex-col">
         <Nav />
-        
+
         <main className="flex-grow">
           {/* Hero Section */}
           <section className="py-16 bg-primary-deep/5 mt-16">
@@ -36,7 +36,7 @@ const ContentCreator = () => {
               </div>
             </Container>
           </section>
-            
+
           {/* Benefits Section */}
           <section className="py-16 bg-white">
             <Container>
@@ -46,7 +46,7 @@ const ContentCreator = () => {
                   Collaborate with us to create authentic travel content and enjoy these exclusive benefits.
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="glass-card p-8 flex flex-col items-center text-center card-hover">
                   <div className="icon-box mb-4">
@@ -59,7 +59,7 @@ const ContentCreator = () => {
                     <span className="text-mist"> per approved reel</span>
                   </div>
                 </div>
-                
+
                 <div className="glass-card p-8 flex flex-col items-center text-center card-hover">
                   <div className="icon-box mb-4">
                     <Youtube className="w-8 h-8" />
@@ -74,7 +74,7 @@ const ContentCreator = () => {
               </div>
             </Container>
           </section>
-          
+
           {/* How It Works Section */}
           <section className="py-16 bg-primary-deep/5">
             <Container>
@@ -84,7 +84,7 @@ const ContentCreator = () => {
                   Follow these simple steps to join our content creator program and start earning rewards.
                 </p>
               </div>
-              
+
               <div className="max-w-4xl mx-auto">
                 <div className="glass-card p-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -99,7 +99,7 @@ const ContentCreator = () => {
                         <p className="text-mist">Upload your reels/vlogs to Google Drive and submit the links through our portal</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-4">
                       <div className="flex-shrink-0">
                         <div className="icon-box-alt w-12 h-12">
@@ -111,7 +111,7 @@ const ContentCreator = () => {
                         <p className="text-mist">Content must be original, high-quality, and showcase authentic Kedarnath experiences</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-4">
                       <div className="flex-shrink-0">
                         <div className="icon-box-alt w-12 h-12">
@@ -123,7 +123,7 @@ const ContentCreator = () => {
                         <p className="text-mist">Our team reviews all submissions within 7 working days and notifies creators of approval</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex gap-4">
                       <div className="flex-shrink-0">
                         <div className="icon-box-alt w-12 h-12">
@@ -140,7 +140,7 @@ const ContentCreator = () => {
               </div>
             </Container>
           </section>
-          
+
           {/* Apply Section */}
           <section className="py-16 bg-white" id="apply">
             <Container>
@@ -150,7 +150,7 @@ const ContentCreator = () => {
                   Fill out the form below to apply for our content creator program. We'll review your application and get back to you within 48 hours.
                 </p>
               </div>
-              
+
               <div className="max-w-2xl mx-auto">
                 <form className="glass-card p-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -163,7 +163,7 @@ const ContentCreator = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-mist mb-1" htmlFor="email">Email Address</label>
                       <input
@@ -173,7 +173,7 @@ const ContentCreator = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-mist mb-1" htmlFor="phone">Phone Number</label>
                       <input
@@ -183,7 +183,7 @@ const ContentCreator = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-mist mb-1" htmlFor="content-type">Content Type</label>
                       <select
@@ -198,7 +198,7 @@ const ContentCreator = () => {
                       </select>
                     </div>
                   </div>
-                  
+
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-mist mb-1" htmlFor="social-links">Social Media Profiles</label>
                     <input
@@ -209,7 +209,7 @@ const ContentCreator = () => {
                       required
                     />
                   </div>
-                  
+
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-mist mb-1" htmlFor="message">Why do you want to join our program?</label>
                     <textarea
@@ -219,7 +219,7 @@ const ContentCreator = () => {
                       required
                     ></textarea>
                   </div>
-                  
+
                   <div className="flex justify-center">
                     <button type="submit" className="btn-primary">
                       Submit Application
@@ -230,7 +230,7 @@ const ContentCreator = () => {
             </Container>
           </section>
         </main>
-        
+
         <Footer />
       </div>
     </>

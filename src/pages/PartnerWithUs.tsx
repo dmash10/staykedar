@@ -36,10 +36,10 @@ const PartnerWithUs = () => {
         <title>Partner With Us | StayKedarnath</title>
         <meta name="description" content="Join our partner network for Kedarnath accommodations and services. List your property, offer transportation, or provide guide services." />
       </Helmet>
-      
+
       <div className="min-h-screen flex flex-col">
         <Nav />
-        
+
         <main className="flex-grow">
           {/* Hero Section */}
           <section className="py-16 bg-primary-deep/5 mt-16">
@@ -48,22 +48,22 @@ const PartnerWithUs = () => {
                 <div className="icon-box w-20 h-20 mx-auto mb-6">
                   <CustomHandshakeIcon />
                 </div>
-                
+
                 <h1 className="text-4xl md:text-5xl font-display font-bold mb-6 animate-fade-in">
                   Partner With KedarnathStays
                 </h1>
-                
+
                 <p className="text-lg mb-8 text-white/80 animate-fade-in animate-delay-100">
                   Grow your reach and connect with pilgrims planning their Kedarnath journey
                 </p>
-                
+
                 <Link to="#contact-form" className="btn-secondary animate-fade-in animate-delay-200">
                   Join Our Network
                 </Link>
               </div>
             </Container>
           </section>
-          
+
           {/* Why Partner Section */}
           <section className="py-16 bg-white">
             <Container>
@@ -75,7 +75,7 @@ const PartnerWithUs = () => {
                   Join our growing network of partners and elevate your business in the spiritual tourism sector
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
@@ -88,7 +88,7 @@ const PartnerWithUs = () => {
                     <p className="text-mist">Connect with thousands of pilgrims planning their Kedarnath Yatra, with focused targeting for your specific services.</p>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="icon-box w-14 h-14">
@@ -100,7 +100,7 @@ const PartnerWithUs = () => {
                     <p className="text-mist">Experience increased bookings through our streamlined platform, designed to convert visitors into customers efficiently.</p>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="icon-box w-14 h-14">
@@ -112,7 +112,7 @@ const PartnerWithUs = () => {
                     <p className="text-mist">Associate with our respected brand that pilgrims trust for reliable information and quality services.</p>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
                     <div className="icon-box w-14 h-14">
@@ -127,7 +127,7 @@ const PartnerWithUs = () => {
               </div>
             </Container>
           </section>
-          
+
           {/* Partner Benefits Section */}
           <section className="py-16 bg-secondary/50">
             <Container>
@@ -139,7 +139,7 @@ const PartnerWithUs = () => {
                   We provide comprehensive support to ensure mutual success in our partnership
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="glass-card p-6 text-center card-hover">
                   <div className="icon-box mx-auto mb-4">
@@ -148,7 +148,7 @@ const PartnerWithUs = () => {
                   <h3 className="text-lg font-semibold text-indigo-deep mb-2">Dedicated Partner Support</h3>
                   <p className="text-mist">Personalized assistance from our partner relationship team to address your needs</p>
                 </div>
-                
+
                 <div className="glass-card p-6 text-center card-hover">
                   <div className="icon-box mx-auto mb-4">
                     <Megaphone className="w-6 h-6" />
@@ -156,7 +156,7 @@ const PartnerWithUs = () => {
                   <h3 className="text-lg font-semibold text-indigo-deep mb-2">Advanced Marketing</h3>
                   <p className="text-mist">Digital marketing support including featured placements and social media promotion</p>
                 </div>
-                
+
                 <div className="glass-card p-6 text-center card-hover">
                   <div className="icon-box mx-auto mb-4">
                     <ArrowUpRight className="w-6 h-6" />
@@ -164,7 +164,7 @@ const PartnerWithUs = () => {
                   <h3 className="text-lg font-semibold text-indigo-deep mb-2">Easy Onboarding</h3>
                   <p className="text-mist">Simple integration process with step-by-step guidance from our technical team</p>
                 </div>
-                
+
                 <div className="glass-card p-6 text-center card-hover">
                   <div className="icon-box mx-auto mb-4">
                     <BarChart3 className="w-6 h-6" />
@@ -175,7 +175,7 @@ const PartnerWithUs = () => {
               </div>
             </Container>
           </section>
-          
+
           {/* Partnership Types Section */}
           <section className="py-16 bg-primary-deep/5">
             <Container>
@@ -187,17 +187,17 @@ const PartnerWithUs = () => {
                   Explore different ways to partner with KedarnathStays based on your business needs
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 <div className="glass-card p-8 flex flex-col h-full card-hover">
                   <div className="icon-box mb-6">
-                    <svg 
-                      className="w-8 h-8" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <svg
+                      className="w-8 h-8"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     >
                       <path d="M19 9V6a2 2 0 00-2-2H7a2 2 0 00-2 2v3" />
@@ -209,9 +209,9 @@ const PartnerWithUs = () => {
                       <path d="M12 12v6" />
                     </svg>
                   </div>
-                  
+
                   <h3 className="text-xl font-semibold text-indigo-deep mb-3">Accommodation Owners</h3>
-                  
+
                   <ul className="text-mist space-y-3 mb-6 flex-grow">
                     <li className="flex items-start gap-2">
                       <ChevronRight className="w-5 h-5 text-indigo-deep flex-shrink-0 mt-0.5" />
@@ -226,21 +226,21 @@ const PartnerWithUs = () => {
                       <span>Set your own pricing and availability</span>
                     </li>
                   </ul>
-                  
+
                   <Link to="#contact-form" className="btn-secondary w-full mt-auto">
                     List Your Property
                   </Link>
                 </div>
-                
+
                 <div className="glass-card p-8 flex flex-col h-full card-hover">
                   <div className="icon-box mb-6">
-                    <svg 
-                      className="w-8 h-8" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <svg
+                      className="w-8 h-8"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     >
                       <path d="M10.5 14.5c3.5-1 5-2.5 8.5-2.5a9 9 0 0 1 1 0" />
@@ -251,9 +251,9 @@ const PartnerWithUs = () => {
                       <path d="M12 20l-8-8 8-8" />
                     </svg>
                   </div>
-                  
+
                   <h3 className="text-xl font-semibold text-indigo-deep mb-3">Affiliate Program</h3>
-                  
+
                   <ul className="text-mist space-y-3 mb-6 flex-grow">
                     <li className="flex items-start gap-2">
                       <ChevronRight className="w-5 h-5 text-indigo-deep flex-shrink-0 mt-0.5" />
@@ -268,21 +268,21 @@ const PartnerWithUs = () => {
                       <span>Transparent tracking and reporting</span>
                     </li>
                   </ul>
-                  
+
                   <Link to="#contact-form" className="btn-secondary w-full mt-auto">
                     Become an Affiliate
                   </Link>
                 </div>
-                
+
                 <div className="glass-card p-8 flex flex-col h-full card-hover">
                   <div className="icon-box mb-6">
-                    <svg 
-                      className="w-8 h-8" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <svg
+                      className="w-8 h-8"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     >
                       <path d="M2 3h20" />
@@ -290,9 +290,9 @@ const PartnerWithUs = () => {
                       <path d="m7 21 5-5 5 5" />
                     </svg>
                   </div>
-                  
+
                   <h3 className="text-xl font-semibold text-indigo-deep mb-3">Service Providers</h3>
-                  
+
                   <ul className="text-mist space-y-3 mb-6 flex-grow">
                     <li className="flex items-start gap-2">
                       <ChevronRight className="w-5 h-5 text-indigo-deep flex-shrink-0 mt-0.5" />
@@ -307,7 +307,7 @@ const PartnerWithUs = () => {
                       <span>Reach pilgrims planning their yatra</span>
                     </li>
                   </ul>
-                  
+
                   <Link to="#contact-form" className="btn-secondary w-full mt-auto">
                     Register Your Service
                   </Link>
@@ -315,7 +315,7 @@ const PartnerWithUs = () => {
               </div>
             </Container>
           </section>
-          
+
           {/* Contact Form Section */}
           <section className="py-16 bg-secondary/50" id="contact-form">
             <Container>
@@ -327,7 +327,7 @@ const PartnerWithUs = () => {
                   Fill out the form below and our partnership team will contact you within 48 hours
                 </p>
               </div>
-              
+
               <div className="max-w-2xl mx-auto">
                 <form className="glass-card p-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -340,7 +340,7 @@ const PartnerWithUs = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-mist mb-1" htmlFor="contact-person">Contact Person</label>
                       <input
@@ -350,7 +350,7 @@ const PartnerWithUs = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-mist mb-1" htmlFor="email">Email Address</label>
                       <input
@@ -360,7 +360,7 @@ const PartnerWithUs = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-mist mb-1" htmlFor="phone">Phone Number</label>
                       <input
@@ -371,7 +371,7 @@ const PartnerWithUs = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-mist mb-1" htmlFor="partnership-type">Partnership Type</label>
                     <select
@@ -386,7 +386,7 @@ const PartnerWithUs = () => {
                       <option value="other">Other</option>
                     </select>
                   </div>
-                  
+
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-mist mb-1" htmlFor="message">Tell us about your business</label>
                     <textarea
@@ -396,7 +396,7 @@ const PartnerWithUs = () => {
                       required
                     ></textarea>
                   </div>
-                  
+
                   <div className="flex justify-center">
                     <button type="submit" className="btn-primary">
                       Submit Partner Request
@@ -407,7 +407,7 @@ const PartnerWithUs = () => {
             </Container>
           </section>
         </main>
-        
+
         <Footer />
       </div>
     </>

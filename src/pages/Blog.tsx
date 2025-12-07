@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link as RouterLink, useSearchParams } from 'react-router-dom';
+import { TransitionLink } from '@/components/TransitionLink';
 import { Helmet } from 'react-helmet';
 import { supabase } from '@/integrations/supabase/client';
 import Nav from '@/components/Nav';
@@ -78,7 +79,7 @@ export default function Blog() {
           .select('*')
           .eq('published', true)
           .order('created_at', { ascending: false }),
-        supabase
+        (supabase as any)
           .from('blog_categories')
           .select('*')
           .eq('is_active', true)
@@ -88,8 +89,8 @@ export default function Blog() {
       if (postsRes.error) throw postsRes.error;
       if (categoriesRes.error) throw categoriesRes.error;
 
-      setPosts(postsRes.data || []);
-      setCategories(categoriesRes.data || []);
+      setPosts((postsRes.data || []) as BlogPost[]);
+      setCategories((categoriesRes.data || []) as BlogCategory[]);
     } catch (err) {
       console.error('Error fetching blog data:', err);
       setError('Failed to load blog posts. Please try again later.');
@@ -248,7 +249,7 @@ export default function Blog() {
                     className={`group relative rounded-2xl overflow-hidden shadow-lg ${index === 0 ? 'lg:col-span-2 lg:row-span-2' : ''
                       }`}
                   >
-                    <Link to={`/blog/${post.slug}`} className="block">
+                    <TransitionLink to={`/blog/${post.slug}`} className="block">
                       <div className={`relative ${index === 0 ? 'aspect-[16/10]' : 'aspect-video'}`}>
                         <OptimizedImage
                           src={post.featured_image || getDefaultImage(index)}
@@ -286,7 +287,7 @@ export default function Blog() {
                           </div>
                         </div>
                       </div>
-                    </Link>
+                    </TransitionLink>
                   </motion.article>
                 ))}
               </div>
@@ -353,7 +354,7 @@ export default function Blog() {
                       transition={{ delay: 0.05 * index }}
                       className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
                     >
-                      <Link to={`/blog/${post.slug}`} className="flex flex-col md:flex-row">
+                      <TransitionLink to={`/blog/${post.slug}`} className="flex flex-col md:flex-row">
                         {/* Image - Fixed 16:9 aspect ratio */}
                         <div className="md:w-72 flex-shrink-0 relative overflow-hidden">
                           <div className="aspect-video w-full">
@@ -414,7 +415,7 @@ export default function Blog() {
                             </span>
                           </div>
                         </div>
-                      </Link>
+                      </TransitionLink>
                     </motion.article>
                   ))}
                 </div>
@@ -436,7 +437,7 @@ export default function Blog() {
 
                   <div className="space-y-4">
                     {popularPosts.slice(0, 5).map((post, index) => (
-                      <Link
+                      <TransitionLink
                         key={post.id}
                         to={`/blog/${post.slug}`}
                         className="group flex gap-3 items-start"
@@ -452,7 +453,7 @@ export default function Blog() {
                             <Eye className="w-3 h-3" /> {post.views || 0} views
                           </span>
                         </div>
-                      </Link>
+                      </TransitionLink>
                     ))}
                   </div>
                 </div>
@@ -527,9 +528,9 @@ export default function Blog() {
                   asChild
                   className="w-full bg-[#FFB700] text-slate-900 hover:bg-[#e5a600] font-semibold"
                 >
-                  <Link to="/packages">
+                  <TransitionLink to="/packages">
                     View Packages <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
+                  </TransitionLink>
                 </Button>
               </div>
             </aside>

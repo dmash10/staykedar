@@ -128,25 +128,25 @@ const PropertyDetail: React.FC = () => {
                 <meta name="description" content={`Book ${property.name} near Kedarnath Temple. ${property.description?.slice(0, 120) || 'Comfortable accommodation for Char Dham pilgrims with modern amenities.'}`} />
                 <meta name="keywords" content={`${property.name}, Kedarnath hotel, Kedarnath stay, Kedarnath accommodation, Char Dham booking`} />
                 <link rel="canonical" href={`https://staykedarnath.in/stays/${propertyId}`} />
-                
+
                 {/* Open Graph */}
                 <meta property="og:type" content="hotel" />
                 <meta property="og:title" content={`${property.name} | StayKedarnath`} />
                 <meta property="og:description" content={property.description || 'Book your stay near Kedarnath Temple'} />
                 {property.images?.[0] && <meta property="og:image" content={property.images[0]} />}
                 <meta property="og:url" content={`https://staykedarnath.in/stays/${propertyId}`} />
-                
+
                 {/* LodgingBusiness Schema */}
                 <script type="application/ld+json">
                     {JSON.stringify(staySchema)}
                 </script>
-                
+
                 {/* Breadcrumb Schema */}
                 <script type="application/ld+json">
                     {JSON.stringify(breadcrumbSchema)}
                 </script>
             </Helmet>
-            
+
             <Nav />
             <main className="min-h-screen bg-gray-50 pb-12">
                 {/* Image Gallery */}
@@ -336,10 +336,10 @@ const PropertyDetail: React.FC = () => {
                         </div>
                     </div>
                 </Container>
-                
+
                 {/* FAQ Section for SEO */}
                 <Container className="py-12">
-                    <AIOptimizedFAQ 
+                    <AIOptimizedFAQ
                         title="Frequently Asked Questions About Kedarnath Stays"
                         faqs={StaysFAQs}
                     />

@@ -45,7 +45,7 @@ const DriverDetail = () => {
   const [vehicles, setVehicles] = useState<CarVehicle[]>([]);
   const [reviews, setReviews] = useState<CarReview[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Booking form
   const [bookingForm, setBookingForm] = useState({
     name: '',
@@ -109,7 +109,7 @@ const DriverDetail = () => {
 
   const handleBookingSubmit = () => {
     if (!driver) return;
-    
+
     const message = `Hi ${driver.name}! 👋
 
 I found your profile on StayKedarnath and would like to book a taxi.
@@ -230,7 +230,7 @@ Please confirm availability and share the price.`;
                     </Badge>
                   )}
                 </div>
-                
+
                 <CardContent className="pt-0 pb-6 px-6 text-center">
                   <div className="relative -mt-16 mb-4">
                     <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200 overflow-hidden shadow-lg mx-auto">
@@ -275,7 +275,7 @@ Please confirm availability and share the price.`;
 
                   {/* Contact Buttons */}
                   <div className="space-y-2">
-                    <Button 
+                    <Button
                       className="w-full bg-green-600 hover:bg-green-700"
                       onClick={() => {
                         const message = `Hi ${driver.name}! I found your profile on StayKedarnath and would like to know more about your taxi services for Kedarnath trip.`;
@@ -285,8 +285,8 @@ Please confirm availability and share the price.`;
                       <MessageCircle className="w-4 h-4 mr-2" />
                       WhatsApp
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="w-full"
                       onClick={() => window.location.href = `tel:${driver.phone}`}
                     >
@@ -315,7 +315,7 @@ Please confirm availability and share the price.`;
                     <p className="text-gray-600">{driver.bio}</p>
                   ) : (
                     <p className="text-gray-500 italic">
-                      Professional taxi driver with {driver.experience_years}+ years of experience 
+                      Professional taxi driver with {driver.experience_years}+ years of experience
                       serving pilgrims on {driver.service_areas.join(', ')} routes.
                     </p>
                   )}
@@ -362,8 +362,8 @@ Please confirm availability and share the price.`;
                   <CardContent>
                     <div className="grid gap-4">
                       {vehicles.map((vehicle) => (
-                        <div 
-                          key={vehicle.id} 
+                        <div
+                          key={vehicle.id}
                           className={`flex items-center gap-4 p-4 rounded-lg border ${vehicle.is_primary ? 'border-blue-200 bg-blue-50' : 'border-gray-200'}`}
                         >
                           <div className="w-20 h-20 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
@@ -430,18 +430,18 @@ Please confirm availability and share the price.`;
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Your Name</label>
-                      <Input 
+                      <Input
                         placeholder="Full name"
                         value={bookingForm.name}
-                        onChange={(e) => setBookingForm({...bookingForm, name: e.target.value})}
+                        onChange={(e) => setBookingForm({ ...bookingForm, name: e.target.value })}
                       />
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Phone</label>
-                      <Input 
+                      <Input
                         placeholder="+91 9876543210"
                         value={bookingForm.phone}
-                        onChange={(e) => setBookingForm({...bookingForm, phone: e.target.value})}
+                        onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })}
                       />
                     </div>
                   </div>
@@ -449,7 +449,7 @@ Please confirm availability and share the price.`;
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Pickup Location</label>
-                      <Select value={bookingForm.pickup} onValueChange={(v) => setBookingForm({...bookingForm, pickup: v})}>
+                      <Select value={bookingForm.pickup} onValueChange={(v) => setBookingForm({ ...bookingForm, pickup: v })}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select city" />
                         </SelectTrigger>
@@ -463,7 +463,7 @@ Please confirm availability and share the price.`;
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Destination</label>
-                      <Select value={bookingForm.drop} onValueChange={(v) => setBookingForm({...bookingForm, drop: v})}>
+                      <Select value={bookingForm.drop} onValueChange={(v) => setBookingForm({ ...bookingForm, drop: v })}>
                         <SelectTrigger>
                           <SelectValue placeholder="Where to?" />
                         </SelectTrigger>
@@ -480,20 +480,20 @@ Please confirm availability and share the price.`;
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Travel Date</label>
-                      <Input 
+                      <Input
                         type="date"
                         value={bookingForm.date}
-                        onChange={(e) => setBookingForm({...bookingForm, date: e.target.value})}
+                        onChange={(e) => setBookingForm({ ...bookingForm, date: e.target.value })}
                       />
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Passengers</label>
-                      <Select value={bookingForm.passengers} onValueChange={(v) => setBookingForm({...bookingForm, passengers: v})}>
+                      <Select value={bookingForm.passengers} onValueChange={(v) => setBookingForm({ ...bookingForm, passengers: v })}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17].map(n => (
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(n => (
                             <SelectItem key={n} value={String(n)}>{n} {n === 1 ? 'person' : 'people'}</SelectItem>
                           ))}
                         </SelectContent>
@@ -504,7 +504,7 @@ Please confirm availability and share the price.`;
                   {vehicles.length > 0 && (
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Preferred Vehicle</label>
-                      <Select value={bookingForm.vehicleType} onValueChange={(v) => setBookingForm({...bookingForm, vehicleType: v})}>
+                      <Select value={bookingForm.vehicleType} onValueChange={(v) => setBookingForm({ ...bookingForm, vehicleType: v })}>
                         <SelectTrigger>
                           <SelectValue placeholder="Any vehicle" />
                         </SelectTrigger>
@@ -520,15 +520,15 @@ Please confirm availability and share the price.`;
 
                   <div>
                     <label className="text-sm font-medium mb-1.5 block">Message (Optional)</label>
-                    <Textarea 
+                    <Textarea
                       placeholder="Any specific requirements..."
                       value={bookingForm.message}
-                      onChange={(e) => setBookingForm({...bookingForm, message: e.target.value})}
+                      onChange={(e) => setBookingForm({ ...bookingForm, message: e.target.value })}
                       rows={3}
                     />
                   </div>
 
-                  <Button 
+                  <Button
                     className="w-full bg-green-600 hover:bg-green-700"
                     size="lg"
                     onClick={handleBookingSubmit}
@@ -576,10 +576,10 @@ Please confirm availability and share the price.`;
                               )}
                             </div>
                             <div className="flex items-center gap-0.5">
-                              {[1,2,3,4,5].map((star) => (
-                                <Star 
-                                  key={star} 
-                                  className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-200'}`} 
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-200'}`}
                                 />
                               ))}
                             </div>
@@ -588,10 +588,10 @@ Please confirm availability and share the price.`;
                             <p className="text-gray-600 text-sm">{review.review_text}</p>
                           )}
                           <p className="text-xs text-gray-400 mt-2">
-                            {new Date(review.created_at).toLocaleDateString('en-IN', { 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
+                            {new Date(review.created_at).toLocaleDateString('en-IN', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
                             })}
                           </p>
                         </div>

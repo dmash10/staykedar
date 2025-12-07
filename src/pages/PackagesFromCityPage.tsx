@@ -35,10 +35,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AIOptimizedFAQ, { FAQItem } from "@/components/SEO/AIOptimizedFAQ";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  generateFAQSchema, 
+import {
+  generateFAQSchema,
   generateBreadcrumbSchema,
-  combineSchemas 
+  combineSchemas
 } from "@/utils/seoSchemas";
 
 // Import cities data for city info
@@ -70,7 +70,7 @@ interface PackageData {
 // Generate FAQs for packages from this city
 const generatePackageFAQs = (city: CityData, packages: PackageData[]): FAQItem[] => {
   const minPrice = packages.length > 0 ? Math.min(...packages.map(p => p.price || 0)) : 0;
-  
+
   return [
     {
       question: `What Kedarnath packages are available from ${city.name}?`,
@@ -78,7 +78,7 @@ const generatePackageFAQs = (city: CityData, packages: PackageData[]): FAQItem[]
     },
     {
       question: `How much does a Kedarnath package from ${city.name} cost?`,
-      answer: minPrice > 0 
+      answer: minPrice > 0
         ? `Kedarnath packages from ${city.name} start from ₹${minPrice.toLocaleString()}. Price varies based on duration, accommodation type, and inclusions like helicopter services.`
         : `Package prices vary based on duration and inclusions. Contact us for customized quotes starting from your budget.`
     },
@@ -111,7 +111,7 @@ const PackagesFromCityPage = () => {
       try {
         // First try to get city from seo_cities
         let cityData: CityData | null = null;
-        
+
         const { data: seoCityData } = await supabase
           .from('seo_cities')
           .select('slug, name, type, state, description')
@@ -144,7 +144,7 @@ const PackagesFromCityPage = () => {
 
         if (packagesData) {
           // Filter packages that could start from this city
-          const filteredPackages = packagesData.filter(pkg => 
+          const filteredPackages = packagesData.filter(pkg =>
             pkg.location?.toLowerCase().includes(cityData?.name.toLowerCase()) ||
             pkg.location?.toLowerCase().includes('all') ||
             pkg.location?.toLowerCase().includes('haridwar') || // Most packages start from major hubs
@@ -222,7 +222,7 @@ const PackagesFromCityPage = () => {
   const allSchemas = combineSchemas(faqSchema, breadcrumbSchema, packageListSchema);
 
   const handleWhatsAppEnquiry = (pkg?: PackageData) => {
-    const message = pkg 
+    const message = pkg
       ? `Hi! I'm interested in the "${pkg.title}" package from ${city.name}. Can you share more details?`
       : `Hi! I'm looking for Kedarnath tour packages from ${city.name}. Can you help me choose the right one?`;
     window.open(`https://wa.me/919027475942?text=${encodeURIComponent(message)}`, '_blank');
@@ -277,13 +277,13 @@ const PackagesFromCityPage = () => {
                 <Package className="w-3 h-3 mr-1" /> {packages.length}+ Packages
               </Badge>
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Kedarnath Tour Packages from {city.name}
             </h1>
-            
+
             <p className="text-xl text-orange-100/80 mb-6">
-              Explore our curated collection of Kedarnath pilgrimage packages starting from {city.name}. 
+              Explore our curated collection of Kedarnath pilgrimage packages starting from {city.name}.
               All-inclusive tours with hotels, transport, meals, and experienced guides.
             </p>
 
@@ -303,7 +303,7 @@ const PackagesFromCityPage = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
-              <Button 
+              <Button
                 size="lg"
                 className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={() => handleWhatsAppEnquiry()}
@@ -312,7 +312,7 @@ const PackagesFromCityPage = () => {
                 Get Custom Quote
               </Button>
               <a href="tel:+919027475942">
-                <Button 
+                <Button
                   size="lg"
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10"
@@ -332,7 +332,7 @@ const PackagesFromCityPage = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-8">
             Available Packages from {city.name}
           </h2>
-          
+
           {packages.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {packages.map((pkg, index) => (
@@ -346,7 +346,7 @@ const PackagesFromCityPage = () => {
                   <Link to={`/packages/${pkg.slug}`}>
                     <Card className="h-full hover:shadow-xl transition-all group overflow-hidden">
                       <div className="aspect-[4/3] relative overflow-hidden">
-                        <img 
+                        <img
                           src={pkg.images?.[0] || `https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600`}
                           alt={pkg.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -382,7 +382,7 @@ const PackagesFromCityPage = () => {
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                           {pkg.description}
                         </p>
-                        
+
                         {/* Features */}
                         {pkg.inclusions && pkg.inclusions.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-4">
@@ -393,17 +393,17 @@ const PackagesFromCityPage = () => {
                             ))}
                           </div>
                         )}
-                        
+
                         <div className="flex items-center justify-between pt-3 border-t">
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             variant="outline"
                             className="text-orange-600 border-orange-200 hover:bg-orange-50"
                           >
                             View Details
                             <ArrowRight className="w-4 h-4 ml-1" />
                           </Button>
-                          <Button 
+                          <Button
                             size="sm"
                             className="bg-green-600 hover:bg-green-700"
                             onClick={(e) => {

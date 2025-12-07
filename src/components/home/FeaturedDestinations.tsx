@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TransitionLink } from "../TransitionLink";
 import Container from "../Container";
 
 const destinations = [
@@ -82,13 +83,13 @@ const FeaturedDestinations = () => {
                             Explore sacred places along the Kedarnath route
                         </p>
                     </div>
-                    <Link
+                    <TransitionLink
                         to="/attractions"
                         className="inline-flex items-center gap-1 text-[#0071c2] font-medium hover:gap-2 transition-all text-sm flex-shrink-0"
                     >
                         View all
                         <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    </TransitionLink>
                 </motion.div>
 
                 {/* Horizontal Scrollable Destinations */}
@@ -102,7 +103,7 @@ const FeaturedDestinations = () => {
                             transition={{ duration: 0.3, delay: index * 0.05 }}
                             className="flex-shrink-0"
                         >
-                            <Link
+                            <TransitionLink
                                 to={`/attractions/${destination.slug}`}
                                 className="group block w-[120px] md:w-[140px]"
                             >
@@ -125,7 +126,7 @@ const FeaturedDestinations = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </Link>
+                            </TransitionLink>
                         </motion.div>
                     ))}
                 </div>

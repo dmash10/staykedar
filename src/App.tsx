@@ -17,6 +17,7 @@ import About from "./pages/About";
 import Weather from "./pages/Weather";
 import LiveStatusPage from "./pages/LiveStatusPage";
 import Attractions from "./pages/Attractions";
+import AttractionDetail from "./pages/AttractionDetail";
 import NotFound from "./pages/NotFound";
 import ContentCreator from "./pages/ContentCreator";
 import PartnerWithUs from "./pages/PartnerWithUs";
@@ -173,6 +174,7 @@ const App = () => {
                     <Route path="/taxi/:citySlug" element={<TaxiServicePage />} />
                     <Route path="/stays/location/:citySlug" element={<StaysLocationPage />} />
                     <Route path="/attractions/in/:citySlug" element={<AttractionsLocationPage />} />
+                    <Route path="/attractions/:slug" element={<AttractionDetail />} />
                     <Route path="/guide/:citySlug" element={<TravelGuidePage />} />
                     <Route path="/route/:routeSlug" element={<RoutePage />} />
                     <Route path="/packages/from/:citySlug" element={<PackagesFromCityPage />} />

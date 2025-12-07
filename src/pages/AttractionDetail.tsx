@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { TransitionLink } from "@/components/TransitionLink";
 import { Helmet } from "react-helmet";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -77,7 +78,7 @@ const difficultyColors = {
 };
 
 const AttractionDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [attraction, setAttraction] = useState<Attraction | null>(null);
   const [relatedAttractions, setRelatedAttractions] = useState<Attraction[]>([]);
@@ -89,38 +90,38 @@ const AttractionDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    if (id) {
+    if (slug) {
       fetchAttraction();
     }
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [slug]);
 
   const fetchAttraction = async () => {
     setLoading(true);
     try {
       // Fetch by slug
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('attractions')
         .select('*')
-        .eq('slug', id)
+        .eq('slug', slug)
         .eq('is_active', true)
         .single();
 
       if (error) throw error;
-      setAttraction(data);
+      setAttraction(data as any);
 
       // Fetch related attractions
       if (data) {
-        const { data: related, error: relatedError } = await supabase
+        const { data: related, error: relatedError } = await (supabase as any)
           .from('attractions')
           .select('*')
           .eq('is_active', true)
-          .neq('slug', id)
+          .neq('slug', slug)
           .or(`type.eq.${data.type}`)
           .limit(4);
 
         if (!relatedError && related) {
-          setRelatedAttractions(related);
+          setRelatedAttractions(related as any);
         }
       }
     } catch (error) {
@@ -187,9 +188,9 @@ const AttractionDetail = () => {
         <Container className="py-20 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Attraction Not Found</h1>
           <p className="text-gray-600 mb-8">The attraction you're looking for doesn't exist.</p>
-          <Link to="/attractions" className="text-[#0071c2] font-medium hover:underline">
+          <TransitionLink to="/attractions" className="text-[#0071c2] font-medium hover:underline">
             ← Back to Attractions
-          </Link>
+          </TransitionLink>
         </Container>
         <Footer />
       </div>
@@ -337,14 +338,14 @@ const AttractionDetail = () => {
 
         {/* Back Button */}
         <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
-          <button
-            onClick={() => navigate('/attractions')}
+          <TransitionLink
+            to="/attractions"
             className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 font-medium hover:bg-white transition-colors text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Back to Attractions</span>
             <span className="sm:hidden">Back</span>
-          </button>
+          </TransitionLink>
         </div>
 
         {/* Action Buttons */}
@@ -368,9 +369,9 @@ const AttractionDetail = () => {
           <Container>
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-white/70 text-sm mb-3">
-              <Link to="/" className="hover:text-white">Home</Link>
+              <TransitionLink to="/" className="hover:text-white">Home</TransitionLink>
               <ChevronRight className="w-4 h-4" />
-              <Link to="/attractions" className="hover:text-white">Attractions</Link>
+              <TransitionLink to="/attractions" className="hover:text-white">Attractions</TransitionLink>
               <ChevronRight className="w-4 h-4" />
               <span className="text-white">{attraction.name}</span>
             </div>
@@ -421,11 +422,11 @@ const AttractionDetail = () => {
                 <span className="text-gray-600">{attraction.time_required}</span>
               </div>
             </div>
-            <Link to="/stays" className="hidden md:flex">
+            <TransitionLink to="/stays" className="hidden md:flex">
               <button className="px-4 py-2 bg-[#0071c2] text-white text-sm font-medium rounded-lg hover:bg-[#005a9c] transition-colors whitespace-nowrap">
                 Book Nearby Stay
               </button>
-            </Link>
+            </TransitionLink>
           </div>
         </Container>
       </section>
@@ -565,13 +566,13 @@ const AttractionDetail = () => {
                   </h2>
                   <div className="space-y-8">
                     {attraction.faqs.map((faq, index) => (
-                      <article 
-                        key={index} 
+                      <article
+                        key={index}
                         className="group pb-8 border-b border-gray-100 last:border-b-0 last:pb-0"
-                        itemScope 
+                        itemScope
                         itemType="https://schema.org/Question"
                       >
-                        <h3 
+                        <h3
                           className="text-lg font-semibold text-gray-900 mb-3 flex items-start gap-4 group-hover:text-[#0071c2] transition-colors duration-200"
                           itemProp="name"
                         >
@@ -580,9 +581,9 @@ const AttractionDetail = () => {
                           </span>
                           <span className="flex-1 leading-relaxed">{faq.question}</span>
                         </h3>
-                        <div 
+                        <div
                           className="text-gray-600 leading-relaxed pl-10 text-[15px]"
-                          itemScope 
+                          itemScope
                           itemType="https://schema.org/Answer"
                           itemProp="acceptedAnswer"
                         >
@@ -622,12 +623,12 @@ const AttractionDetail = () => {
                 <p className="text-white/80 text-sm mb-4">
                   Find comfortable accommodations near this attraction for a hassle-free pilgrimage.
                 </p>
-                <Link to="/stays">
+                <TransitionLink to="/stays">
                   <button className="w-full py-3 bg-white text-[#003580] font-semibold rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
                     <Bed className="w-5 h-5" />
                     Find Stays
                   </button>
-                </Link>
+                </TransitionLink>
               </motion.div>
 
               {/* Package CTA */}
@@ -649,12 +650,12 @@ const AttractionDetail = () => {
                 <p className="text-gray-600 text-sm mb-4">
                   Explore curated packages that include this destination with accommodation, transport & meals.
                 </p>
-                <Link to="/packages">
+                <TransitionLink to="/packages">
                   <button className="w-full py-3 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 transition-colors flex items-center justify-center gap-2">
                     <Package className="w-5 h-5" />
                     View Packages
                   </button>
-                </Link>
+                </TransitionLink>
               </motion.div>
 
               {/* Contact CTA */}
@@ -711,10 +712,10 @@ const AttractionDetail = () => {
           <Container>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Nearby Attractions</h2>
-              <Link to="/attractions" className="text-[#0071c2] font-medium flex items-center gap-1 hover:gap-2 transition-all">
+              <TransitionLink to="/attractions" className="text-[#0071c2] font-medium flex items-center gap-1 hover:gap-2 transition-all">
                 View All
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </TransitionLink>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -726,7 +727,7 @@ const AttractionDetail = () => {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Link to={`/attractions/${item.slug}`}>
+                  <TransitionLink to={`/attractions/${item.slug}`}>
                     <div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
                       <div className="aspect-[4/3] overflow-hidden relative">
                         <img
@@ -751,7 +752,7 @@ const AttractionDetail = () => {
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </TransitionLink>
                 </motion.div>
               ))}
             </div>
@@ -762,18 +763,18 @@ const AttractionDetail = () => {
       {/* Bottom CTA - Mobile */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 md:hidden z-40">
         <div className="flex gap-3">
-          <Link to="/stays" className="flex-1">
+          <TransitionLink to="/stays" className="flex-1">
             <button className="w-full py-3 bg-[#0071c2] text-white font-semibold rounded-xl flex items-center justify-center gap-2">
               <Bed className="w-5 h-5" />
               Book Stay
             </button>
-          </Link>
-          <Link to="/packages" className="flex-1">
+          </TransitionLink>
+          <TransitionLink to="/packages" className="flex-1">
             <button className="w-full py-3 border-2 border-[#0071c2] text-[#0071c2] font-semibold rounded-xl flex items-center justify-center gap-2">
               <Package className="w-5 h-5" />
               Packages
             </button>
-          </Link>
+          </TransitionLink>
         </div>
       </div>
 

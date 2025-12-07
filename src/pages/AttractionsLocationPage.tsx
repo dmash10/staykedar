@@ -39,10 +39,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AIOptimizedFAQ, { FAQItem } from "@/components/SEO/AIOptimizedFAQ";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  generateFAQSchema, 
+import {
+  generateFAQSchema,
   generateBreadcrumbSchema,
-  combineSchemas 
+  combineSchemas
 } from "@/utils/seoSchemas";
 
 // Types
@@ -109,8 +109,8 @@ const generateAttractionFAQs = (city: CityData, attractions: Attraction[]): FAQI
 
   // Add city-specific FAQs if available
   if (city.faqs) {
-    faqs.push(...city.faqs.filter(f => 
-      f.question.toLowerCase().includes('visit') || 
+    faqs.push(...city.faqs.filter(f =>
+      f.question.toLowerCase().includes('visit') ||
       f.question.toLowerCase().includes('see') ||
       f.question.toLowerCase().includes('attraction')
     ));
@@ -287,11 +287,11 @@ const AttractionsLocationPage = () => {
                 </Badge>
               )}
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Places to Visit in {city.name}
             </h1>
-            
+
             <p className="text-xl text-emerald-100/80 mb-6">
               {city.description || `Explore the best tourist attractions, temples, and natural wonders in ${city.name}. Perfect stop during your Kedarnath pilgrimage.`}
             </p>
@@ -312,7 +312,7 @@ const AttractionsLocationPage = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
-              <Button 
+              <Button
                 size="lg"
                 className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={handleWhatsAppEnquiry}
@@ -321,7 +321,7 @@ const AttractionsLocationPage = () => {
                 Plan My Sightseeing
               </Button>
               <Link to={`/taxi/${city.slug}`}>
-                <Button 
+                <Button
                   size="lg"
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10"
@@ -342,7 +342,7 @@ const AttractionsLocationPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-8">
               Top Attractions in {city.name}
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {attractions.map((attraction, index) => {
                 const Icon = getAttractionIcon(attraction.type);
@@ -357,7 +357,7 @@ const AttractionsLocationPage = () => {
                     <Link to={`/attractions/${attraction.slug}`}>
                       <Card className="h-full hover:shadow-xl transition-all group overflow-hidden">
                         <div className="aspect-video relative overflow-hidden">
-                          <img 
+                          <img
                             src={attraction.main_image || `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600`}
                             alt={attraction.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

@@ -27,9 +27,24 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
+    // Initialize from localStorage cache for instant hydration (no flash)
+    const [user, setUser] = useState<User | null>(() => {
+        try {
+            const cached = localStorage.getItem('auth_user_cache');
+            return cached ? JSON.parse(cached) : null;
+        } catch {
+            return null;
+        }
+    });
     const [session, setSession] = useState<Session | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(() => {
+        // Not loading if we have cached user
+        try {
+            return !localStorage.getItem('auth_user_cache');
+        } catch {
+            return true;
+        }
+    });
     const { toast } = useToast();
 
     useEffect(() => {
@@ -38,6 +53,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setSession(session);
             setUser(session?.user ?? null);
             setIsLoading(false);
+
+            // Update cache
+            try {
+                if (session?.user) {
+                    localStorage.setItem('auth_user_cache', JSON.stringify(session.user));
+                } else {
+                    localStorage.removeItem('auth_user_cache');
+                }
+            } catch { }
         });
 
         // Listen for auth changes
@@ -46,6 +70,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setSession(session);
             setUser(session?.user ?? null);
             setIsLoading(false);
+
+            // Update cache on auth changes
+            try {
+                if (session?.user) {
+                    localStorage.setItem('auth_user_cache', JSON.stringify(session.user));
+                } else {
+                    localStorage.removeItem('auth_user_cache');
+                    localStorage.removeItem('cached_user_name');
+                    localStorage.removeItem('cached_is_logged_in');
+                }
+            } catch { }
         });
 
         return () => subscription.unsubscribe();

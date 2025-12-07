@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { TransitionLink } from "@/components/TransitionLink";
 import {
   Mail,
   Phone,
@@ -42,7 +42,7 @@ const Footer = () => {
             <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Free Tools</h3>
             <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/tools/kedarnath-budget-calculator" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/tools/kedarnath-budget-calculator" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Calculator className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -51,10 +51,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/tools/is-it-raining-in-kedarnath" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/tools/is-it-raining-in-kedarnath" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <CloudRain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -63,10 +63,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/compare/guptkashi-vs-sonprayag" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/compare/guptkashi-vs-sonprayag" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <ArrowRightLeft className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -75,10 +75,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/tools/itinerary-planner" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/tools/itinerary-planner" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -87,7 +87,7 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
             </ul>
           </div>
@@ -97,7 +97,7 @@ const Footer = () => {
             <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Support</h3>
             <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/help" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/help" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <HelpCircle className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -106,10 +106,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/support/raise" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/support/raise" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <FileText className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -118,10 +118,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/support/track" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/support/track" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Truck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -130,10 +130,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/shipping" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/shipping" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Truck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -142,10 +142,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/cancellation" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/cancellation" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <FileWarning className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -154,7 +154,7 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
             </ul>
           </div>
@@ -164,7 +164,7 @@ const Footer = () => {
             <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Discover</h3>
             <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Book className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -173,10 +173,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/attractions" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/attractions" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -185,10 +185,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/live-status" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/live-status" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Activity className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0 text-red-500" />
                   <EditableButton
                     section="footer"
@@ -197,10 +197,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm font-medium"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/weather" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/weather" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -209,10 +209,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/car-rentals" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/car-rentals" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Car className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -221,7 +221,7 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
             </ul>
           </div>
@@ -231,22 +231,22 @@ const Footer = () => {
             <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Pilgrimage</h3>
             <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/char-dham" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
+                <TransitionLink to="/char-dham" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
                   <Mountain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <span>Char Dham Yatra</span>
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/do-dham" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
+                <TransitionLink to="/do-dham" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
                   <Mountain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <span>Do Dham (Kedar + Badri)</span>
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/badrinath" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
+                <TransitionLink to="/badrinath" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
                   <Mountain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <span>Badrinath</span>
-                </Link>
+                </TransitionLink>
               </li>
             </ul>
           </div>
@@ -256,7 +256,7 @@ const Footer = () => {
             <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Terms and settings</h3>
             <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/terms" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/terms" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <FileCheck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -265,10 +265,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/privacy" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/privacy" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Shield className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -277,7 +277,7 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
             </ul>
           </div>
@@ -287,7 +287,7 @@ const Footer = () => {
             <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Partners</h3>
             <ul className="space-y-0 md:space-y-1">
               <li>
-                <Link to="/partner-with-us#property" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/partner-with-us#property" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -296,10 +296,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/content-creator" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/content-creator" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Camera className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -308,10 +308,10 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
               <li>
-                <Link to="/driver-registration" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
+                <TransitionLink to="/driver-registration" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
                   <Car className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                   <EditableButton
                     section="footer"
@@ -320,7 +320,7 @@ const Footer = () => {
                     className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
                     variant="ghost"
                   />
-                </Link>
+                </TransitionLink>
               </li>
             </ul>
           </div>

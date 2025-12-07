@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, BookOpen, Cloud, Landmark, ChevronRightIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { TransitionLink } from "../TransitionLink";
 import { motion } from "framer-motion";
 import { Map, Calendar, Compass, Sunrise, Mountain, CloudRain } from "lucide-react";
 import Container from "../Container";
@@ -71,15 +72,15 @@ const YatraGuide = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-2">
-            <button 
-              onClick={handlePrev} 
+            <button
+              onClick={handlePrev}
               disabled={startIndex === 0 || isEditMode}
               className={`p-2 rounded-full ${startIndex === 0 ? 'text-mist bg-secondary' : 'text-indigo-deep bg-white hover:bg-secondary'} transition-colors duration-300 border border-border`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button 
-              onClick={handleNext} 
+            <button
+              onClick={handleNext}
               disabled={startIndex >= totalItems - itemsPerPage || isEditMode}
               className={`p-2 rounded-full ${startIndex >= totalItems - itemsPerPage ? 'text-mist bg-secondary' : 'text-indigo-deep bg-white hover:bg-secondary'} transition-colors duration-300 border border-border`}
             >
@@ -90,7 +91,7 @@ const YatraGuide = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {visibleArticles.map((article) => (
-            <div 
+            <div
               key={article.id}
               className="bg-white rounded-xl p-6 shadow-sm border border-border hover:shadow-md hover:bg-blue-50/30 transition-all duration-300 flex flex-col h-full"
             >
@@ -109,17 +110,17 @@ const YatraGuide = () => {
                 defaultValue={article.title}
                 className="text-xl font-semibold mb-2 text-indigo-deep"
               />
-              
+
               <EditableText
                 section="yatraGuide"
                 contentKey={`article_excerpt_${article.id}`}
                 defaultValue={article.excerpt}
                 className="text-mist mb-6"
               />
-              
+
               <div className="mt-auto">
-                <Link 
-                  to={`/guide/${article.id}`} 
+                <TransitionLink
+                  to={`/guide/${article.id}`}
                   className="text-indigo-light hover:text-indigo-deep flex items-center transition-colors duration-300"
                   onClick={(e) => isEditMode && e.preventDefault()}
                 >
@@ -131,22 +132,22 @@ const YatraGuide = () => {
                     variant="ghost"
                     icon={<ChevronRight className="w-4 h-4 ml-1" />}
                   />
-                </Link>
+                </TransitionLink>
               </div>
             </div>
           ))}
         </div>
 
         <div className="mt-10 flex md:hidden justify-center items-center space-x-4">
-          <button 
-            onClick={handlePrev} 
+          <button
+            onClick={handlePrev}
             disabled={startIndex === 0 || isEditMode}
             className={`p-2 rounded-full ${startIndex === 0 ? 'text-mist bg-secondary' : 'text-indigo-deep bg-white hover:bg-secondary'} transition-colors duration-300 border border-border`}
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button 
-            onClick={handleNext} 
+          <button
+            onClick={handleNext}
             disabled={startIndex >= totalItems - itemsPerPage || isEditMode}
             className={`p-2 rounded-full ${startIndex >= totalItems - itemsPerPage ? 'text-mist bg-secondary' : 'text-indigo-deep bg-white hover:bg-secondary'} transition-colors duration-300 border border-border`}
           >
@@ -155,8 +156,8 @@ const YatraGuide = () => {
         </div>
 
         <div className="mt-12 text-center">
-          <Link 
-            to="/guide" 
+          <TransitionLink
+            to="/guide"
             className="inline-block"
             onClick={(e) => isEditMode && e.preventDefault()}
           >
@@ -166,7 +167,7 @@ const YatraGuide = () => {
               defaultValue="Read All Articles"
               className="btn-primary"
             />
-          </Link>
+          </TransitionLink>
         </div>
       </Container>
     </section>

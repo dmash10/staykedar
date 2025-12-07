@@ -5,12 +5,24 @@
 
 import React, { useCallback, MouseEvent } from 'react';
 import { Link, LinkProps, useNavigate } from 'react-router-dom';
+import { flushSync } from 'react-dom';
 import { supportsViewTransitions } from '@/hooks/useViewTransition';
+
+export type TransitionStyle = 'slide' | 'blur' | 'scale' | 'slide-left';
 
 interface TransitionLinkProps extends LinkProps {
     children: React.ReactNode;
     className?: string;
+    /** Animation style: 'slide' (default), 'blur', 'scale', or 'slide-left' */
+    transitionStyle?: TransitionStyle;
 }
+
+const styleClassMap: Record<TransitionStyle, string> = {
+    slide: '', // default animation, no extra class needed
+    blur: 'vt-blur',
+    scale: 'vt-scale',
+    'slide-left': 'vt-slide-left',
+};
 
 /**
  * A Link component that triggers View Transitions on navigation
@@ -21,6 +33,7 @@ export function TransitionLink({
     children,
     className,
     onClick,
+    transitionStyle = 'blur', // Default to blur for better visual effect
     ...props
 }: TransitionLinkProps) {
     const navigate = useNavigate();
@@ -39,12 +52,32 @@ export function TransitionLink({
             // Prevent default Link behavior
             e.preventDefault();
 
+            // Add transition style class
+            const styleClass = styleClassMap[transitionStyle];
+            if (styleClass) {
+                document.documentElement.classList.add(styleClass);
+            }
+
             // Navigate with View Transition
-            (document as any).startViewTransition(() => {
-                navigate(to as string);
+            const transition = (document as any).startViewTransition(() => {
+                flushSync(() => {
+                    navigate(to as string);
+                });
+            });
+
+            // Clean up class after transition completes
+            transition.finished.then(() => {
+                if (styleClass) {
+                    document.documentElement.classList.remove(styleClass);
+                }
+            }).catch(() => {
+                // Cleanup even if transition fails
+                if (styleClass) {
+                    document.documentElement.classList.remove(styleClass);
+                }
             });
         },
-        [to, navigate, onClick]
+        [to, navigate, onClick, transitionStyle]
     );
 
     return (

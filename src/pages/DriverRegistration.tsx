@@ -179,7 +179,7 @@ const DriverRegistration = () => {
 
   const handleFinalSubmit = async (data: Documents) => {
     setIsSubmitting(true);
-    
+
     const allData = {
       personal: formData.personal,
       vehicle: formData.vehicle,
@@ -252,7 +252,7 @@ const DriverRegistration = () => {
       // Redirect to success page or WhatsApp
       const message = `Hi! I just registered as a driver on StayKedarnath.\n\nName: ${allData.personal.fullName}\nPhone: ${allData.personal.phone}\nVehicle: ${allData.vehicle.vehicleName} (${allData.vehicle.vehicleType})\n\nPlease verify my profile.`;
       window.open(`https://wa.me/919027475942?text=${encodeURIComponent(message)}`, '_blank');
-      
+
       navigate('/car-rentals');
 
     } catch (error: any) {
@@ -340,18 +340,17 @@ const DriverRegistration = () => {
                   const Icon = step.icon;
                   const isActive = currentStep === step.id;
                   const isCompleted = currentStep > step.id;
-                  
+
                   return (
                     <div key={step.id} className="flex items-center">
                       <div className="flex flex-col items-center">
                         <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                            isCompleted
+                          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isCompleted
                               ? 'bg-green-500 text-white'
                               : isActive
-                              ? 'bg-blue-600 text-white ring-4 ring-blue-100'
-                              : 'bg-gray-200 text-gray-500'
-                          }`}
+                                ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                                : 'bg-gray-200 text-gray-500'
+                            }`}
                         >
                           {isCompleted ? (
                             <CheckCircle2 className="w-6 h-6" />
@@ -364,9 +363,8 @@ const DriverRegistration = () => {
                         </span>
                       </div>
                       {index < steps.length - 1 && (
-                        <div className={`flex-1 h-1 mx-2 rounded ${
-                          currentStep > step.id ? 'bg-green-500' : 'bg-gray-200'
-                        }`} style={{ minWidth: '40px' }} />
+                        <div className={`flex-1 h-1 mx-2 rounded ${currentStep > step.id ? 'bg-green-500' : 'bg-gray-200'
+                          }`} style={{ minWidth: '40px' }} />
                       )}
                     </div>
                   );
@@ -741,11 +739,10 @@ const DriverRegistration = () => {
                                   {SERVICE_AREAS.map((area) => (
                                     <label
                                       key={area}
-                                      className={`flex items-center gap-2 px-4 py-2 border rounded-full cursor-pointer transition ${
-                                        field.value?.includes(area)
+                                      className={`flex items-center gap-2 px-4 py-2 border rounded-full cursor-pointer transition ${field.value?.includes(area)
                                           ? 'bg-blue-600 text-white border-blue-600'
                                           : 'bg-white hover:border-blue-300'
-                                      }`}
+                                        }`}
                                     >
                                       <Checkbox
                                         checked={field.value?.includes(area)}
@@ -957,8 +954,8 @@ const DriverRegistration = () => {
                             <Button type="button" variant="outline" onClick={goBack} className="flex-1">
                               <ArrowLeft className="w-4 h-4 mr-2" /> Back
                             </Button>
-                            <Button 
-                              type="submit" 
+                            <Button
+                              type="submit"
                               className="flex-1 bg-green-600 hover:bg-green-700"
                               disabled={isSubmitting}
                             >

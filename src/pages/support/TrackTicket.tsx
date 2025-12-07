@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { 
+import {
     Search, ArrowLeft, Ticket, Clock, AlertCircle,
     Loader2, MessageSquare
 } from "lucide-react";
@@ -48,7 +48,7 @@ export default function TrackTicket() {
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!ticketNumber.trim()) {
             toast({
                 title: "Enter Ticket Number",
@@ -129,13 +129,13 @@ export default function TrackTicket() {
                 <meta name="description" content="Track the status of your support ticket" />
             </Helmet>
             <Nav />
-            
+
             <div className="min-h-screen bg-gray-50">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-[#0A1628] via-[#0F2167] to-[#1E3A8A] py-10 md:py-14">
                     <div className="max-w-2xl mx-auto px-4">
-                        <Link 
-                            to="/help" 
+                        <Link
+                            to="/help"
                             className="inline-flex items-center gap-2 text-white hover:text-white/90 mb-5 transition-colors text-sm bg-white/15 px-3 py-1.5 rounded-full border border-white/20"
                         >
                             <ArrowLeft className="w-4 h-4" />
@@ -166,7 +166,7 @@ export default function TrackTicket() {
                                     className={`h-12 font-mono text-base ${inputStyle}`}
                                 />
                             </div>
-                            
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Email Address (Optional - for verification)
@@ -239,7 +239,7 @@ export default function TrackTicket() {
                                             <span className="font-mono">{ticket.ticket_number}</span>
                                         </div>
                                         <h4 className="font-medium text-gray-900 mb-3">{ticket.subject}</h4>
-                                        
+
                                         <div className="grid grid-cols-2 gap-4 text-sm">
                                             <div>
                                                 <p className="text-gray-500">Category</p>

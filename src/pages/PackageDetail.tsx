@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { TransitionLink } from "@/components/TransitionLink";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
 import {
@@ -123,9 +124,9 @@ const PackageDetail = () => {
                 <div className="flex-grow flex items-center justify-center pt-20">
                     <div className="text-center">
                         <h1 className="text-2xl font-bold mb-4">Package Not Found</h1>
-                        <Link to="/packages">
+                        <TransitionLink to="/packages">
                             <Button>Back to Packages</Button>
-                        </Link>
+                        </TransitionLink>
                     </div>
                 </div>
                 <Footer />
@@ -158,7 +159,7 @@ const PackageDetail = () => {
                 <meta name="description" content={`${pkg.title} - ${pkg.duration} Kedarnath package at ₹${pkg.price.toLocaleString()}. Includes: ${pkg.inclusions?.slice(0, 3).join(', ')}. Book your Char Dham Yatra now!`} />
                 <meta name="keywords" content={`${pkg.title}, Kedarnath package, Char Dham package, Kedarnath yatra, pilgrimage package, ${pkg.location}`} />
                 <link rel="canonical" href={`https://staykedarnath.in/packages/${slug}`} />
-                
+
                 {/* Open Graph */}
                 <meta property="og:type" content="product" />
                 <meta property="og:title" content={`${pkg.title} | StayKedarnath`} />
@@ -167,12 +168,12 @@ const PackageDetail = () => {
                 <meta property="og:url" content={`https://staykedarnath.in/packages/${slug}`} />
                 <meta property="product:price:amount" content={pkg.price.toString()} />
                 <meta property="product:price:currency" content="INR" />
-                
+
                 {/* TouristTrip Schema */}
                 <script type="application/ld+json">
                     {JSON.stringify(packageSchema)}
                 </script>
-                
+
                 {/* Breadcrumb Schema */}
                 <script type="application/ld+json">
                     {JSON.stringify(breadcrumbSchema)}
@@ -187,10 +188,10 @@ const PackageDetail = () => {
                     <div className="bg-white border-b border-gray-200">
                         <Container className="py-6">
                             <div className="mb-4">
-                                <Link to="/packages" className="inline-flex items-center text-gray-500 hover:text-[#0071c2] transition-colors">
+                                <TransitionLink to="/packages" className="inline-flex items-center text-gray-500 hover:text-[#0071c2] transition-colors">
                                     <ArrowLeft className="w-4 h-4 mr-2" />
                                     Back to Packages
-                                </Link>
+                                </TransitionLink>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 h-[400px] rounded-xl overflow-hidden mb-6">

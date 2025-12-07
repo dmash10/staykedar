@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { TransitionLink } from "@/components/TransitionLink";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Container from "../components/Container";
@@ -252,11 +252,11 @@ const Packages = () => {
                               <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Starting From</p>
                               <p className="text-xl font-bold text-[#0071c2]">₹{pkg.price.toLocaleString()}</p>
                             </div>
-                            <Link to={`/packages/${pkg.slug}`}>
+                            <TransitionLink to={`/packages/${pkg.slug}`}>
                               <Button size="sm" className="rounded-lg bg-[#0071c2] hover:bg-[#005a9c] text-white font-semibold shadow-sm hover:shadow-md transition-all">
                                 View Details <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                               </Button>
-                            </Link>
+                            </TransitionLink>
                           </div>
                         </div>
                       </motion.div>
@@ -305,11 +305,11 @@ const Packages = () => {
               </div>
             </Container>
           </section>
-          
+
           {/* FAQ Section for SEO */}
           <section className="bg-gray-50 py-12 border-t">
             <Container>
-              <AIOptimizedFAQ 
+              <AIOptimizedFAQ
                 title="Kedarnath Package FAQs"
                 description="Common questions about Char Dham and Kedarnath yatra packages"
                 faqs={PackageFAQs}

@@ -50,10 +50,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AIOptimizedFAQ, { FAQItem } from "@/components/SEO/AIOptimizedFAQ";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  generateFAQSchema, 
+import {
+  generateFAQSchema,
   generateBreadcrumbSchema,
-  combineSchemas 
+  combineSchemas
 } from "@/utils/seoSchemas";
 
 // Types
@@ -260,11 +260,11 @@ const TravelGuidePage = () => {
             <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 mb-4">
               <BookOpen className="w-3 h-3 mr-1" /> Complete Travel Guide
             </Badge>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               {city.name} Travel Guide 2026
             </h1>
-            
+
             <p className="text-xl text-indigo-100/80 mb-6">
               Everything you need to know for your {city.name} trip during Kedarnath Yatra
             </p>
@@ -295,7 +295,7 @@ const TravelGuidePage = () => {
 
             {/* CTA */}
             <div className="flex flex-wrap gap-4">
-              <Button 
+              <Button
                 size="lg"
                 className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={handleWhatsAppEnquiry}
@@ -304,7 +304,7 @@ const TravelGuidePage = () => {
                 Plan My Trip
               </Button>
               <Link to={`/taxi/${city.slug}`}>
-                <Button 
+                <Button
                   size="lg"
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10"
@@ -335,11 +335,10 @@ const TravelGuidePage = () => {
                         <a
                           key={item.id}
                           href={`#${item.id}`}
-                          className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                            activeSection === item.id
+                          className={`block px-3 py-2 rounded-lg text-sm transition-colors ${activeSection === item.id
                               ? 'bg-indigo-100 text-indigo-700 font-medium'
                               : 'text-gray-600 hover:bg-gray-100'
-                          }`}
+                            }`}
                           onClick={() => setActiveSection(item.id)}
                         >
                           {item.label}
@@ -436,7 +435,7 @@ const TravelGuidePage = () => {
                         <h3 className="font-bold text-gray-900">By Road</h3>
                       </div>
                       <p className="text-gray-600 text-sm">
-                        Well connected via national highways. 
+                        Well connected via national highways.
                         {city.taxi_rates?.drop_sonprayag_sedan && city.taxi_rates.drop_sonprayag_sedan > 0 && (
                           <span> Taxi to Sonprayag: ₹{city.taxi_rates.drop_sonprayag_sedan.toLocaleString()}</span>
                         )}
@@ -449,8 +448,8 @@ const TravelGuidePage = () => {
                     <CardContent className="p-6">
                       <div className="prose prose-sm max-w-none text-gray-600">
                         {city.how_to_reach.split('\n\n').map((paragraph, index) => (
-                          <p key={index} className="mb-3" dangerouslySetInnerHTML={{ 
-                            __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                          <p key={index} className="mb-3" dangerouslySetInnerHTML={{
+                            __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                           }} />
                         ))}
                       </div>
@@ -681,8 +680,8 @@ const TravelGuidePage = () => {
               Let us help you plan the perfect trip
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-white text-indigo-600 hover:bg-gray-100"
                 onClick={handleWhatsAppEnquiry}
               >

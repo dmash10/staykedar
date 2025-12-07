@@ -40,7 +40,7 @@ const Index = () => {
           "description": "Ancient Hindu temple dedicated to Lord Shiva, part of Char Dham Yatra"
         },
         {
-          "@type": "TouristAttraction", 
+          "@type": "TouristAttraction",
           "name": "Vasuki Tal",
           "description": "Glacial lake located 6 km from Kedarnath at 4,135 meters"
         },
@@ -65,7 +65,7 @@ const Index = () => {
         <meta name="description" content="Official Kedarnath booking partner. Book verified stays near Kedarnath Temple, helicopter services from ₹2,500, VIP darshan, and complete Char Dham Yatra packages. 24/7 support. Best prices guaranteed." />
         <meta name="keywords" content="Kedarnath booking, Kedarnath hotel, Kedarnath helicopter, Char Dham Yatra, Kedarnath Temple, Kedarnath trek, Kedarnath stay, Gaurikund hotel, Kedarnath package" />
         <link rel="canonical" href="https://staykedarnath.in" />
-        
+
         {/* Open Graph for Social Sharing */}
         <meta property="og:type" content="website" />
         <meta property="og:title" content="StayKedarnath - Book Kedarnath Stays & Helicopter Services" />
@@ -73,19 +73,19 @@ const Index = () => {
         <meta property="og:url" content="https://staykedarnath.in" />
         <meta property="og:image" content="https://staykedarnath.in/og-image.png" />
         <meta property="og:site_name" content="StayKedarnath" />
-        
+
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="StayKedarnath - Book Kedarnath Stays & Helicopter Services" />
         <meta name="twitter:description" content="Official booking partner for Kedarnath stays and Char Dham Yatra packages." />
         <meta name="twitter:image" content="https://staykedarnath.in/og-image.png" />
-        
+
         {/* Homepage Schema */}
         <script type="application/ld+json">
           {JSON.stringify(homepageSchema)}
         </script>
       </Helmet>
-      
+
       {/* Global Schema Markup for Organization, Website, LocalBusiness */}
       <GlobalSchemaMarkup />
 
@@ -98,20 +98,20 @@ const Index = () => {
         <main className="flex-grow">
           {/* Hero with search bar inside */}
           <Hero />
-          
+
           {/* Animated Marquee Banner - Below Hero */}
           <MarqueeBanner />
-          
+
           <WhyUs />
           <FeaturedDestinations />
           <CuratedPackages />
           <HowItWorks />
           <TrustSignals />
-          
+
           {/* AI-Optimized FAQ Section for Search Visibility */}
           <section className="py-16 bg-gray-50">
             <div className="container mx-auto px-4">
-              <AIOptimizedFAQ 
+              <AIOptimizedFAQ
                 title="Kedarnath Yatra - Frequently Asked Questions"
                 description="Everything you need to know about planning your sacred journey to Kedarnath"
                 faqs={KedarnathTravelFAQs}

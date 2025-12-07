@@ -113,7 +113,7 @@ const CarRentals = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch drivers
       const { data: driversData, error: driversError } = await supabase
         .from('car_drivers')
@@ -155,10 +155,10 @@ const CarRentals = () => {
   const filteredDrivers = drivers.filter(driver => {
     const matchesSearch = driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       driver.base_city.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesFilter = filterArea === 'all' || 
+
+    const matchesFilter = filterArea === 'all' ||
       driver.service_areas.some(area => area.toLowerCase().includes(filterArea.toLowerCase()));
-    
+
     return matchesSearch && matchesFilter;
   });
 
@@ -281,7 +281,7 @@ const CarRentals = () => {
                   </div>
 
                   <div className="flex items-end">
-                    <Button 
+                    <Button
                       onClick={handleSearch}
                       className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
                     >
@@ -386,7 +386,7 @@ const CarRentals = () => {
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Our Verified Drivers</h2>
               <p className="text-gray-600">Choose a driver and book directly</p>
             </div>
-            
+
             <div className="flex gap-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -421,7 +421,7 @@ const CarRentals = () => {
               <Car className="w-16 h-16 mx-auto text-gray-300 mb-4" />
               <h3 className="text-xl font-semibold text-gray-700 mb-2">No Drivers Found</h3>
               <p className="text-gray-500 mb-6">
-                {drivers.length === 0 
+                {drivers.length === 0
                   ? "We're currently onboarding drivers. Contact us for bookings!"
                   : "Try adjusting your search filters"}
               </p>
@@ -452,7 +452,7 @@ const CarRentals = () => {
                         </Badge>
                       )}
                     </div>
-                    
+
                     <CardContent className="pt-0 pb-6 px-6">
                       {/* Profile Photo */}
                       <div className="flex items-end gap-4 -mt-10 mb-4">
@@ -522,7 +522,7 @@ const CarRentals = () => {
 
                       {/* Actions */}
                       <div className="flex gap-2">
-                        <Button 
+                        <Button
                           className="flex-1 bg-green-600 hover:bg-green-700"
                           onClick={() => {
                             const message = `Hi ${driver.name}! I found your profile on StayKedarnath and would like to book a taxi for my Kedarnath trip. Please share your availability and rates.`;
@@ -532,7 +532,7 @@ const CarRentals = () => {
                           <MessageCircle className="w-4 h-4 mr-2" />
                           WhatsApp
                         </Button>
-                        <Button 
+                        <Button
                           variant="outline"
                           onClick={() => window.location.href = `tel:${driver.phone}`}
                         >
@@ -699,8 +699,8 @@ const CarRentals = () => {
               </p>
             </div>
             <Link to="/driver-registration">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-white text-blue-900 hover:bg-blue-50"
               >
                 <Car className="w-4 h-4 mr-2" />

@@ -10,7 +10,8 @@ import MainSearchBar from '@/components/search/MainSearchBar';
 import stayService, { PropertySearchResult } from '@/api/stayService';
 import { useToast } from '@/components/ui/use-toast';
 import AIOptimizedFAQ, { StaysFAQs } from '@/components/SEO/AIOptimizedFAQ';
-import { Link } from 'react-router-dom';
+import { TransitionLink } from '@/components/TransitionLink';
+import { supportsViewTransitions } from '@/hooks/useViewTransition';
 import { MapPin, Mountain, Bed, ArrowRight, Clock, Phone, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import citiesData from '@/data/cities.json';
@@ -149,7 +150,14 @@ const StayListing = () => {
   };
 
   const navigateToPropertyDetail = (propertyId: string) => {
-    navigate(`/stays/${propertyId}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`);
+    const url = `/stays/${propertyId}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`;
+    if (supportsViewTransitions()) {
+      (document as any).startViewTransition(() => {
+        navigate(url);
+      });
+    } else {
+      navigate(url);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -209,9 +217,9 @@ const StayListing = () => {
                     Last Minute Lightning Deals
                   </h2>
                 </div>
-                <Link to="/urgent-stays" className="text-sm font-medium text-red-600 hover:text-red-700 flex items-center">
+                <TransitionLink to="/urgent-stays" className="text-sm font-medium text-red-600 hover:text-red-700 flex items-center">
                   View All <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
+                </TransitionLink>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -530,7 +538,7 @@ const StayListing = () => {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Link to={`/stays/location/${city.slug}`}>
+                    <TransitionLink to={`/stays/location/${city.slug}`}>
                       <div className="bg-white rounded-xl p-4 shadow-sm hover:shadow-lg transition-all group cursor-pointer border-2 hover:border-[#0071c2]">
                         <div className="flex items-center gap-3 mb-2">
                           <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-[#0071c2] transition-colors">
@@ -558,7 +566,7 @@ const StayListing = () => {
                           </div>
                         )}
                       </div>
-                    </Link>
+                    </TransitionLink>
                   </motion.div>
                 ))}
             </div>
