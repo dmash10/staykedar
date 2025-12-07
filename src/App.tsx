@@ -121,6 +121,7 @@ import HelpArticle from './pages/help/HelpArticle';
 import BadrinathPage from './pages/BadrinathPage';
 import CharDhamPage from './pages/CharDhamPage';
 import DoDhamPage from './pages/DoDhamPage';
+import WorkFromPahadPage from './pages/WorkFromPahadPage';
 
 const queryClient = new QueryClient();
 
@@ -202,6 +203,7 @@ const App = () => {
                     <Route path="/badrinath" element={<BadrinathPage />} />
                     <Route path="/char-dham" element={<CharDhamPage />} />
                     <Route path="/do-dham" element={<DoDhamPage />} />
+                    <Route path="/work-from-pahad" element={<WorkFromPahadPage />} />
                     <Route path="/tools/itinerary-planner" element={<ItineraryPlannerPage />} />
 
                     {/* Support Routes */}

@@ -45,6 +45,11 @@ const Footer = () => {
                   Car Rentals
                 </TransitionLink>
               </li>
+              <li>
+                <TransitionLink to="/work-from-pahad" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Work from Pahad
+                </TransitionLink>
+              </li>
             </ul>
           </div>
 
