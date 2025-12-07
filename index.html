@@ -45,8 +45,9 @@
   <meta name="ICBM" content="30.7346, 79.0669" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" href="/og-image.png" />
+  <!-- Favicon - Managed dynamically by Index.tsx -->
+  <!-- <link rel="icon" type="image/x-icon" href="/favicon.ico" /> -->
+  <!-- <link rel="apple-touch-icon" href="/og-image.png" /> -->
 
   <!-- Preconnect for Performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -137,9 +138,194 @@
     }
   }
   </script>
+
+  <!-- FAQPage Schema - Critical for AI Overviews -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How to reach Kedarnath Temple?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kedarnath can be reached by a 16 km trek from Gaurikund, or by helicopter from Phata, Guptkashi, or Sitapur helipads. The trek takes 6-8 hours, while helicopter ride is 10-15 minutes. StayKedarnath offers helicopter booking services starting from ₹2,500 per person."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the best time to visit Kedarnath?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The best time to visit Kedarnath is May to June and September to October. The temple opens in April/May (Akshaya Tritiya) and closes in November (Bhai Dooj). Monsoon (July-August) should be avoided due to landslides."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where can I stay near Kedarnath Temple?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Accommodation is available near the temple premises with basic facilities. For comfortable stays, book hotels in Gaurikund, Guptkashi, or Sitapur. StayKedarnath offers verified accommodations with prices ranging from ₹500 to ₹5,000 per night."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How to book Kedarnath helicopter tickets?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Kedarnath helicopter tickets can be booked through IRCTC or authorized partners like StayKedarnath. Helicopters operate from Phata, Guptkashi, and Sitapur helipads. Advance booking is recommended, especially during peak season."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is included in Char Dham Yatra package?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Char Dham Yatra packages typically include accommodation, meals, transportation, guide services, and temple darshan assistance. Packages range from 7 to 12 days covering Yamunotri, Gangotri, Kedarnath, and Badrinath temples."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Service Schema - Helicopter Services -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Kedarnath Helicopter Booking",
+    "serviceType": "Helicopter Transportation",
+    "provider": {
+      "@type": "Organization",
+      "name": "StayKedarnath"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": "Kedarnath, Uttarakhand"
+    },
+    "description": "Book helicopter services for Kedarnath pilgrimage from Phata, Guptkashi, and Sitapur helipads. Same-day return available.",
+    "offers": {
+      "@type": "Offer",
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "price": "2500",
+        "priceCurrency": "INR",
+        "minPrice": "2500",
+        "maxPrice": "7000"
+      },
+      "availability": "https://schema.org/InStock"
+    }
+  }
+  </script>
+
+  <!-- ItemList Schema - Key Offerings -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "StayKedarnath Services",
+    "description": "Complete pilgrimage services for Kedarnath and Char Dham Yatra",
+    "numberOfItems": 5,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Kedarnath Hotels & Stays",
+        "url": "https://staykedarnath.in/stays"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Kedarnath Helicopter Booking",
+        "url": "https://staykedarnath.in/helicopter"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Char Dham Yatra Packages",
+        "url": "https://staykedarnath.in/packages"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Car Rentals",
+        "url": "https://staykedarnath.in/car-rentals"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "Kedarnath Attractions",
+        "url": "https://staykedarnath.in/attractions"
+      }
+    ]
+  }
+  </script>
+
+  <!-- SiteNavigationElement - Main Navigation -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SiteNavigationElement",
+    "name": "Main Navigation",
+    "hasPart": [
+      {"@type": "WebPage", "name": "Home", "url": "https://staykedarnath.in/"},
+      {"@type": "WebPage", "name": "Stays", "url": "https://staykedarnath.in/stays"},
+      {"@type": "WebPage", "name": "Car Rentals", "url": "https://staykedarnath.in/car-rentals"},
+      {"@type": "WebPage", "name": "Attractions", "url": "https://staykedarnath.in/attractions"},
+      {"@type": "WebPage", "name": "Packages", "url": "https://staykedarnath.in/packages"},
+      {"@type": "WebPage", "name": "Blog", "url": "https://staykedarnath.in/blog"}
+    ]
+  }
+  </script>
+
+  <!-- BreadcrumbList Schema - Homepage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://staykedarnath.in/"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Product Schema - Accommodation Aggregate -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Kedarnath Stays & Accommodation",
+    "description": "Verified hotels and guest houses near Kedarnath Temple. Book comfortable stays in Gaurikund, Guptkashi, and Sitapur.",
+    "brand": {
+      "@type": "Brand",
+      "name": "StayKedarnath"
+    },
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "500",
+      "highPrice": "5000",
+      "priceCurrency": "INR",
+      "offerCount": "50+",
+      "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.5",
+      "reviewCount": "1200",
+      "bestRating": "5",
+      "worstRating": "1"
+    }
+  }
+  </script>
 </head>
 
-<body style="background-color: #003580; margin: 0;">
+<body style="background-color: #ffffff; margin: 0;">
   <div id="root"></div>
   <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
   <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>

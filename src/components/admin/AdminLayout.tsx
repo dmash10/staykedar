@@ -91,6 +91,8 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
       label: 'Management',
       items: [
         { name: 'Properties', path: '/admin/properties', icon: Building2 },
+        { name: 'Blind Properties', path: '/admin/blind-properties', icon: Building2 },
+        { name: 'Stay Leads', path: '/admin/stay-leads', icon: Users },
         { name: 'Car Drivers', path: '/admin/car-drivers', icon: Car },
         { name: 'Packages', path: '/admin/packages', icon: Package },
         { name: 'Urgent Inventory', path: '/admin/inventory', icon: Clock },

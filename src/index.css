@@ -72,8 +72,8 @@
   /* Default Scrollbar (Customer Pages - Light Background) */
   /* Needs to be darker to be visible on white */
   ::-webkit-scrollbar-thumb {
-    background: rgba(71, 85, 105, 0.5);
-    /* Slate-600 - Darker for white pages */
+    background: #cfcfcf;
+    /* Matching footer gray tone */
     border-radius: 3px;
     border: none;
     transition: background-color 0.2s;

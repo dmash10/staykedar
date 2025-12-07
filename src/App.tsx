@@ -36,7 +36,7 @@ import PackagesFromCityPage from "./pages/PackagesFromCityPage";
 import SEORoutesPage from "./pages/admin/SEORoutesPage";
 import DriverDetail from "./pages/DriverDetail";
 import DriverRegistration from "./pages/DriverRegistration";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ItineraryPage from "./pages/ItineraryPage";
 import Blog from './pages/Blog';
@@ -67,6 +67,8 @@ import SEOItinerariesPage from '@/pages/admin/SEOItinerariesPage';
 import BannersPage from '@/pages/admin/BannersPage';
 import UrgentStaysPage from '@/pages/UrgentStaysPage';
 import InventoryManager from '@/pages/admin/InventoryManager';
+import BlindPropertiesPage from '@/pages/admin/BlindPropertiesPage';
+import StayLeadsPage from '@/pages/admin/StayLeadsPage';
 import AttractionEditorPage from '@/pages/admin/AttractionEditorPage';
 import MarqueeBannerManager from '@/pages/admin/MarqueeBannerManager';
 import PromoCodesPage from '@/pages/admin/PromoCodesPage';
@@ -89,6 +91,8 @@ import ShippingPolicy from './pages/ShippingPolicy';
 import CancellationPolicy from './pages/CancellationPolicy';
 import ContactUs from './pages/ContactUs';
 import StayListing from './pages/StayListing';
+import SmartStaysPage from './pages/SmartStaysPage';
+import PropertyAuditPage from './pages/PropertyAuditPage';
 import PropertyDetail from './pages/PropertyDetail';
 import UserBookings from './pages/UserBookings';
 import UserTickets from './pages/user/UserTickets';
@@ -132,7 +136,7 @@ const App = () => {
                 <TooltipProvider>
                   <Helmet>
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-                    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+                    {/* <link rel="icon" type="image/svg+xml" href="/favicon.ico" /> - Removed to allow dynamic favicon from Index.tsx */}
                   </Helmet>
 
                   <Toaster />
@@ -152,7 +156,9 @@ const App = () => {
                     <Route path="/content-creator" element={<ContentCreator />} />
                     <Route path="/partner-with-us" element={<PartnerWithUs />} />
                     <Route path="/auth" element={<Auth />} />
-                    <Route path="/stays" element={<StayListing />} />
+                    <Route path="/stays" element={<SmartStaysPage />} />
+                    <Route path="/stays/view/:propertyId" element={<PropertyAuditPage />} />
+                    <Route path="/stays/old" element={<StayListing />} />
                     <Route path="/stays/:propertyId" element={<PropertyDetail />} />
                     <Route path="/packages" element={<Packages />} />
                     <Route path="/packages/:slug" element={<PackageDetail />} />
@@ -284,6 +290,8 @@ const App = () => {
                     <Route path="/admin/banners" element={<BannersPage />} />
                     <Route path="/admin/promos" element={<PromoCodesPage />} />
                     <Route path="/admin/inventory" element={<InventoryManager />} />
+                    <Route path="/admin/blind-properties" element={<BlindPropertiesPage />} />
+                    <Route path="/admin/stay-leads" element={<StayLeadsPage />} />
                     <Route path="/urgent-stays" element={<UrgentStaysPage />} />
                     <Route path="/tools/kedarnath-budget-calculator" element={<BudgetCalculatorPage />} />
                     <Route path="/tools/is-it-raining-in-kedarnath" element={<WeatherCheckPage />} />

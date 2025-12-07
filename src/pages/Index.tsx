@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Hero from "../components/home/Hero";
@@ -12,15 +12,19 @@ import PromoBanner from "../components/home/PromoBanner";
 import PluginRenderer from "../components/plugins/PluginRenderer";
 import { GlobalSchemaMarkup } from "../components/SEO/SchemaMarkup";
 import AIOptimizedFAQ, { KedarnathTravelFAQs } from "../components/SEO/AIOptimizedFAQ";
+import { useSEOSettings, generateOrganizationSchema, generateWebsiteSchema } from "../hooks/useSEOSettings";
 
 const Index = () => {
+  // Load SEO settings from database
+  const { seo } = useSEOSettings();
+
   // Homepage structured data for AI Search
   const homepageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "StayKedarnath - Book Kedarnath Stays, Helicopter & Yatra Packages",
-    "description": "Official booking partner for Kedarnath stays, helicopter services, and pilgrimage packages. Plan your sacred journey to Kedarnath Temple with trusted accommodations and VIP darshan services.",
-    "url": "https://staykedarnath.in",
+    "name": seo.site_title,
+    "description": seo.site_description,
+    "url": seo.canonical_base_url,
     "mainEntity": {
       "@type": "TouristDestination",
       "name": "Kedarnath",
@@ -53,36 +57,67 @@ const Index = () => {
     },
     "provider": {
       "@type": "TravelAgency",
-      "name": "StayKedarnath",
-      "url": "https://staykedarnath.in"
+      "name": seo.org_name,
+      "url": seo.canonical_base_url
     }
   };
+
+  // Generate dynamic schemas from SEO settings
+  const organizationSchema = generateOrganizationSchema(seo);
+  const websiteSchema = generateWebsiteSchema(seo);
 
   return (
     <>
       <Helmet>
-        <title>StayKedarnath | Book Kedarnath Stays, Helicopter & Yatra Packages 2024</title>
-        <meta name="description" content="Official Kedarnath booking partner. Book verified stays near Kedarnath Temple, helicopter services from ₹2,500, VIP darshan, and complete Char Dham Yatra packages. 24/7 support. Best prices guaranteed." />
-        <meta name="keywords" content="Kedarnath booking, Kedarnath hotel, Kedarnath helicopter, Char Dham Yatra, Kedarnath Temple, Kedarnath trek, Kedarnath stay, Gaurikund hotel, Kedarnath package" />
-        <link rel="canonical" href="https://staykedarnath.in" />
+        {/* Dynamic Title & Description from Admin SEO Settings */}
+        <title>{seo.site_title}</title>
+        <meta name="description" content={seo.site_description} />
+        <meta name="keywords" content={seo.site_keywords} />
+        <link rel="canonical" href={seo.canonical_base_url} />
 
-        {/* Open Graph for Social Sharing */}
+        {/* Dynamic Favicon from Admin Settings */}
+        {/* Dynamic Favicon from Admin Settings with Cache Busting */}
+        {seo.site_favicon && <link rel="icon" href={`${seo.site_favicon}?v=${new Date().getTime()}`} />}
+
+        {/* Open Graph for Social Sharing - Dynamic */}
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="StayKedarnath - Book Kedarnath Stays & Helicopter Services" />
-        <meta property="og:description" content="Official booking partner for Kedarnath. Book verified stays, helicopter services, and Char Dham Yatra packages." />
-        <meta property="og:url" content="https://staykedarnath.in" />
-        <meta property="og:image" content="https://staykedarnath.in/og-image.png" />
-        <meta property="og:site_name" content="StayKedarnath" />
+        <meta property="og:title" content={seo.site_title} />
+        <meta property="og:description" content={seo.site_description} />
+        <meta property="og:url" content={seo.canonical_base_url} />
+        <meta property="og:image" content={seo.og_image} />
+        <meta property="og:site_name" content={seo.og_site_name} />
+        <meta property="og:locale" content={seo.og_locale} />
 
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="StayKedarnath - Book Kedarnath Stays & Helicopter Services" />
-        <meta name="twitter:description" content="Official booking partner for Kedarnath stays and Char Dham Yatra packages." />
-        <meta name="twitter:image" content="https://staykedarnath.in/og-image.png" />
+        {/* Twitter Card - Dynamic */}
+        <meta name="twitter:card" content={seo.twitter_card_type} />
+        <meta name="twitter:site" content={seo.twitter_handle} />
+        <meta name="twitter:title" content={seo.site_title} />
+        <meta name="twitter:description" content={seo.site_description} />
+        <meta name="twitter:image" content={seo.og_image} />
+
+        {/* Google Search Console Verification */}
+        {seo.google_search_console_verification && (
+          <meta name="google-site-verification" content={seo.google_search_console_verification} />
+        )}
+
+        {/* Bing Verification */}
+        {seo.bing_verification && (
+          <meta name="msvalidate.01" content={seo.bing_verification} />
+        )}
 
         {/* Homepage Schema */}
         <script type="application/ld+json">
           {JSON.stringify(homepageSchema)}
+        </script>
+
+        {/* Organization Schema - Dynamic from Admin */}
+        <script type="application/ld+json">
+          {JSON.stringify(organizationSchema)}
+        </script>
+
+        {/* Website Schema - Dynamic from Admin */}
+        <script type="application/ld+json">
+          {JSON.stringify(websiteSchema)}
         </script>
       </Helmet>
 

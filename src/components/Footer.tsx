@@ -1,394 +1,221 @@
 import { TransitionLink } from "@/components/TransitionLink";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Info,
-  Shield,
-  Book,
-  FileText,
-  Truck,
-  CreditCard,
-  Camera,
-  Users,
-  HelpCircle,
-  FileCheck,
-  FileWarning,
-  Car,
-  Activity,
-  Calculator,
-  CloudRain,
-  ArrowRightLeft,
-  Instagram,
-  Youtube,
-  Clock,
-  Home,
-  Mountain
-} from "lucide-react";
+import { Mail, Phone, Instagram, Youtube } from "lucide-react";
 import Container from "./Container";
-import { EditableButton, EditableText } from "./editable";
 import { useEdit } from "@/contexts/EditContext";
 import { socialConfig } from "@/lib/social-config";
 
 const Footer = () => {
   const { isEditMode } = useEdit();
 
+  // Link style - clean, normal weight, underline on hover
+  const linkClass = "text-xs text-gray-700 hover:underline py-0.5 block";
+
   return (
-    <footer className="bg-primary-deep/10 pt-8 pb-6">
+    <footer className="bg-[#e7e7e7] pt-10 pb-8">
       <Container>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-4">
-          {/* Tools */}
+        {/* Main Footer Grid - Reordered for better flow */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-6">
+
+          {/* 1. Discover - Primary content */}
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Free Tools</h3>
-            <ul className="space-y-0 md:space-y-1">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Discover</h3>
+            <ul className="space-y-1.5">
               <li>
-                <TransitionLink to="/tools/kedarnath-budget-calculator" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Calculator className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="budget_calc_link"
-                    defaultValue="Budget Calculator"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/blog" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Blog
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/tools/is-it-raining-in-kedarnath" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <CloudRain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="weather_check_link"
-                    defaultValue="Rain Check"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/attractions" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Attractions
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/compare/guptkashi-vs-sonprayag" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <ArrowRightLeft className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="compare_link"
-                    defaultValue="Compare Cities"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/live-status" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Live Status
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/tools/itinerary-planner" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="itinerary_planner_link"
-                    defaultValue="Itinerary Planner"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/weather" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Weather Updates
+                </TransitionLink>
+              </li>
+              <li>
+                <TransitionLink to="/car-rentals" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Car Rentals
                 </TransitionLink>
               </li>
             </ul>
           </div>
 
-          {/* Support */}
+          {/* 2. Pilgrimage - Core offering */}
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Support</h3>
-            <ul className="space-y-0 md:space-y-1">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Pilgrimage</h3>
+            <ul className="space-y-1.5">
               <li>
-                <TransitionLink to="/help" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <HelpCircle className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="help_center_link"
-                    defaultValue="Help Center"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/char-dham" className={linkClass}>
+                  Char Dham Yatra
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/support/raise" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <FileText className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="raise_ticket_link"
-                    defaultValue="Raise a Ticket"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/do-dham" className={linkClass}>
+                  Do Dham (Kedar + Badri)
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/support/track" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Truck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="track_ticket_link"
-                    defaultValue="Track Status"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
-                </TransitionLink>
-              </li>
-              <li>
-                <TransitionLink to="/shipping" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Truck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="shipping_link"
-                    defaultValue="Shipping Policy"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
-                </TransitionLink>
-              </li>
-              <li>
-                <TransitionLink to="/cancellation" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <FileWarning className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="cancellation_link"
-                    defaultValue="Cancellation & Refunds"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/badrinath" className={linkClass}>
+                  Badrinath
                 </TransitionLink>
               </li>
             </ul>
           </div>
 
-          {/* Discover */}
+          {/* 3. Free Tools - Value-add */}
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Discover</h3>
-            <ul className="space-y-0 md:space-y-1">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Free Tools</h3>
+            <ul className="space-y-1.5">
               <li>
-                <TransitionLink to="/blog" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Book className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="blog_link"
-                    defaultValue="Blog"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/tools/kedarnath-budget-calculator" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Budget Calculator
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/attractions" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="attractions_link"
-                    defaultValue="Attractions"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/tools/is-it-raining-in-kedarnath" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Rain Check
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/live-status" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Activity className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0 text-red-500" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="live_status_link"
-                    defaultValue="Live Status"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm font-medium"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/compare/guptkashi-vs-sonprayag" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Compare Cities
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/weather" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="weather_link"
-                    defaultValue="Weather Updates"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
-                </TransitionLink>
-              </li>
-              <li>
-                <TransitionLink to="/car-rentals" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Car className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="car_rentals_link"
-                    defaultValue="Car Rentals"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/tools/itinerary-planner" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Itinerary Planner
                 </TransitionLink>
               </li>
             </ul>
           </div>
 
-          {/* Pilgrimage */}
+          {/* 4. Support */}
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Pilgrimage</h3>
-            <ul className="space-y-0 md:space-y-1">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Support</h3>
+            <ul className="space-y-1.5">
               <li>
-                <TransitionLink to="/char-dham" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
-                  <Mountain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <span>Char Dham Yatra</span>
+                <TransitionLink to="/help" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Help Center
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/do-dham" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
-                  <Mountain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <span>Do Dham (Kedar + Badri)</span>
+                <TransitionLink to="/support/raise" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Raise a Ticket
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/badrinath" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5">
-                  <Mountain className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <span>Badrinath</span>
+                <TransitionLink to="/support/track" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Track Status
+                </TransitionLink>
+              </li>
+              <li>
+                <TransitionLink to="/shipping" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Shipping Policy
+                </TransitionLink>
+              </li>
+              <li>
+                <TransitionLink to="/cancellation" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Cancellation & Refunds
                 </TransitionLink>
               </li>
             </ul>
           </div>
 
-          {/* Terms and settings */}
+          {/* 5. Partners */}
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Terms and settings</h3>
-            <ul className="space-y-0 md:space-y-1">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Partners</h3>
+            <ul className="space-y-1.5">
               <li>
-                <TransitionLink to="/terms" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <FileCheck className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="terms_link"
-                    defaultValue="Terms & Conditions"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/partner-with-us#property" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  List Your Property
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/privacy" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Shield className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="privacy_link"
-                    defaultValue="Privacy Policy"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/content-creator" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Content Creator Program
+                </TransitionLink>
+              </li>
+              <li>
+                <TransitionLink to="/driver-registration" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Become a Driver
                 </TransitionLink>
               </li>
             </ul>
           </div>
 
-          {/* Partners */}
+          {/* 6. Terms & Settings - Legal (last) */}
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">Partners</h3>
-            <ul className="space-y-0 md:space-y-1">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Terms & Settings</h3>
+            <ul className="space-y-1.5">
               <li>
-                <TransitionLink to="/partner-with-us#property" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Home className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="list_property_link"
-                    defaultValue="List Your Property"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/terms" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Terms & Conditions
                 </TransitionLink>
               </li>
               <li>
-                <TransitionLink to="/content-creator" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Camera className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="content_creator_link"
-                    defaultValue="Content Creator Program"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
-                </TransitionLink>
-              </li>
-              <li>
-                <TransitionLink to="/driver-registration" className="text-xs md:text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 py-0.5" onClick={(e) => isEditMode && e.preventDefault()}>
-                  <Car className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                  <EditableButton
-                    section="footer"
-                    contentKey="driver_registration_link"
-                    defaultValue="Become a Driver"
-                    className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground hover:text-primary text-xs md:text-sm"
-                    variant="ghost"
-                  />
+                <TransitionLink to="/privacy" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Privacy Policy
                 </TransitionLink>
               </li>
             </ul>
           </div>
-          {/* About */}
-          <div className="col-span-2 md:col-span-2 lg:col-span-1">
-            <h3 className="text-base md:text-lg font-semibold text-indigo-deep mb-2 md:mb-3">About</h3>
-            <div className="space-y-2">
-              <EditableText
-                section="footer"
-                contentKey="company_description"
-                defaultValue="Your trusted partner for a seamless and spiritual Kedarnath journey. We provide accommodation, travel services, and complete pilgrimage packages."
-                className="text-xs text-muted-foreground leading-relaxed"
-              />
-              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
-                <Mail className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                <EditableButton
-                  section="footer"
-                  contentKey="company_email"
-                  defaultValue="support@staykedarnath.in"
-                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-xs md:text-sm"
-                  variant="ghost"
-                />
+        </div>
+
+        {/* Bottom Section: About + Copyright */}
+        <div className="mt-8 pt-6 border-t border-gray-300">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+            {/* About Section */}
+            <div className="max-w-sm">
+              <h3 className="text-sm font-bold text-gray-900 mb-2">About</h3>
+              <p className="text-xs text-gray-600 leading-relaxed mb-3">
+                Your trusted partner for a seamless and spiritual Kedarnath journey. We provide accommodation, travel services, and complete pilgrimage packages.
+              </p>
+              <div className="space-y-1 text-xs text-gray-700">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>support@staykedarnath.in</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>+91 9027475942</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground">
-                <Phone className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
-                <EditableButton
-                  section="footer"
-                  contentKey="company_phone"
-                  defaultValue="+91 9027475942"
-                  className="p-0 m-0 bg-transparent hover:bg-transparent border-none shadow-none text-muted-foreground text-xs md:text-sm"
-                  variant="ghost"
-                />
-              </div>
-              <div className="flex space-x-3 md:space-x-4 pt-2">
+              {/* Social Icons */}
+              <div className="flex gap-3 mt-3">
                 <a
                   href={socialConfig.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 p-3 rounded-full hover:bg-pink-500 hover:scale-110 transition-all duration-300 group"
+                  className="text-gray-600 hover:text-pink-600 transition-colors"
                   aria-label="Instagram"
                 >
-                  <Instagram className="w-5 h-5 text-white group-hover:fill-current" />
+                  <Instagram className="w-5 h-5" />
                 </a>
-
                 <a
                   href={socialConfig.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white/10 p-3 rounded-full hover:bg-red-600 hover:scale-110 transition-all duration-300 group"
+                  className="text-gray-600 hover:text-red-600 transition-colors"
                   aria-label="YouTube"
                 >
-                  <Youtube className="w-5 h-5 text-white group-hover:fill-current" />
+                  <Youtube className="w-5 h-5" />
                 </a>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Copyright */}
-        <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-          <p className="text-xs text-muted-foreground">
-            <EditableText
-              section="footer"
-              contentKey="copyright"
-              defaultValue="© 2025 StayKedar. All rights reserved."
-              className="text-xs text-muted-foreground"
-            />
-          </p>
+            {/* Copyright */}
+            <p className="text-xs text-gray-500">
+              © 2025 StayKedar. All rights reserved.
+            </p>
+          </div>
         </div>
       </Container>
     </footer>

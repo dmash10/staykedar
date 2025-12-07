@@ -773,6 +773,130 @@ export type Database = {
         }
         Relationships: []
       }
+      blind_properties: {
+        Row: {
+          id: string
+          internal_name: string
+          display_name: string
+          location_slug: string
+          category: string
+          base_price: number
+          surge_price: number | null
+          amenities: Json | null
+          audit_notes: string | null
+          owner_phone: string | null
+          images: string[] | null
+          zone_description: string | null
+          pros: string[] | null
+          cons: string[] | null
+          verification_date: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          internal_name: string
+          display_name: string
+          location_slug: string
+          category?: string
+          base_price: number
+          surge_price?: number | null
+          amenities?: Json | null
+          audit_notes?: string | null
+          owner_phone?: string | null
+          images?: string[] | null
+          zone_description?: string | null
+          pros?: string[] | null
+          cons?: string[] | null
+          verification_date?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          internal_name?: string
+          display_name?: string
+          location_slug?: string
+          category?: string
+          base_price?: number
+          surge_price?: number | null
+          amenities?: Json | null
+          audit_notes?: string | null
+          owner_phone?: string | null
+          images?: string[] | null
+          zone_description?: string | null
+          pros?: string[] | null
+          cons?: string[] | null
+          verification_date?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stay_leads: {
+        Row: {
+          id: string
+          customer_phone: string
+          customer_name: string | null
+          property_id: string | null
+          location_slug: string | null
+          check_in: string | null
+          check_out: string | null
+          guests: number | null
+          budget_category: string | null
+          is_urgent: boolean
+          status: string
+          notes: string | null
+          source: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          customer_phone: string
+          customer_name?: string | null
+          property_id?: string | null
+          location_slug?: string | null
+          check_in?: string | null
+          check_out?: string | null
+          guests?: number | null
+          budget_category?: string | null
+          is_urgent?: boolean
+          status?: string
+          notes?: string | null
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          customer_phone?: string
+          customer_name?: string | null
+          property_id?: string | null
+          location_slug?: string | null
+          check_in?: string | null
+          check_out?: string | null
+          guests?: number | null
+          budget_category?: string | null
+          is_urgent?: boolean
+          status?: string
+          notes?: string | null
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stay_leads_property_id_fkey"
+            columns: ["property_id"]
+            referencedRelation: "blind_properties"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
