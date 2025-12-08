@@ -73,6 +73,7 @@ const Packages = () => {
         const { data, error } = await supabase
           .from('packages')
           .select('*')
+          .eq('status', 'published')
           .order('price', { ascending: true });
 
         if (error) throw error;

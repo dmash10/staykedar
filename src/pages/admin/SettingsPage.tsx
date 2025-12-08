@@ -1154,10 +1154,10 @@ export default function SettingsPage() {
                       <div className="space-y-2">
                         <Label className="text-gray-300">Street Address</Label>
                         <Input
-                          value={(seoData.org_address || {}).streetAddress || ''}
+                          value={(seoData.org_address || DEFAULT_SEO.org_address).streetAddress || ''}
                           onChange={(e) => setSeoData({
                             ...seoData,
-                            org_address: { ...(seoData.org_address || {}), streetAddress: e.target.value }
+                            org_address: { ...(seoData.org_address || DEFAULT_SEO.org_address), streetAddress: e.target.value }
                           })}
                           className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
                         />
@@ -1165,10 +1165,10 @@ export default function SettingsPage() {
                       <div className="space-y-2">
                         <Label className="text-gray-300">City</Label>
                         <Input
-                          value={(seoData.org_address || {}).addressLocality || ''}
+                          value={(seoData.org_address || DEFAULT_SEO.org_address).addressLocality || ''}
                           onChange={(e) => setSeoData({
                             ...seoData,
-                            org_address: { ...(seoData.org_address || {}), addressLocality: e.target.value }
+                            org_address: { ...(seoData.org_address || DEFAULT_SEO.org_address), addressLocality: e.target.value }
                           })}
                           className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
                         />
@@ -1176,10 +1176,10 @@ export default function SettingsPage() {
                       <div className="space-y-2">
                         <Label className="text-gray-300">State/Region</Label>
                         <Input
-                          value={(seoData.org_address || {}).addressRegion || ''}
+                          value={(seoData.org_address || DEFAULT_SEO.org_address).addressRegion || ''}
                           onChange={(e) => setSeoData({
                             ...seoData,
-                            org_address: { ...(seoData.org_address || {}), addressRegion: e.target.value }
+                            org_address: { ...(seoData.org_address || DEFAULT_SEO.org_address), addressRegion: e.target.value }
                           })}
                           className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
                         />
@@ -1187,10 +1187,10 @@ export default function SettingsPage() {
                       <div className="space-y-2">
                         <Label className="text-gray-300">Postal Code</Label>
                         <Input
-                          value={(seoData.org_address || {}).postalCode || ''}
+                          value={(seoData.org_address || DEFAULT_SEO.org_address).postalCode || ''}
                           onChange={(e) => setSeoData({
                             ...seoData,
-                            org_address: { ...(seoData.org_address || {}), postalCode: e.target.value }
+                            org_address: { ...(seoData.org_address || DEFAULT_SEO.org_address), postalCode: e.target.value }
                           })}
                           className="bg-[#1A1A1A] border-[#2A2A2A] text-white"
                         />

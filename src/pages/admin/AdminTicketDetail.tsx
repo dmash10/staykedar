@@ -14,8 +14,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { 
-    ArrowLeft, Send, Loader2, User, Headphones, 
+import {
+    ArrowLeft, Send, Loader2, User, Headphones,
     Clock, CheckCircle2, AlertCircle,
     MessageSquare, Mail, Phone, Calendar, Check, CheckCheck
 } from "lucide-react";
@@ -136,7 +136,7 @@ export default function AdminTicketDetail() {
 
                 setMessages(messagesData || []);
                 setIsLoading(false);
-                
+
                 // Scroll after messages load
                 setTimeout(scrollToBottom, 100);
 
@@ -212,7 +212,7 @@ export default function AdminTicketDetail() {
                     })
                     .subscribe();
                 typingChannelRef.current = typingChannel;
-                
+
                 // Broadcast that admin is viewing (to mark customer messages as read)
                 // Only send when tab is visible and focused (like WhatsApp)
                 const sendReadReceipt = () => {
@@ -225,25 +225,25 @@ export default function AdminTicketDetail() {
                         });
                     }
                 };
-                
+
                 // Send read receipt when tab becomes visible
                 const handleVisibilityChange = () => {
                     if (document.visibilityState === 'visible') {
                         sendReadReceipt();
                     }
                 };
-                
+
                 // Send read receipt when window gains focus
                 const handleFocus = () => sendReadReceipt();
-                
+
                 document.addEventListener('visibilitychange', handleVisibilityChange);
                 window.addEventListener('focus', handleFocus);
-                
+
                 // Send initial read receipt if already visible
                 if (document.visibilityState === 'visible' && document.hasFocus()) {
                     setTimeout(sendReadReceipt, 1000);
                 }
-                
+
                 // Store cleanup functions
                 (window as any).readReceiptCleanup = () => {
                     document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -257,7 +257,7 @@ export default function AdminTicketDetail() {
                         .select("*")
                         .eq("ticket_id", ticketData.id)
                         .order("created_at", { ascending: true });
-                    
+
                     if (newMessages) {
                         setMessages(prev => {
                             if (JSON.stringify(prev) !== JSON.stringify(newMessages)) {
@@ -272,7 +272,7 @@ export default function AdminTicketDetail() {
                         .select("*")
                         .eq("id", ticketData.id)
                         .single();
-                        
+
                     if (updatedTicket) {
                         setTicket(prev => {
                             if (JSON.stringify(prev) !== JSON.stringify(updatedTicket)) {
@@ -329,7 +329,7 @@ export default function AdminTicketDetail() {
 
         const messageText = newMessage.trim();
         setIsSending(true);
-        
+
         // Optimistically add message to UI immediately
         const optimisticMessage: Message = {
             id: `temp-${Date.now()}`,
@@ -340,10 +340,10 @@ export default function AdminTicketDetail() {
             sender_id: user?.id || null,
             created_at: new Date().toISOString(),
         };
-        
+
         setMessages(prev => [...prev, optimisticMessage]);
         setNewMessage("");
-        
+
         // Scroll to bottom after adding message
         setTimeout(scrollToBottom, 50);
 
@@ -375,11 +375,11 @@ export default function AdminTicketDetail() {
 
             // Replace optimistic message with real one
             if (newMsg) {
-                setMessages(prev => prev.map(m => 
+                setMessages(prev => prev.map(m =>
                     m.id === optimisticMessage.id ? newMsg : m
                 ));
             }
-            
+
             // Broadcast that message was sent (to stop typing indicator on user side)
             if (typingChannelRef.current) {
                 typingChannelRef.current.send({
@@ -428,7 +428,7 @@ export default function AdminTicketDetail() {
         try {
             const { error } = await supabase
                 .from("support_tickets")
-                .update({ 
+                .update({
                     status: newStatus,
                     updated_at: new Date().toISOString(),
                 })
@@ -462,7 +462,7 @@ export default function AdminTicketDetail() {
         try {
             const { error } = await supabase
                 .from("support_tickets")
-                .update({ 
+                .update({
                     priority: newPriority,
                     updated_at: new Date().toISOString(),
                 })
@@ -496,8 +496,8 @@ export default function AdminTicketDetail() {
 
     const formatMessageTime = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) + 
-               " · " + date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+        return date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) +
+            " · " + date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
     };
 
     if (isLoading) {
@@ -546,256 +546,365 @@ export default function AdminTicketDetail() {
                 {/* Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-                    {/* Chat Box */}
-                    <div className="lg:col-span-2 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] overflow-hidden flex flex-col h-[500px]">
-                        {/* Chat Header */}
-                        <div className="px-4 py-2.5 border-b border-[#2A2A2A] bg-[#0F0F0F] flex items-center gap-2">
-                            <MessageSquare className="w-4 h-4 text-[#0071c2]" />
-                            <span className="font-medium text-white text-sm">Conversation</span>
-                            <span className="text-xs text-gray-500 bg-[#2A2A2A] px-1.5 py-0.5 rounded-full">{messages.length}</span>
-                        </div>
-
-                        {/* Messages */}
-                        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#0A0A0A]">
-                                {messages.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                                        <MessageSquare className="w-10 h-10 mb-2 opacity-50" />
-                                        <p className="text-sm">No messages yet</p>
-                                    </div>
-                                ) : (
-                                    <>
-                                        {messages.map((msg, index) => {
-                                            const isTemp = msg.id.startsWith('temp-');
-                                            // Check if customer has read this specific message:
-                                            // 1. They replied after this message, OR
-                                            // 2. They viewed the chat AFTER this message was sent
-                                            const hasReplyAfter = msg.is_admin && messages.slice(index + 1).some(m => !m.is_admin);
-                                            const wasReadByCustomer = msg.is_admin && !isTemp && customerLastReadAt && 
-                                                new Date(msg.created_at) <= new Date(customerLastReadAt);
-                                            const isRead = hasReplyAfter || wasReadByCustomer;
-                                            
-                                            return (
-                                                <div
-                                                    key={msg.id}
-                                                    className={`flex gap-2 ${msg.is_admin ? "flex-row-reverse" : ""}`}
-                                                >
-                                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                                        msg.is_admin 
-                                                            ? "bg-[#0071c2]" 
-                                                            : "bg-gray-600"
-                                                    }`}>
-                                                        {msg.is_admin ? (
-                                                            <Headphones className="w-3.5 h-3.5 text-white" />
-                                                        ) : (
-                                                            <User className="w-3.5 h-3.5 text-white" />
-                                                        )}
+                    {ticket.subject === "Contact Form Message" ? (
+                        /* Simple View for Contact Messages */
+                        <div className="lg:col-span-3 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Message Content */}
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-6">
+                                    <h3 className="text-sm font-medium text-gray-400 mb-4 px-1">Message Details</h3>
+                                    <div className="bg-[#0A0A0A] rounded-lg p-5 border border-[#2A2A2A]">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                                <Mail className="w-5 h-5 text-blue-400" />
+                                            </div>
+                                            <div className="space-y-4 w-full">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <p className="text-white font-medium text-lg">{ticket.subject}</p>
+                                                        <p className="text-gray-400 text-sm mt-1">From: {ticket.guest_name}</p>
                                                     </div>
-                                                    <div className={`max-w-[80%] ${msg.is_admin ? "text-right" : ""}`}>
-                                                        <div className={`inline-block px-3 py-1.5 rounded-2xl text-sm ${
-                                                            msg.is_admin 
-                                                                ? "bg-[#0071c2] text-white rounded-tr-sm" 
-                                                                : "bg-[#2A2A2A] text-gray-200 rounded-tl-sm"
-                                                        } ${isTemp ? "opacity-70" : ""}`}>
-                                                            <p className="whitespace-pre-wrap">{msg.message}</p>
-                                                        </div>
-                                                        {/* Time and read receipt */}
-                                                        <div className={`flex items-center gap-1 mt-0.5 ${msg.is_admin ? "justify-end" : "justify-start"}`}>
-                                                            <span className="text-[10px] text-gray-600">
-                                                                {formatMessageTime(msg.created_at)}
-                                                            </span>
-                                                            {msg.is_admin && (
-                                                                <span className="flex items-center">
-                                                                    {isTemp ? (
-                                                                        <Clock className="w-3 h-3 text-gray-500" />
-                                                                    ) : isRead ? (
-                                                                        <CheckCheck className="w-3.5 h-3.5 text-[#53bdeb]" />
-                                                                    ) : (
-                                                                        <CheckCheck className="w-3.5 h-3.5 text-gray-500" />
-                                                                    )}
-                                                                </span>
+                                                    <span className="text-xs text-gray-500 bg-[#1F1F1F] px-2 py-1 rounded">
+                                                        {formatDate(ticket.created_at)}
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-px bg-[#2A2A2A]" />
+                                                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap text-base">
+                                                    {ticket.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="mt-6 flex gap-3">
+                                        <Button
+                                            onClick={() => window.open(`mailto:${ticket.guest_email}?subject=Re: ${ticket.subject} (${ticket.ticket_number})`)}
+                                            className="bg-[#0071c2] hover:bg-[#005999] text-white"
+                                        >
+                                            <Mail className="w-4 h-4 mr-2" />
+                                            Reply via Email
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => updateTicketStatus("resolved")}
+                                            className="border-green-800 text-green-500 hover:bg-green-900/20 hover:text-green-400"
+                                            disabled={ticket.status === 'resolved'}
+                                        >
+                                            <CheckCircle2 className="w-4 h-4 mr-2" />
+                                            Mark as Resolved
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => updateTicketStatus("closed")}
+                                            className="border-[#2A2A2A] text-gray-400 hover:bg-[#2A2A2A] hover:text-white"
+                                            disabled={ticket.status === 'closed'}
+                                        >
+                                            Close Inquiry
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Sidebar Info */}
+                            <div className="space-y-4">
+                                <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-5">
+                                    <h3 className="text-xs text-gray-500 uppercase mb-4 font-semibold tracking-wider">Sender Information</h3>
+
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                                {(ticket.guest_name || "U").charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <p className="text-white font-medium">{ticket.guest_name || "Unknown Sender"}</p>
+                                                <p className="text-xs text-gray-400">Guest User</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-4 border-t border-[#2A2A2A] space-y-3">
+                                            <div>
+                                                <label className="text-[10px] text-gray-500 uppercase mb-1 block">Email Address</label>
+                                                <div className="flex items-center gap-2 text-sm text-gray-300">
+                                                    <Mail className="w-3.5 h-3.5 text-gray-500" />
+                                                    {ticket.guest_email}
+                                                </div>
+                                            </div>
+
+                                            {ticket.guest_phone && (
+                                                <div>
+                                                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Phone Number</label>
+                                                    <div className="flex items-center gap-2 text-sm text-gray-300">
+                                                        <Phone className="w-3.5 h-3.5 text-gray-500" />
+                                                        {ticket.guest_phone}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div>
+                                                <label className="text-[10px] text-gray-500 uppercase mb-1 block">Status</label>
+                                                <div className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${status.bgColor} ${status.color}`}>
+                                                    {status.label}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        /* Standard Ticket View (Chat Interface) */
+                        <>
+                            {/* Chat Box */}
+                            <div className="lg:col-span-2 bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] overflow-hidden flex flex-col h-[500px]">
+                                {/* Chat Header */}
+                                <div className="px-4 py-2.5 border-b border-[#2A2A2A] bg-[#0F0F0F] flex items-center gap-2">
+                                    <MessageSquare className="w-4 h-4 text-[#0071c2]" />
+                                    <span className="font-medium text-white text-sm">Conversation</span>
+                                    <span className="text-xs text-gray-500 bg-[#2A2A2A] px-1.5 py-0.5 rounded-full">{messages.length}</span>
+                                </div>
+
+                                {/* Messages */}
+                                <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-3 space-y-2 bg-[#0A0A0A]">
+                                    {messages.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                                            <MessageSquare className="w-10 h-10 mb-2 opacity-50" />
+                                            <p className="text-sm">No messages yet</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {messages.map((msg, index) => {
+                                                const isTemp = msg.id.startsWith('temp-');
+                                                // Check if customer has read this specific message:
+                                                // 1. They replied after this message, OR
+                                                // 2. They viewed the chat AFTER this message was sent
+                                                const hasReplyAfter = msg.is_admin && messages.slice(index + 1).some(m => !m.is_admin);
+                                                const wasReadByCustomer = msg.is_admin && !isTemp && customerLastReadAt &&
+                                                    new Date(msg.created_at) <= new Date(customerLastReadAt);
+                                                const isRead = hasReplyAfter || wasReadByCustomer;
+
+                                                return (
+                                                    <div
+                                                        key={msg.id}
+                                                        className={`flex gap-2 ${msg.is_admin ? "flex-row-reverse" : ""}`}
+                                                    >
+                                                        <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${msg.is_admin
+                                                                ? "bg-[#0071c2]"
+                                                                : "bg-gray-600"
+                                                            }`}>
+                                                            {msg.is_admin ? (
+                                                                <Headphones className="w-3.5 h-3.5 text-white" />
+                                                            ) : (
+                                                                <User className="w-3.5 h-3.5 text-white" />
                                                             )}
                                                         </div>
+                                                        <div className={`max-w-[80%] ${msg.is_admin ? "text-right" : ""}`}>
+                                                            <div className={`inline-block px-3 py-1.5 rounded-2xl text-sm ${msg.is_admin
+                                                                    ? "bg-[#0071c2] text-white rounded-tr-sm"
+                                                                    : "bg-[#2A2A2A] text-gray-200 rounded-tl-sm"
+                                                                } ${isTemp ? "opacity-70" : ""}`}>
+                                                                <p className="whitespace-pre-wrap">{msg.message}</p>
+                                                            </div>
+                                                            {/* Time and read receipt */}
+                                                            <div className={`flex items-center gap-1 mt-0.5 ${msg.is_admin ? "justify-end" : "justify-start"}`}>
+                                                                <span className="text-[10px] text-gray-600">
+                                                                    {formatMessageTime(msg.created_at)}
+                                                                </span>
+                                                                {msg.is_admin && (
+                                                                    <span className="flex items-center">
+                                                                        {isTemp ? (
+                                                                            <Clock className="w-3 h-3 text-gray-500" />
+                                                                        ) : isRead ? (
+                                                                            <CheckCheck className="w-3.5 h-3.5 text-[#53bdeb]" />
+                                                                        ) : (
+                                                                            <CheckCheck className="w-3.5 h-3.5 text-gray-500" />
+                                                                        )}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })}
-                                        
-                                        {/* Customer Typing Indicator */}
-                                        {isCustomerTyping && (
-                                            <div className="flex gap-2 items-end">
-                                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600">
-                                                    <User className="w-3 h-3 text-white" />
-                                                </div>
-                                                <div className="bg-[#2A2A2A] border border-[#3A3A3A] rounded-2xl rounded-tl-sm px-3 py-1.5">
-                                                    <div className="flex gap-0.5 items-center h-4">
-                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s' }}></span>
-                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s', animationDelay: '0.2s' }}></span>
-                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s', animationDelay: '0.4s' }}></span>
+                                                );
+                                            })}
+
+                                            {/* Customer Typing Indicator */}
+                                            {isCustomerTyping && (
+                                                <div className="flex gap-2 items-end">
+                                                    <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-gray-600">
+                                                        <User className="w-3 h-3 text-white" />
                                                     </div>
+                                                    <div className="bg-[#2A2A2A] border border-[#3A3A3A] rounded-2xl rounded-tl-sm px-3 py-1.5">
+                                                        <div className="flex gap-0.5 items-center h-4">
+                                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s' }}></span>
+                                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s', animationDelay: '0.2s' }}></span>
+                                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDuration: '1s', animationDelay: '0.4s' }}></span>
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-[10px] text-gray-500 mb-0.5">typing...</span>
                                                 </div>
-                                                <span className="text-[10px] text-gray-500 mb-0.5">typing...</span>
-                                            </div>
-                                        )}
-                                    </>
+                                            )}
+                                        </>
+                                    )}
+                                    <div ref={messagesEndRef} />
+                                </div>
+
+                                {/* Reply Box */}
+                                {ticket.status !== "closed" ? (
+                                    <div className="border-t border-[#2A2A2A] p-3 bg-[#0F0F0F]">
+                                        {/* Quick Actions */}
+                                        <div className="flex gap-1.5 mb-2 flex-wrap">
+                                            <button
+                                                onClick={() => updateTicketStatus("resolved")}
+                                                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                                            >
+                                                <CheckCircle2 className="w-3 h-3" />
+                                                Resolve
+                                            </button>
+                                            <button
+                                                onClick={() => updateTicketStatus("closed")}
+                                                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-gray-500/20 text-gray-400 hover:bg-gray-500/30"
+                                            >
+                                                Close
+                                            </button>
+                                            <button
+                                                onClick={() => updateTicketPriority("urgent")}
+                                                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                                            >
+                                                Urgent
+                                            </button>
+                                            <button
+                                                onClick={() => updateTicketStatus("in_progress")}
+                                                className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                                            >
+                                                In Progress
+                                            </button>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <Textarea
+                                                ref={textareaRef}
+                                                placeholder="Type your reply... (Enter to send)"
+                                                value={newMessage}
+                                                onChange={(e) => {
+                                                    setNewMessage(e.target.value);
+                                                    broadcastTyping();
+                                                }}
+                                                onKeyDown={handleKeyDown}
+                                                className="min-h-[50px] max-h-[100px] bg-[#1A1A1A] border-[#2A2A2A] text-white resize-none focus:border-[#0071c2] focus:ring-0 text-sm"
+                                            />
+                                            <Button
+                                                onClick={handleSendMessage}
+                                                disabled={!newMessage.trim() || isSending}
+                                                className="bg-[#0071c2] hover:bg-[#005999] text-white h-[50px] w-[50px] p-0 flex-shrink-0"
+                                            >
+                                                {isSending ? (
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                ) : (
+                                                    <Send className="w-5 h-5" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="border-t border-[#2A2A2A] p-3 bg-[#0F0F0F] flex items-center justify-between">
+                                        <p className="text-gray-500 text-xs">Ticket closed</p>
+                                        <Button
+                                            onClick={() => updateTicketStatus("open")}
+                                            size="sm"
+                                            className="bg-[#0071c2] hover:bg-[#005999] text-white text-xs h-7"
+                                        >
+                                            Reopen
+                                        </Button>
+                                    </div>
                                 )}
-                            <div ref={messagesEndRef} />
-                        </div>
-
-                        {/* Reply Box */}
-                        {ticket.status !== "closed" ? (
-                            <div className="border-t border-[#2A2A2A] p-3 bg-[#0F0F0F]">
-                                {/* Quick Actions */}
-                                <div className="flex gap-1.5 mb-2 flex-wrap">
-                                    <button
-                                        onClick={() => updateTicketStatus("resolved")}
-                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                                    >
-                                        <CheckCircle2 className="w-3 h-3" />
-                                        Resolve
-                                    </button>
-                                    <button
-                                        onClick={() => updateTicketStatus("closed")}
-                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-gray-500/20 text-gray-400 hover:bg-gray-500/30"
-                                    >
-                                        Close
-                                    </button>
-                                    <button
-                                        onClick={() => updateTicketPriority("urgent")}
-                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                                    >
-                                        Urgent
-                                    </button>
-                                    <button
-                                        onClick={() => updateTicketStatus("in_progress")}
-                                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
-                                    >
-                                        In Progress
-                                    </button>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <Textarea
-                                        ref={textareaRef}
-                                        placeholder="Type your reply... (Enter to send)"
-                                        value={newMessage}
-                                        onChange={(e) => {
-                                            setNewMessage(e.target.value);
-                                            broadcastTyping();
-                                        }}
-                                        onKeyDown={handleKeyDown}
-                                        className="min-h-[50px] max-h-[100px] bg-[#1A1A1A] border-[#2A2A2A] text-white resize-none focus:border-[#0071c2] focus:ring-0 text-sm"
-                                    />
-                                    <Button
-                                        onClick={handleSendMessage}
-                                        disabled={!newMessage.trim() || isSending}
-                                        className="bg-[#0071c2] hover:bg-[#005999] text-white h-[50px] w-[50px] p-0 flex-shrink-0"
-                                    >
-                                        {isSending ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                        ) : (
-                                            <Send className="w-5 h-5" />
-                                        )}
-                                    </Button>
-                                </div>
                             </div>
-                        ) : (
-                            <div className="border-t border-[#2A2A2A] p-3 bg-[#0F0F0F] flex items-center justify-between">
-                                <p className="text-gray-500 text-xs">Ticket closed</p>
-                                <Button
-                                    onClick={() => updateTicketStatus("open")}
-                                    size="sm"
-                                    className="bg-[#0071c2] hover:bg-[#005999] text-white text-xs h-7"
-                                >
-                                    Reopen
-                                </Button>
-                            </div>
-                        )}
-                    </div>
 
-                    {/* Sidebar */}
-                    <div className="space-y-4">
-                        {/* Customer Card */}
-                        <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
-                            <h3 className="text-xs text-gray-500 uppercase mb-3">Customer</h3>
-                            <div className="flex items-center gap-3 mb-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0071c2] to-[#005999] flex items-center justify-center">
-                                    <span className="text-white font-bold">
-                                        {(ticket.guest_name || "U").charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="font-medium text-white text-sm truncate">
-                                        {ticket.guest_name || "Customer"}
-                                    </p>
-                                    <p className="text-xs text-gray-400">Customer</p>
-                                </div>
-                            </div>
-                            {ticket.guest_email && (
-                                <a href={`mailto:${ticket.guest_email}`} className="flex items-center gap-2 text-xs text-[#0071c2] hover:underline bg-[#0071c2]/10 rounded px-2 py-1.5">
-                                    <Mail className="w-3.5 h-3.5" />
-                                    <span className="truncate">{ticket.guest_email}</span>
-                                </a>
-                            )}
-                        </div>
-
-                        {/* Ticket Details */}
-                        <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
-                            <h3 className="text-xs text-gray-500 uppercase mb-3">Details</h3>
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Status</label>
-                                    <Select value={ticket.status} onValueChange={updateTicketStatus}>
-                                        <SelectTrigger className="bg-[#0A0A0A] border-[#2A2A2A] text-white h-8 text-xs">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
-                                            <SelectItem value="open" className="text-white text-xs">Open</SelectItem>
-                                            <SelectItem value="in_progress" className="text-white text-xs">In Progress</SelectItem>
-                                            <SelectItem value="waiting_customer" className="text-white text-xs">Awaiting Reply</SelectItem>
-                                            <SelectItem value="resolved" className="text-white text-xs">Resolved</SelectItem>
-                                            <SelectItem value="closed" className="text-white text-xs">Closed</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] text-gray-500 uppercase mb-1 block">Priority</label>
-                                    <Select value={ticket.priority} onValueChange={updateTicketPriority}>
-                                        <SelectTrigger className="bg-[#0A0A0A] border-[#2A2A2A] text-white h-8 text-xs">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
-                                            <SelectItem value="low" className="text-white text-xs">Low</SelectItem>
-                                            <SelectItem value="medium" className="text-white text-xs">Medium</SelectItem>
-                                            <SelectItem value="high" className="text-white text-xs">High</SelectItem>
-                                            <SelectItem value="urgent" className="text-white text-xs">Urgent</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="pt-2 border-t border-[#2A2A2A] space-y-1.5 text-xs">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Category</span>
-                                        <span className="text-gray-300 capitalize">{ticket.category || "General"}</span>
+                            {/* Sidebar */}
+                            <div className="space-y-4">
+                                {/* Customer Card */}
+                                <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+                                    <h3 className="text-xs text-gray-500 uppercase mb-3">Customer</h3>
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0071c2] to-[#005999] flex items-center justify-center">
+                                            <span className="text-white font-bold">
+                                                {(ticket.guest_name || "U").charAt(0).toUpperCase()}
+                                            </span>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="font-medium text-white text-sm truncate">
+                                                {ticket.guest_name || "Customer"}
+                                            </p>
+                                            <p className="text-xs text-gray-400">Customer</p>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Created</span>
-                                        <span className="text-gray-400">{formatDate(ticket.created_at)}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Updated</span>
-                                        <span className="text-gray-400">{formatDate(ticket.updated_at)}</span>
+                                    {ticket.guest_email && (
+                                        <a href={`mailto:${ticket.guest_email}`} className="flex items-center gap-2 text-xs text-[#0071c2] hover:underline bg-[#0071c2]/10 rounded px-2 py-1.5">
+                                            <Mail className="w-3.5 h-3.5" />
+                                            <span className="truncate">{ticket.guest_email}</span>
+                                        </a>
+                                    )}
+                                </div>
+
+                                {/* Ticket Details */}
+                                <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+                                    <h3 className="text-xs text-gray-500 uppercase mb-3">Details</h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="text-[10px] text-gray-500 uppercase mb-1 block">Status</label>
+                                            <Select value={ticket.status} onValueChange={updateTicketStatus}>
+                                                <SelectTrigger className="bg-[#0A0A0A] border-[#2A2A2A] text-white h-8 text-xs">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                                                    <SelectItem value="open" className="text-white text-xs">Open</SelectItem>
+                                                    <SelectItem value="in_progress" className="text-white text-xs">In Progress</SelectItem>
+                                                    <SelectItem value="waiting_customer" className="text-white text-xs">Awaiting Reply</SelectItem>
+                                                    <SelectItem value="resolved" className="text-white text-xs">Resolved</SelectItem>
+                                                    <SelectItem value="closed" className="text-white text-xs">Closed</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-gray-500 uppercase mb-1 block">Priority</label>
+                                            <Select value={ticket.priority} onValueChange={updateTicketPriority}>
+                                                <SelectTrigger className="bg-[#0A0A0A] border-[#2A2A2A] text-white h-8 text-xs">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                                                    <SelectItem value="low" className="text-white text-xs">Low</SelectItem>
+                                                    <SelectItem value="medium" className="text-white text-xs">Medium</SelectItem>
+                                                    <SelectItem value="high" className="text-white text-xs">High</SelectItem>
+                                                    <SelectItem value="urgent" className="text-white text-xs">Urgent</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="pt-2 border-t border-[#2A2A2A] space-y-1.5 text-xs">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-500">Category</span>
+                                                <span className="text-gray-300 capitalize">{ticket.category || "General"}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-500">Created</span>
+                                                <span className="text-gray-400">{formatDate(ticket.created_at)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-500">Updated</span>
+                                                <span className="text-gray-400">{formatDate(ticket.updated_at)}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        {/* Description */}
-                        {ticket.description && (
-                            <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
-                                <h3 className="text-xs text-gray-500 uppercase mb-2">Description</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+                                {/* Description */}
+                                {ticket.description && (
+                                    <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+                                        <h3 className="text-xs text-gray-500 uppercase mb-2">Description</h3>
+                                        <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </>
+                    )}
                 </div>
             </div>
         </AdminLayout>

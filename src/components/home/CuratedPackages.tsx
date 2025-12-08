@@ -1,66 +1,84 @@
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Calendar, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Check, ArrowRight, Calendar, Star, Loader2 } from "lucide-react";
 import { TransitionLink } from "../TransitionLink";
 import Container from "../Container";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-const packages = [
-    {
-        id: 1,
-        name: "Kedarnath Express",
-        duration: "3D/2N",
-        price: "12,999",
-        originalPrice: "15,999",
-        image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80",
-        rating: 4.8,
-        reviews: 234,
-        inclusions: ["Helicopter ride", "2N stay", "VIP Darshan"],
-        highlight: "Helicopter",
-        slug: "kedarnath-express"
-    },
-    {
-        id: 2,
-        name: "Do Dham Yatra",
-        duration: "5D/4N",
-        price: "19,999",
-        originalPrice: "24,999",
-        image: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=600&q=80",
-        rating: 4.9,
-        reviews: 412,
-        inclusions: ["Kedarnath + Badrinath", "4N hotel", "Transport"],
-        popular: true,
-        highlight: "Popular",
-        slug: "do-dham-yatra"
-    },
-    {
-        id: 3,
-        name: "Budget Pilgrim",
-        duration: "4D/3N",
-        price: "8,999",
-        originalPrice: "11,999",
-        image: "https://images.unsplash.com/photo-1486216736640-1a72cb1c53fa?w=600&q=80",
-        rating: 4.6,
-        reviews: 189,
-        inclusions: ["Budget stays", "Shared cab", "Meals"],
-        highlight: "Value",
-        slug: "budget-pilgrim"
-    },
-    {
-        id: 4,
-        name: "Char Dham Complete",
-        duration: "10D/9N",
-        price: "35,999",
-        originalPrice: "42,999",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
-        rating: 4.9,
-        reviews: 156,
-        inclusions: ["All 4 Dhams", "9N hotel", "All meals"],
-        highlight: "Premium",
-        slug: "char-dham-complete"
-    }
-];
+interface PackageType {
+    id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    price: number | null;
+    duration: string | null;
+    images: string[] | null;
+    category: string | null;
+    features: string[] | null;
+    is_featured: boolean | null;
+}
 
 const CuratedPackages = () => {
+    const [packages, setPackages] = useState<PackageType[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPackages = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('packages')
+                    .select('id, title, slug, description, price, duration, images, category, features, is_featured')
+                    .eq('status', 'published')
+                    .order('is_featured', { ascending: false })
+                    .order('price', { ascending: true })
+                    .limit(4);
+
+                if (error) throw error;
+                setPackages(data || []);
+            } catch (error) {
+                console.error('Error fetching packages:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPackages();
+    }, []);
+
+    // Category badge config
+    const getCategoryBadge = (category: string | null, isFeatured: boolean | null) => {
+        if (isFeatured) return { label: 'Featured', className: 'bg-[#0071c2] text-white' };
+
+        switch (category) {
+            case 'helicopter':
+                return { label: 'Helicopter', className: 'bg-amber-500 text-white' };
+            case 'premium':
+                return { label: 'Premium', className: 'bg-purple-600 text-white' };
+            case 'adventure':
+                return { label: 'Adventure', className: 'bg-orange-500 text-white' };
+            case 'budget':
+                return { label: 'Value', className: 'bg-green-500 text-white' };
+            default:
+                return { label: 'Popular', className: 'bg-white/90 text-gray-700' };
+        }
+    };
+
+    if (loading) {
+        return (
+            <section className="py-8 md:py-12 bg-white">
+                <Container>
+                    <div className="flex items-center justify-center py-12">
+                        <Loader2 className="w-6 h-6 animate-spin text-[#0071c2]" />
+                    </div>
+                </Container>
+            </section>
+        );
+    }
+
+    if (packages.length === 0) {
+        return null; // Don't show section if no packages
+    }
+
     return (
         <section className="py-8 md:py-12 bg-white">
             <Container>
@@ -91,79 +109,89 @@ const CuratedPackages = () => {
 
                 {/* Horizontal Scrollable Packages */}
                 <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-                    {packages.map((pkg, index) => (
-                        <motion.div
-                            key={pkg.id}
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.3, delay: index * 0.1 }}
-                            className="flex-shrink-0 w-[240px]"
-                        >
-                            <div className={`bg-white rounded-xl overflow-hidden border h-full flex flex-col ${pkg.popular ? 'border-[#0071c2] shadow-md' : 'border-gray-200'}`}>
-                                {/* Image - Fixed height */}
-                                <div className="relative h-[140px] overflow-hidden">
-                                    <img
-                                        src={pkg.image}
-                                        alt={pkg.name}
-                                        loading="lazy"
-                                        className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    {packages.map((pkg, index) => {
+                        const badge = getCategoryBadge(pkg.category, pkg.is_featured);
+                        const originalPrice = pkg.price ? Math.round(pkg.price * 1.2) : null;
 
-                                    {/* Badge */}
-                                    <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-semibold ${pkg.popular
-                                        ? 'bg-[#0071c2] text-white'
-                                        : 'bg-white/90 text-gray-700'
-                                        }`}>
-                                        {pkg.highlight}
-                                    </div>
+                        return (
+                            <motion.div
+                                key={pkg.id}
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.3, delay: index * 0.1 }}
+                                className="flex-shrink-0 w-[240px]"
+                            >
+                                <div className={`bg-white rounded-xl overflow-hidden border h-full flex flex-col ${pkg.is_featured ? 'border-[#0071c2] shadow-md' : 'border-gray-200'}`}>
+                                    {/* Image - Fixed height */}
+                                    <div className="relative h-[140px] overflow-hidden">
+                                        <img
+                                            src={pkg.images?.[0] || 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=600&q=80'}
+                                            alt={pkg.title}
+                                            loading="lazy"
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-                                    {/* Price */}
-                                    <div className="absolute bottom-2 right-2 text-right">
-                                        <div className="text-white/70 text-[10px] line-through">₹{pkg.originalPrice}</div>
-                                        <div className="text-white font-bold text-base">₹{pkg.price}</div>
-                                    </div>
-                                </div>
+                                        {/* Badge */}
+                                        <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-semibold ${badge.className}`}>
+                                            {badge.label}
+                                        </div>
 
-                                {/* Content - Fixed structure */}
-                                <div className="p-3 flex flex-col flex-grow">
-                                    {/* Title & Rating */}
-                                    <div className="flex items-start justify-between gap-2 mb-1.5">
-                                        <h3 className="font-semibold text-gray-900 text-sm leading-tight">{pkg.name}</h3>
-                                        <div className="flex items-center gap-0.5 text-xs flex-shrink-0">
-                                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                                            <span className="font-medium">{pkg.rating}</span>
+                                        {/* Price */}
+                                        <div className="absolute bottom-2 right-2 text-right">
+                                            {originalPrice && (
+                                                <div className="text-white/70 text-[10px] line-through">
+                                                    ₹{originalPrice.toLocaleString()}
+                                                </div>
+                                            )}
+                                            <div className="text-white font-bold text-base">
+                                                ₹{pkg.price?.toLocaleString() || '0'}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Duration */}
-                                    <div className="flex items-center gap-1.5 text-gray-500 text-xs mb-2">
-                                        <Calendar className="w-3 h-3" />
-                                        <span>{pkg.duration}</span>
-                                    </div>
+                                    {/* Content - Fixed structure */}
+                                    <div className="p-3 flex flex-col flex-grow">
+                                        {/* Title & Rating */}
+                                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                                            <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-1">
+                                                {pkg.title}
+                                            </h3>
+                                            <div className="flex items-center gap-0.5 text-xs flex-shrink-0">
+                                                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                                <span className="font-medium">4.8</span>
+                                            </div>
+                                        </div>
 
-                                    {/* Inclusions - Fixed height */}
-                                    <div className="flex flex-wrap gap-1 mb-3 flex-grow">
-                                        {pkg.inclusions.slice(0, 3).map((item, idx) => (
-                                            <span key={idx} className="inline-flex items-center gap-0.5 text-[10px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
-                                                <Check className="w-2.5 h-2.5 text-green-500" />
-                                                {item}
-                                            </span>
-                                        ))}
-                                    </div>
+                                        {/* Duration */}
+                                        <div className="flex items-center gap-1.5 text-gray-500 text-xs mb-2">
+                                            <Calendar className="w-3 h-3" />
+                                            <span>{pkg.duration || 'Contact for details'}</span>
+                                        </div>
 
-                                    {/* View Details Button */}
-                                    <TransitionLink
-                                        to={`/packages/${pkg.slug}`}
-                                        className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-center transition-colors bg-[#0071c2] text-white hover:bg-[#005999]"
-                                    >
-                                        View Details
-                                    </TransitionLink>
+                                        {/* Features - Fixed height */}
+                                        <div className="flex flex-wrap gap-1 mb-3 flex-grow">
+                                            {(pkg.features || []).slice(0, 3).map((item, idx) => (
+                                                <span key={idx} className="inline-flex items-center gap-0.5 text-[10px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                                                    <Check className="w-2.5 h-2.5 text-green-500" />
+                                                    {item}
+                                                </span>
+                                            ))}
+                                        </div>
+
+                                        {/* View Details Button */}
+                                        <TransitionLink
+                                            to={`/packages/${pkg.slug}`}
+                                            className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-center transition-colors bg-[#0071c2] text-white hover:bg-[#005999]"
+                                        >
+                                            View Details
+                                        </TransitionLink>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                            </motion.div>
+                        );
+                    })}
                 </div>
             </Container>
 

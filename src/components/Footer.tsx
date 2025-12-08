@@ -158,8 +158,18 @@ const Footer = () => {
 
           {/* 6. Terms & Settings - Legal (last) */}
           <div>
-            <h3 className="text-sm font-bold text-gray-900 mb-3">Terms & Settings</h3>
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Company</h3>
             <ul className="space-y-1.5">
+              <li>
+                <TransitionLink to="/about" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  About Us
+                </TransitionLink>
+              </li>
+              <li>
+                <TransitionLink to="/contact" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
+                  Contact Us
+                </TransitionLink>
+              </li>
               <li>
                 <TransitionLink to="/terms" className={linkClass} onClick={(e) => isEditMode && e.preventDefault()}>
                   Terms & Conditions
@@ -217,9 +227,18 @@ const Footer = () => {
             </div>
 
             {/* Copyright */}
-            <p className="text-xs text-gray-500">
-              © 2025 StayKedar. All rights reserved.
-            </p>
+            {/* Ownership & Copyright */}
+            <div className="text-right">
+              <p className="text-xs text-gray-500 mb-1">
+                StayKedarnath.in is owned and operated by:
+              </p>
+              <p className="text-xs font-semibold text-gray-700 mb-2">
+                Ashutosh Singh (Proprietor)
+              </p>
+              <p className="text-xs text-gray-500">
+                © 2025 StayKedar. All rights reserved.
+              </p>
+            </div>
           </div>
         </div>
       </Container>

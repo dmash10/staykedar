@@ -13,7 +13,7 @@ import AdminRoute from "@/components/AdminRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Index from "./pages/Index";
-import About from "./pages/About";
+import About from "./pages/AboutUs";
 import Weather from "./pages/Weather";
 import LiveStatusPage from "./pages/LiveStatusPage";
 import Attractions from "./pages/Attractions";
@@ -89,6 +89,7 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ShippingPolicy from './pages/ShippingPolicy';
 import CancellationPolicy from './pages/CancellationPolicy';
+import DisclaimerPolicy from './pages/DisclaimerPolicy';
 import ContactUs from './pages/ContactUs';
 import StayListing from './pages/StayListing';
 import SmartStaysPage from './pages/SmartStaysPage';
@@ -194,6 +195,7 @@ const App = () => {
                     <Route path="/privacy" element={<PrivacyPolicy />} />
                     <Route path="/shipping" element={<ShippingPolicy />} />
                     <Route path="/cancellation" element={<CancellationPolicy />} />
+                    <Route path="/disclaimer" element={<DisclaimerPolicy />} />
                     <Route path="/contact" element={<ContactUs />} />
                     <Route path="/property-owner-signup" element={<Signup />} />
                     <Route path="/become-a-host" element={<PropertyOwnerSignup />} />
@@ -275,7 +277,7 @@ const App = () => {
                     <Route path="/admin/revenue" element={<RevenuePage />} />
                     <Route path="/admin/reviews" element={<ReviewsPage />} />
                     <Route path="/admin/tickets" element={<SupportTicketsPage />} />
-                    <Route path="/admin/tickets/:ticketId" element={<AdminTicketDetail />} />
+                    <Route path="/admin/tickets/:ticketNumber" element={<AdminTicketDetail />} />
                     <Route path="/admin/notifications" element={<NotificationsPage />} />
                     <Route path="/admin/reports" element={<ReportsPage />} />
                     <Route path="/admin/logs" element={<ActivityLogsPage />} />

@@ -22,7 +22,12 @@ import {
     ChevronUp,
     Minus,
     Plus,
-    X
+    X,
+    DollarSign,
+    XCircle,
+    Heart,
+    ClipboardCheck,
+    CheckCircle2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import Nav from '@/components/Nav';
@@ -227,6 +232,127 @@ const SmartStaysPage = () => {
                         </div>
                     </Container>
                 </section>
+                {/* Why Choose StayKedarnath - Booking.com Style */}
+                <section className="bg-white py-10 md:py-14 border-b border-gray-100">
+                    <Container>
+                        {/* Section Cards - 4 Feature Cards with Illustrations */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+
+                            {/* Card 1: Book Now Pay Later */}
+                            <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-5 md:p-6 transition-colors group">
+                                <div className="mb-4">
+                                    {/* Illustration - Calendar with checkmark */}
+                                    <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="8" y="14" width="48" height="42" rx="4" fill="#FFE0B2" />
+                                        <rect x="8" y="14" width="48" height="12" rx="4" fill="#FF9800" />
+                                        <rect x="16" y="8" width="4" height="12" rx="2" fill="#795548" />
+                                        <rect x="44" y="8" width="4" height="12" rx="2" fill="#795548" />
+                                        <circle cx="44" cy="42" r="12" fill="#4CAF50" />
+                                        <path d="M39 42L42 45L49 38" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        <rect x="16" y="32" width="8" height="6" rx="1" fill="#FFCC80" />
+                                        <rect x="28" y="32" width="8" height="6" rx="1" fill="#FFCC80" />
+                                    </svg>
+                                </div>
+                                <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">
+                                    Book Now, Pay at Property
+                                </h3>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                    <span className="text-[#0071c2] font-medium">FREE cancellation</span> on most rooms
+                                </p>
+                            </div>
+
+                            {/* Card 2: Verified Reviews */}
+                            <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-5 md:p-6 transition-colors group">
+                                <div className="mb-4">
+                                    {/* Illustration - Thumbs up with checkmark */}
+                                    <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 32V52C20 53.1046 20.8954 54 22 54H26C27.1046 54 28 53.1046 28 52V32C28 30.8954 27.1046 30 26 30H22C20.8954 30 20 30.8954 20 32Z" fill="#FF9800" />
+                                        <path d="M28 34H40C43.3137 34 46 31.3137 46 28V26C46 24.8954 45.1046 24 44 24H36L38 14C38 11.7909 36.2091 10 34 10C32.8954 10 32 10.8954 32 12V20L28 30V34Z" fill="#FFCC80" />
+                                        <circle cx="50" cy="18" r="12" fill="#4CAF50" />
+                                        <path d="M45 18L48 21L55 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                                <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">
+                                    Verified Guest Reviews
+                                </h3>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                    Get trusted information from guests like you
+                                </p>
+                            </div>
+
+                            {/* Card 3: 100+ Properties */}
+                            <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-5 md:p-6 transition-colors group">
+                                <div className="mb-4">
+                                    {/* Illustration - Globe with buildings */}
+                                    <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="32" cy="32" r="24" fill="#FFE0B2" />
+                                        <ellipse cx="32" cy="32" rx="10" ry="24" stroke="#FF9800" strokeWidth="2" />
+                                        <line x1="8" y1="32" x2="56" y2="32" stroke="#FF9800" strokeWidth="2" />
+                                        <path d="M14 20C20 20 26 18 32 18C38 18 44 20 50 20" stroke="#FF9800" strokeWidth="2" />
+                                        <path d="M14 44C20 44 26 46 32 46C38 46 44 44 50 44" stroke="#FF9800" strokeWidth="2" />
+                                        <circle cx="50" cy="14" r="10" fill="#2196F3" />
+                                        <path d="M46 14H54M50 10V18" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </div>
+                                <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">
+                                    100+ Verified Properties
+                                </h3>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                    Hotels, guesthouses, homestays, and camps
+                                </p>
+                            </div>
+
+                            {/* Card 4: 24/7 Support */}
+                            <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-5 md:p-6 transition-colors group">
+                                <div className="mb-4">
+                                    {/* Illustration - Customer service agent */}
+                                    <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="32" cy="28" r="16" fill="#BBDEFB" />
+                                        <circle cx="32" cy="24" r="10" fill="#FFE0B2" />
+                                        <path d="M22 24C22 24 24 22 32 22C40 22 42 24 42 24" stroke="#795548" strokeWidth="2" />
+                                        <ellipse cx="28" cy="24" rx="1.5" ry="2" fill="#795548" />
+                                        <ellipse cx="36" cy="24" rx="1.5" ry="2" fill="#795548" />
+                                        <path d="M30 28C30 28 31 29 32 29C33 29 34 28 34 28" stroke="#795548" strokeWidth="1.5" strokeLinecap="round" />
+                                        <path d="M18 22V28C18 28 18 32 22 32" stroke="#2196F3" strokeWidth="3" strokeLinecap="round" />
+                                        <path d="M46 22V28C46 28 46 32 42 32" stroke="#2196F3" strokeWidth="3" strokeLinecap="round" />
+                                        <rect x="16" y="20" width="6" height="4" rx="2" fill="#2196F3" />
+                                        <rect x="42" y="20" width="6" height="4" rx="2" fill="#2196F3" />
+                                        <path d="M24 44C24 40 28 38 32 38C36 38 40 40 40 44V54H24V44Z" fill="#2196F3" />
+                                    </svg>
+                                </div>
+                                <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">
+                                    24/7 Customer Support
+                                </h3>
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                    We're always here to help you
+                                </p>
+                            </div>
+
+                        </div>
+
+                        {/* Our Promise Banner */}
+                        <div className="mt-8 bg-gradient-to-r from-[#003580] to-[#0071c2] rounded-xl p-5 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6">
+                            <div className="flex-shrink-0">
+                                <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
+                                    <Heart className="w-7 h-7 text-white" />
+                                </div>
+                            </div>
+                            <div className="flex-1 text-center md:text-left">
+                                <h3 className="font-bold text-white text-lg md:text-xl mb-1">
+                                    We Only List Properties We'd Stay At Ourselves
+                                </h3>
+                                <p className="text-white/85 text-sm md:text-base">
+                                    Every property is personally visited, inspected, and verified by our team before going live.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 bg-white/10 rounded-full px-4 py-2">
+                                <ClipboardCheck className="w-5 h-5 text-yellow-400" />
+                                <span className="text-white text-sm font-medium whitespace-nowrap">100+ Audited</span>
+                            </div>
+                        </div>
+                    </Container>
+                </section>
+
                 <Container className="py-6">
                     {/* Our Locations Section */}
                     <div className="mb-10">

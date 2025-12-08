@@ -158,6 +158,13 @@ const Index = () => {
           <div className="fixed bottom-20 right-4 z-10">
             <PluginRenderer pluginName="Live Chat" />
           </div>
+
+          {/* Legal Ownership for Verification */}
+          <div className="bg-gray-50 pb-4 text-center">
+            <p className="text-[10px] text-gray-400">
+              Owned and Operated by Ashutosh Singh
+            </p>
+          </div>
         </main>
 
         <Footer />

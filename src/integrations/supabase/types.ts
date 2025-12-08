@@ -1388,56 +1388,53 @@ export type Database = {
             }
             support_tickets: {
                 Row: {
-                    assigned_to: string | null
+                    access_pin: string | null
                     category: string | null
                     created_at: string | null
-                    description: string
-                    email: string
+                    description: string | null
+                    guest_email: string | null
+                    guest_name: string | null
+                    guest_phone: string | null
                     id: string
-                    name: string
-                    phone: string | null
+                    metadata: Json | null
                     priority: string | null
-                    resolution: string | null
-                    resolved_at: string | null
                     status: string | null
-                    subject: string
-                    ticket_number: string
+                    subject: string | null
+                    ticket_number: string | null
                     updated_at: string | null
                     user_id: string | null
                 }
                 Insert: {
-                    assigned_to?: string | null
+                    access_pin?: string | null
                     category?: string | null
                     created_at?: string | null
-                    description: string
-                    email: string
+                    description?: string | null
+                    guest_email?: string | null
+                    guest_name?: string | null
+                    guest_phone?: string | null
                     id?: string
-                    name: string
-                    phone?: string | null
+                    metadata?: Json | null
                     priority?: string | null
-                    resolution?: string | null
-                    resolved_at?: string | null
                     status?: string | null
-                    subject: string
-                    ticket_number: string
+                    subject?: string | null
+                    ticket_number?: string | null
                     updated_at?: string | null
                     user_id?: string | null
                 }
                 Update: {
-                    assigned_to?: string | null
+                    access_pin?: string | null
                     category?: string | null
                     created_at?: string | null
-                    description?: string
-                    email?: string
+                    description?: string | null
+                    guest_email?: string | null
+                    guest_name?: string | null
+                    guest_phone?: string | null
                     id?: string
-                    name?: string
-                    phone?: string | null
+                    metadata?: Json | null
                     priority?: string | null
-                    resolution?: string | null
-                    resolved_at?: string | null
                     status?: string | null
-                    subject?: string
-                    ticket_number?: string
+                    subject?: string | null
+                    ticket_number?: string | null
                     updated_at?: string | null
                     user_id?: string | null
                 }
