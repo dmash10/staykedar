@@ -214,7 +214,7 @@ export default function BlindPropertiesPage() {
     const allLocations = LOCATION_GROUPS.flatMap(g => g.options);
 
     return (
-        <AdminLayout title="Blind Properties">
+        <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <Card className="bg-gradient-to-br from-orange-600 to-orange-700 border-none text-white">
@@ -717,6 +717,6 @@ export default function BlindPropertiesPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </AdminLayout>
+        </>
     );
 }

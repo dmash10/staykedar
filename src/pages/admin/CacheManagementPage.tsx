@@ -190,7 +190,7 @@ export default function CacheManagementPage() {
   }, 0);
 
   return (
-    <AdminLayout title="Cache Management">
+    <>
       <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -385,7 +385,7 @@ export default function CacheManagementPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
+    </>
   );
 }
 

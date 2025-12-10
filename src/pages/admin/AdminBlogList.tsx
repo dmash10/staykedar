@@ -440,7 +440,7 @@ export default function AdminBlogList() {
   };
 
   return (
-    <AdminLayout title="Blog Management">
+    <>
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
@@ -597,6 +597,6 @@ export default function AdminBlogList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
+    </>
   );
 }

@@ -68,7 +68,7 @@ export default function ActivityLogsPage() {
     };
 
     return (
-        <AdminLayout title="Activity Logs">
+        <>
             <Card className="bg-[#111111] border-[#2A2A2A]">
                 <CardHeader className="pb-4 border-b border-[#2A2A2A]">
                     <div className="flex items-center justify-between">
@@ -154,6 +154,6 @@ export default function ActivityLogsPage() {
                     </Table>
                 </CardContent>
             </Card>
-        </AdminLayout>
+        </>
     );
 }

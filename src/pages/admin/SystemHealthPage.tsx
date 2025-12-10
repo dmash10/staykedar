@@ -232,16 +232,16 @@ export default function SystemHealthPage() {
 
   if (statsLoading) {
     return (
-      <AdminLayout title="System Health">
+      <>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="System Health">
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -509,7 +509,7 @@ export default function SystemHealthPage() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 

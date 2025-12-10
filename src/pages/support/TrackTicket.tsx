@@ -63,30 +63,27 @@ export default function TrackTicket() {
         setTicket(null);
 
         try {
+            // Use RPC for secure guest access
             const { data, error } = await supabase
-                .from("support_tickets")
-                .select(`
-                    id,
-                    ticket_number,
-                    subject,
-                    status,
-                    priority,
-                    category,
-                    created_at,
-                    updated_at,
-                    guest_email
-                `)
-                .eq("ticket_number", ticketNumber.trim().toUpperCase())
-                .single();
+                .rpc('get_ticket_by_number', { p_ticket_number: ticketNumber.trim().toUpperCase() });
 
-            if (error || !data) {
+            if (error) {
                 console.error("Ticket search error:", error);
                 setNotFound(true);
                 return;
             }
 
+            if (!data) {
+                setNotFound(true);
+                return;
+            }
+
+            // Parse returned JSONB data
+            // data is already a Json object thanks to rpc returning jsonb, but we might need to cast
+            const ticketData = data as any;
+
             // If email is provided, verify it matches
-            if (email && data.guest_email && data.guest_email.toLowerCase() !== email.toLowerCase()) {
+            if (email && ticketData.guest_email && ticketData.guest_email.toLowerCase() !== email.toLowerCase()) {
                 setNotFound(true);
                 toast({
                     title: "Verification Failed",
@@ -98,8 +95,16 @@ export default function TrackTicket() {
 
             // Map category to the expected format
             setTicket({
-                ...data,
-                support_categories: data.category ? { name: data.category } : undefined
+                id: ticketData.id,
+                ticket_number: ticketData.ticket_number,
+                subject: ticketData.subject,
+                status: ticketData.status,
+                priority: ticketData.priority,
+                category: ticketData.category,
+                created_at: ticketData.created_at,
+                updated_at: ticketData.updated_at,
+                guest_email: ticketData.guest_email,
+                support_categories: ticketData.category ? { name: ticketData.category } : undefined
             });
         } catch (error) {
             console.error("Search error:", error);

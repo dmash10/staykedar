@@ -502,21 +502,21 @@ export default function AdminTicketDetail() {
 
     if (isLoading) {
         return (
-            <AdminLayout title="Ticket Details">
+            <>
                 <div className="flex items-center justify-center h-96">
                     <Loader2 className="w-8 h-8 animate-spin text-[#0071c2]" />
                 </div>
-            </AdminLayout>
+            </>
         );
     }
 
     if (!ticket) {
         return (
-            <AdminLayout title="Ticket Details">
+            <>
                 <div className="p-6 text-center">
                     <p className="text-gray-400">Ticket not found</p>
                 </div>
-            </AdminLayout>
+            </>
         );
     }
 
@@ -524,7 +524,7 @@ export default function AdminTicketDetail() {
     const priority = priorityConfig[ticket.priority] || priorityConfig.medium;
 
     return (
-        <AdminLayout title={`Ticket ${ticket.ticket_number}`}>
+        <>
             <div className="p-4 md:p-6 max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-4">
@@ -907,6 +907,6 @@ export default function AdminTicketDetail() {
                     )}
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

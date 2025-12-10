@@ -298,16 +298,16 @@ export default function AdminBlogEditor() {
 
     if (isLoading) {
         return (
-            <AdminLayout title={pageTitle}>
+            <>
                 <div className="flex justify-center items-center h-64">
                     <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
                 </div>
-            </AdminLayout>
+            </>
         );
     }
 
     return (
-        <AdminLayout title={pageTitle}>
+        <>
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -669,6 +669,6 @@ export default function AdminBlogEditor() {
                     )}
                 </div>
             </div>
-        </AdminLayout>
+        </>
     );
 }

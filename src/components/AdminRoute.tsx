@@ -1,10 +1,10 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AdminRouteProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 const AdminRoute = ({ children }: AdminRouteProps) => {
@@ -107,14 +107,14 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     console.log("No user, redirecting to auth");
     return <Navigate to="/auth" />;
   }
-  
+
   if (!isAdmin) {
     console.log("User is not admin, redirecting to dashboard");
     return <Navigate to="/dashboard" />;
   }
 
   console.log("Admin access granted to:", user?.email);
-  return <>{children}</>;
+  return <>{children ? children : <Outlet />}</>;
 };
 
 export default AdminRoute;

@@ -1,0 +1,137 @@
+{
+    "name": "StayKedarnath - New Lead Notification",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "new-lead",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Website Lead Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "create",
+                "schemaType": "manual",
+                "table": "stay_leads",
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "customer_name": "={{ $json.name }}",
+                        "customer_phone": "={{ $json.phone }}",
+                        "customer_email": "={{ $json.email }}",
+                        "status": "new",
+                        "guests": "={{ $json.guests || 2 }}",
+                        "budget_category": "={{ $json.budget || 'medium' }}",
+                        "notes": "={{ $json.message }}"
+                    }
+                },
+                "options": {}
+            },
+            "id": "supabase-insert",
+            "name": "Save to Supabase",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Supabase account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "REPLACE_WITH_YOUR_TELEGRAM_CHAT_ID",
+                "text": "🔔 *NEW LEAD ALERT!*\n\n👤 *Name:* {{ $json.customer_name }}\n📞 *Phone:* {{ $json.customer_phone }}\n📧 *Email:* {{ $json.customer_email || 'Not provided' }}\n👥 *Guests:* {{ $json.guests || 2 }}\n💰 *Budget:* {{ $json.budget_category || 'Not specified' }}\n📝 *Message:* {{ $json.notes || 'No message' }}\n\n⏰ *Received:* {{ $now.format('DD MMM YYYY, hh:mm A') }}\n\n🚀 Reply within 1 hour for best conversion!",
+                "additionalFields": {
+                    "parse_mode": "Markdown"
+                }
+            },
+            "id": "telegram-notify",
+            "name": "Notify on Telegram",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                750,
+                300
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Telegram Bot"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify({ success: true, message: 'Lead received successfully' }) }}",
+                "options": {}
+            },
+            "id": "respond-webhook",
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                1000,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Website Lead Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Save to Supabase",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Save to Supabase": {
+            "main": [
+                [
+                    {
+                        "node": "Notify on Telegram",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Notify on Telegram": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [
+        {
+            "name": "StayKedarnath"
+        }
+    ]
+}

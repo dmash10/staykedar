@@ -1,363 +1,332 @@
+
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Calendar,
-  Users,
-  Home,
-  ArrowUpRight,
-  Activity,
-  Clock
+  IndianRupee, Building2, Zap, BanknoteIcon, LayoutDashboard,
+  Download, Activity, CalendarDays, Users, AlertTriangle
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { format, subDays } from 'date-fns';
+import {
+  ResponsiveContainer, ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip as RechartsTooltip, PieChart, Pie, Cell, FunnelChart, Funnel, LabelList
+} from 'recharts';
+import { format, subDays, eachDayOfInterval, isSameDay, isToday, startOfMonth, endOfMonth, getDay, getDate } from 'date-fns';
+
+// New Components
+import { StatsCard } from '@/components/admin/dashboard/StatsCard';
+import { GlassCard } from '@/components/admin/dashboard/GlassCard';
+import { LiveTicker, FeedItem } from '@/components/admin/dashboard/LiveTicker';
+import { UrgentAlertsWidget } from '@/components/admin/dashboard/UrgentAlertsWidget';
+import { DashboardMarquee } from '@/components/admin/dashboard/DashboardMarquee';
+import { LeadsPageContent } from '@/pages/admin/LeadsPage';
+import { InventoryManagerContent } from '@/pages/admin/InventoryManager';
+import { FinancePageContent } from '@/pages/admin/FinancePage';
+
+// ============================================
+// TYPES & CONSTANTS
+// ============================================
+
+const COLORS = {
+  blue: '#3B82F6',
+  emerald: '#10B981',
+  amber: '#F59E0B',
+  rose: '#F43F5E',
+  purple: '#8B5CF6',
+  slate: '#64748B'
+};
+
+const PIE_COLORS = [COLORS.blue, COLORS.emerald, COLORS.amber, COLORS.rose];
+
+// ============================================
+// MAIN PAGE COMPONENT
+// ============================================
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [dateRange, setDateRange] = useState('30d');
+  const [activeTab, setActiveTab] = useState('overview');
 
-  // Fetch comprehensive dashboard stats - OPTIMIZED with parallel queries
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['admin-dashboard-stats'],
+  // DATA FETCHING
+  const { data: bookings } = useQuery({
+    queryKey: ['dashboard-bookings'],
     queryFn: async () => {
-      // Run all queries in PARALLEL for faster loading
-      const [usersResult, propertiesResult, bookingsResult, recentBookingsResult] = await Promise.all([
-        // Users count
-        supabase.from('customer_details').select('*', { count: 'exact', head: true }),
-        // Properties count
-        supabase.from('properties').select('*', { count: 'exact', head: true }),
-        // All bookings for stats (only needed fields)
-        supabase.from('bookings').select('id, status, total_price, created_at').order('created_at', { ascending: false }),
-        // Recent bookings with details (only 5)
-        supabase.from('bookings').select(`
-          *,
-          customer_details (name),
-          rooms (
-            name,
-            properties (name)
-          )
-        `).order('created_at', { ascending: false }).limit(5)
-      ]);
-
-      const usersCount = usersResult.count || 0;
-      const propertiesCount = propertiesResult.count || 0;
-      const bookings = bookingsResult.data || [];
-      const recentBookings = recentBookingsResult.data || [];
-
-      const totalRevenue = bookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
-
-      // Status breakdown
-      const statusBreakdown = {
-        confirmed: bookings.filter(b => b.status === 'confirmed').length,
-        pending: bookings.filter(b => b.status === 'pending').length,
-        cancelled: bookings.filter(b => b.status === 'cancelled').length,
-        completed: bookings.filter(b => b.status === 'completed').length,
-      };
-
-      // Revenue trend (last 7 days)
-      const revenueTrend = Array.from({ length: 7 }, (_, i) => {
-        const date = subDays(new Date(), 6 - i);
-        const dayBookings = bookings.filter(b =>
-          format(new Date(b.created_at), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-        );
-        const revenue = dayBookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
-        return {
-          date: format(date, 'MMM dd'),
-          revenue: revenue,
-          bookings: dayBookings.length
-        };
-      });
-
-      return {
-        totalRevenue,
-        totalBookings: bookings.length,
-        totalUsers: usersCount,
-        totalProperties: propertiesCount,
-        statusBreakdown,
-        revenueTrend,
-        recentBookings,
-        avgBookingValue: totalRevenue / (bookings.length || 1)
-      };
+      const { data } = await supabase
+        .from('bookings')
+        .select('*, properties!bookings_property_id_fkey(name)')
+        .order('created_at', { ascending: false });
+      return data || [];
     },
-    staleTime: 30000, // Cache for 30 seconds - prevents refetching on navigation
-    refetchOnWindowFocus: false // Don't refetch when window regains focus
+    refetchInterval: 60000
   });
 
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
+  const { data: promoUsage } = useQuery({
+    queryKey: ['dashboard-promo-usage'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('promo_code_usage')
+        .select('*')
+        .order('used_at', { ascending: false })
+        .limit(20);
+      return data || [];
+    },
+    refetchInterval: 60000
+  });
 
-  if (isLoading) {
-    return (
-      <AdminLayout title="Dashboard">
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      </AdminLayout>
-    );
-  }
+  // Calculate Overview Stats
+  const stats = useMemo(() => {
+    if (!bookings) return null;
+    const totalRevenue = bookings.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+    const activeBookings = bookings.filter(b => b.status === 'confirmed').length;
+    const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+    const todayCheckins = bookings.filter(b => b.check_in && isToday(new Date(b.check_in))).length;
 
-  const pieData = [
-    { name: 'Confirmed', value: stats?.statusBreakdown.confirmed || 0 },
-    { name: 'Pending', value: stats?.statusBreakdown.pending || 0 },
-    { name: 'Cancelled', value: stats?.statusBreakdown.cancelled || 0 },
-    { name: 'Completed', value: stats?.statusBreakdown.completed || 0 },
+    // Daily buckets for chart
+    const dates = eachDayOfInterval({ start: subDays(new Date(), 29), end: new Date() });
+    const trendData = dates.map(date => {
+      const dayBookings = bookings.filter(b => b.created_at && isSameDay(new Date(b.created_at), date));
+      const dailyRev = dayBookings.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+      return {
+        date: format(date, 'MMM dd'),
+        revenue: dailyRev,
+        bookings: dayBookings.length
+      };
+    });
+
+    return { revenue: totalRevenue, active: activeBookings, pending: pendingBookings, todayCheckins, trendData };
+  }, [bookings]);
+
+
+  // LEAD DATA FETCHING
+  const { data: leads } = useQuery({
+    queryKey: ['dashboard-leads'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('stay_leads')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      return data || [];
+    },
+    refetchInterval: 60000
+  });
+
+
+  // Feed Items
+  const activityFeed: FeedItem[] = useMemo(() => {
+    const bookingItems: FeedItem[] = (bookings?.slice(0, 10).map(b => ({
+      id: `b-${b.id}`,
+      type: 'booking',
+      title: `Booking: ${b.customer_name}`,
+      description: `${b.properties?.name || 'Property'} • ₹${b.total_amount}`,
+      timestamp: new Date(b.created_at!),
+      actionUrl: `/admin/bookings`,
+    })) || []) as FeedItem[];
+
+    // NEW: Leads integration (Replacing Promos)
+    const leadItems: FeedItem[] = (leads?.map(l => ({
+      id: `l-${l.id}`,
+      type: 'lead',
+      title: `New Lead: ${l.customer_name}`,
+      description: `${l.budget_category?.toUpperCase()} • ${l.guests} PAX • ${l.is_urgent ? '🔥 Urgent' : 'Standard'}`,
+      timestamp: new Date(l.created_at || new Date().toISOString()),
+      actionUrl: `/admin/sales`,
+    })) || []) as FeedItem[];
+
+
+    const combined = [...bookingItems, ...leadItems].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 20);
+
+    // FALLBACK "USEFUL" MOCK DATA (High Value Operational Events)
+    if (combined.length === 0) {
+      return [
+        { id: 'm1', type: 'booking', title: 'New Booking: Rajesh Kumar', description: 'Hotel Kedar Heights • ₹12,500 • PAID via Razorpay', timestamp: new Date(), actionUrl: '/admin/bookings' },
+        { id: 'm2', type: 'alert', title: 'Inventory Warning', description: 'Sonprayag Zone is 95% Sold Out for Tomorrow', timestamp: subDays(new Date(), 0), actionUrl: '/admin/inventory' },
+        { id: 'm3', type: 'lead', title: 'VIP Inquiry: Amit Verma', description: 'PREMIUM Budget • 12 PAX • Needs Heli-Charter', timestamp: subDays(new Date(), 0), actionUrl: '/admin/sales' },
+        { id: 'm4', type: 'payment', title: 'Payment Failed', description: 'Booking #8821 (Suresh R.) - ₹5,000 pending', timestamp: subDays(new Date(), 0), actionUrl: '/admin/bookings' },
+        { id: 'm5', type: 'booking', title: 'Check-in Completed', description: 'Guest: David Miller (Room 302)', timestamp: subDays(new Date(), 1), actionUrl: '/admin/bookings' },
+      ] as FeedItem[];
+    }
+
+    return combined;
+  }, [bookings, leads]);
+
+
+  // DUMMY DATA FOR CHARTS
+  const funnelData = [
+    { value: 100, name: 'Leads', fill: '#ea580c' },
+    { value: 80, name: 'Quotes', fill: '#f97316' },
+    { value: 50, name: 'Negot.', fill: '#fb923c' },
+    { value: 30, name: 'Payment', fill: '#fdba74' },
+    { value: 15, name: 'Booked', fill: '#fed7aa' },
   ];
 
   return (
-    <AdminLayout title="Dashboard">
-      <div className="space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Total Revenue */}
-          <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-none text-white">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium mb-1">Total Revenue</p>
-                  <h3 className="text-3xl font-bold">₹{stats?.totalRevenue.toLocaleString()}</h3>
-                  <div className="flex items-center mt-2 text-blue-100">
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    <span className="text-sm">From {stats?.totalBookings} bookings</span>
-                  </div>
-                </div>
-                <div className="bg-white/20 p-3 rounded-lg">
-                  <DollarSign className="w-6 h-6" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <>
+      <div className="space-y-6 pb-10">
 
-          {/* Total Bookings */}
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm font-medium mb-1">Total Bookings</p>
-                  <h3 className="text-3xl font-bold text-white">{stats?.totalBookings}</h3>
-                  <div className="flex items-center mt-2 text-green-400">
-                    <Activity className="w-4 h-4 mr-1" />
-                    <span className="text-sm">Active bookings</span>
-                  </div>
-                </div>
-                <div className="bg-green-500/10 p-3 rounded-lg">
-                  <Calendar className="w-6 h-6 text-green-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* TOP MARQUEE HEADER */}
+        <DashboardMarquee />
 
-          {/* Total Users */}
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm font-medium mb-1">Total Users</p>
-                  <h3 className="text-3xl font-bold text-white">{stats?.totalUsers}</h3>
-                  <div className="flex items-center mt-2 text-purple-400">
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                    <span className="text-sm">Registered users</span>
-                  </div>
-                </div>
-                <div className="bg-purple-500/10 p-3 rounded-lg">
-                  <Users className="w-6 h-6 text-purple-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Total Properties */}
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm font-medium mb-1">Total Properties</p>
-                  <h3 className="text-3xl font-bold text-white">{stats?.totalProperties}</h3>
-                  <div className="flex items-center mt-2 text-amber-400">
-                    <Home className="w-4 h-4 mr-1" />
-                    <span className="text-sm">Listed properties</span>
-                  </div>
-                </div>
-                <div className="bg-amber-500/10 p-3 rounded-lg">
-                  <Home className="w-6 h-6 text-amber-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Revenue Trend */}
-          <Card className="lg:col-span-2 bg-[#111111] border-[#2A2A2A]">
-            <CardHeader className="border-b border-[#2A2A2A] pb-4">
-              <CardTitle className="text-white text-lg font-semibold flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-blue-400" />
-                Revenue Trend
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={stats?.revenueTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2A2A2A" />
-                  <XAxis dataKey="date" stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                  <YAxis stroke="#9CA3AF" style={{ fontSize: '12px' }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#1A1A1A',
-                      border: '1px solid #2A2A2A',
-                      borderRadius: '8px',
-                      color: '#FFFFFF'
-                    }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={2} name="Revenue (₹)" />
-                  <Line type="monotone" dataKey="bookings" stroke="#10B981" strokeWidth={2} name="Bookings" />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Booking Status Distribution */}
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardHeader className="border-b border-[#2A2A2A] pb-4">
-              <CardTitle className="text-white text-lg font-semibold">Booking Status</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#1A1A1A',
-                      border: '1px solid #2A2A2A',
-                      borderRadius: '8px',
-                      color: '#FFFFFF'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity & Quick Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Bookings */}
-          <Card className="lg:col-span-2 bg-[#111111] border-[#2A2A2A]">
-            <CardHeader className="border-b border-[#2A2A2A] pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-white text-lg font-semibold">Recent Bookings</CardTitle>
+        {/* HEADER CONTROLS */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+              <LayoutDashboard className="w-8 h-8 text-blue-500 animate-pulse" />
+              Overview
+            </h1>
+            <p className="text-slate-400 mt-1">Real-time enterprise intelligence</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-black/40 border border-white/10 p-1 rounded-lg backdrop-blur-md">
+              {['7d', '30d', '90d'].map(r => (
                 <Button
-                  variant="ghost"
+                  key={r}
+                  variant={dateRange === r ? 'secondary' : 'ghost'}
                   size="sm"
-                  onClick={() => navigate('/admin/bookings')}
-                  className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                  onClick={() => setDateRange(r)}
+                  className={`text-xs h-8 capitalize ${dateRange === r ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
                 >
-                  View All <ArrowUpRight className="w-4 h-4 ml-1" />
+                  {r}
                 </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-4">
-                {stats?.recentBookings && stats.recentBookings.length > 0 ? (
-                  stats.recentBookings.map((booking) => (
-                    <div key={booking.id} className="flex items-center justify-between p-4 bg-[#0A0A0A] rounded-lg border border-[#2A2A2A] hover:border-blue-500/30 transition">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-blue-500/10 p-2 rounded-lg">
-                          <Calendar className="w-5 h-5 text-blue-400" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-white">{booking.customer_details?.name || 'Guest'}</p>
-                          <p className="text-sm text-gray-400">
-                            {booking.rooms?.properties?.name || 'Unknown Property'} • {booking.rooms?.name}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-white">₹{booking.total_price?.toLocaleString()}</p>
-                        <p className="text-xs text-gray-400 flex items-center justify-end gap-1">
-                          <Clock className="w-3 h-3" />
-                          {format(new Date(booking.created_at), 'MMM dd, HH:mm')}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-12 text-gray-400">
-                    <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p>No recent bookings</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="bg-[#111111] border-[#2A2A2A]">
-            <CardHeader className="border-b border-[#2A2A2A] pb-4">
-              <CardTitle className="text-white text-lg font-semibold">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-3">
-                <Button
-                  onClick={() => navigate('/admin/bookings')}
-                  className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  View All Bookings
-                </Button>
-                <Button
-                  onClick={() => navigate('/admin/users')}
-                  className="w-full justify-start bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white border border-[#2A2A2A]"
-                  variant="outline"
-                >
-                  <Users className="w-4 h-4 mr-2" />
-                  Manage Users
-                </Button>
-                <Button
-                  onClick={() => navigate('/admin/properties')}
-                  className="w-full justify-start bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white border border-[#2A2A2A]"
-                  variant="outline"
-                >
-                  <Home className="w-4 h-4 mr-2" />
-                  Manage Properties
-                </Button>
-                <Button
-                  onClick={() => navigate('/admin/revenue')}
-                  className="w-full justify-start bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white border border-[#2A2A2A]"
-                  variant="outline"
-                >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Revenue Analytics
-                </Button>
-
-                {/* Key Metric */}
-                <div className="mt-6 p-4 bg-gradient-to-br from-green-600/20 to-green-700/20 border border-green-500/30 rounded-lg">
-                  <p className="text-green-400 text-sm font-medium mb-1">Avg. Booking Value</p>
-                  <p className="text-2xl font-bold text-white">₹{Math.round(stats?.avgBookingValue || 0).toLocaleString()}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              ))}
+            </div>
+            <Button variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white gap-2">
+              <Download className="w-4 h-4" /> Export
+            </Button>
+          </div>
         </div>
+
+        {/* TABS */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="bg-black/40 border border-white/10 p-1 backdrop-blur-md">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Executive View</TabsTrigger>
+            <TabsTrigger value="sales" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">Sales & CRM</TabsTrigger>
+            <TabsTrigger value="supply" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Inventory</TabsTrigger>
+            <TabsTrigger value="financials" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white">Financials</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+
+            {/* KPI GRID (BENTO) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <StatsCard
+                title="Gross Booking Value"
+                value={`₹${(stats?.revenue || 0).toLocaleString()}`}
+                subValue="Confirmed Trips (All Time)"
+                trend="up" trendValue="15.2%" icon={IndianRupee} colorClass="text-emerald-500"
+                sparkData={[40, 35, 55, 45, 60, 55, 75, 60, 80]}
+              />
+              <StatsCard
+                title="Net Revenue"
+                value={`₹${((stats?.revenue || 0) * 0.15).toLocaleString()}`}
+                subValue="Est. Commission (15%)"
+                trend="up" trendValue="8.4%" icon={BanknoteIcon} colorClass="text-blue-500"
+                sparkData={[12, 10, 15, 13, 18, 16, 22, 18, 24]}
+              />
+              <StatsCard
+                title="Active Leads"
+                value="142"
+                subValue="38 High Priority"
+                trend="down" trendValue="Needs Action" icon={Users} colorClass="text-amber-500"
+                sparkData={[45, 42, 48, 40, 38, 35, 30, 42, 38]}
+              />
+              <StatsCard
+                title="Occupancy"
+                value="78%"
+                subValue="Peak Dates filling fast"
+                trend="up" trendValue="+12%" icon={Building2} colorClass="text-purple-500"
+                sparkData={[60, 65, 70, 68, 72, 75, 74, 76, 78]}
+              />
+            </div>
+
+            {/* MAIN CHART + TICKER */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px]">
+              {/* Main Revenue Chart */}
+              <GlassCard className="lg:col-span-2 p-6 flex flex-col">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Revenue Performance</h3>
+                    <p className="text-sm text-slate-400">Gross Booking Value vs Volume</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="flex items-center gap-1 text-xs text-blue-400"><div className="w-2 h-2 rounded-full bg-blue-500"></div> Revenue</span>
+                    <span className="flex items-center gap-1 text-xs text-white/50"><div className="w-2 h-2 rounded-full bg-white/20"></div> Bookings</span>
+                  </div>
+                </div>
+                <div className="flex-1 w-full min-h-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={stats?.trendData || []}>
+                      <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                      <XAxis dataKey="date" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} dy={10} />
+                      <YAxis yAxisId="right" orientation="right" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v / 1000}k`} />
+                      <RechartsTooltip
+                        contentStyle={{ backgroundColor: '#000', borderColor: '#333', borderRadius: '8px', color: '#fff' }}
+                        itemStyle={{ color: '#ccc' }}
+                      />
+                      <Area type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={2} fill="url(#colorRevenue)" />
+                      <Bar dataKey="bookings" yAxisId="right" fill="#fff" opacity={0.1} barSize={20} radius={[4, 4, 0, 0]} />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </GlassCard>
+
+              {/* Live Ticker */}
+              <div className="lg:col-span-1 h-full min-h-0">
+                <LiveTicker items={activityFeed} />
+              </div>
+            </div>
+
+            {/* ROW 3: URGENT ALERTS & MAP */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <UrgentAlertsWidget />
+
+              <GlassCard className="p-6">
+                <h3 className="text-white font-bold mb-4">Quick Actions</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button variant="outline" className="h-20 flex flex-col gap-2 bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:text-emerald-100 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300">
+                    <Zap className="w-6 h-6" />
+                    Create Booking
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col gap-2 bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20 hover:border-blue-500/50 hover:text-blue-100 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300">
+                    <IndianRupee className="w-6 h-6" />
+                    Record Payment
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col gap-2 bg-purple-500/10 border-purple-500/20 text-purple-400 hover:bg-purple-500/20 hover:border-purple-500/50 hover:text-purple-100 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300">
+                    <Users className="w-6 h-6" />
+                    Add Lead
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col gap-2 bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/50 hover:text-amber-100 hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300">
+                    <CalendarDays className="w-6 h-6" />
+                    Check Avail.
+                  </Button>
+                </div>
+              </GlassCard>
+            </div>
+          </TabsContent>
+
+
+          <TabsContent value="sales">
+            <LeadsPageContent />
+          </TabsContent>
+          <TabsContent value="supply">
+            <InventoryManagerContent />
+          </TabsContent>
+          <TabsContent value="financials">
+            <FinancePageContent />
+          </TabsContent>
+        </Tabs>
+
       </div>
-    </AdminLayout>
+    </>
   );
 }

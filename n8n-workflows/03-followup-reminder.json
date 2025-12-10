@@ -1,0 +1,169 @@
+{
+    "name": "StayKedarnath - Follow-up Reminder",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 4
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "Every 4 Hours",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "table": "stay_leads",
+                "returnAll": false,
+                "limit": 50,
+                "filters": {
+                    "filter": [
+                        {
+                            "column": "status",
+                            "condition": "in",
+                            "value": "new,contacted,quote_sent"
+                        },
+                        {
+                            "column": "created_at",
+                            "condition": "lte",
+                            "value": "={{ $now.minus({ hours: 24 }).toISO() }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "get-stale-leads",
+            "name": "Get Stale Leads (24h+)",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Supabase account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [],
+                    "number": [
+                        {
+                            "value1": "={{ $json.length }}",
+                            "operation": "larger",
+                            "value2": 0
+                        }
+                    ]
+                }
+            },
+            "id": "if-has-leads",
+            "name": "Has Stale Leads?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                750,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "chatId": "REPLACE_WITH_YOUR_TELEGRAM_CHAT_ID",
+                "text": "⚠️ *FOLLOW-UP REMINDER*\n\n{{ $json.length }} leads need attention!\n\n{{ $json.slice(0, 5).map((l, i) => `${i+1}. *${l.customer_name}* - ${l.customer_phone}\\n   Status: ${l.status} | Created: ${new Date(l.created_at).toLocaleDateString()}`).join('\\n\\n') }}\n\n{{ $json.length > 5 ? `\\n...and ${$json.length - 5} more` : '' }}\n\n📞 *Call them now for better conversion!*",
+                "additionalFields": {
+                    "parse_mode": "Markdown"
+                }
+            },
+            "id": "telegram-reminder",
+            "name": "Send Reminder",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                1000,
+                200
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Telegram Bot"
+                }
+            }
+        },
+        {
+            "parameters": {},
+            "id": "no-op",
+            "name": "No Action Needed",
+            "type": "n8n-nodes-base.noOp",
+            "typeVersion": 1,
+            "position": [
+                1000,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Every 4 Hours": {
+            "main": [
+                [
+                    {
+                        "node": "Get Stale Leads (24h+)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Stale Leads (24h+)": {
+            "main": [
+                [
+                    {
+                        "node": "Has Stale Leads?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Has Stale Leads?": {
+            "main": [
+                [
+                    {
+                        "node": "Send Reminder",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "No Action Needed",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [
+        {
+            "name": "StayKedarnath"
+        }
+    ]
+}

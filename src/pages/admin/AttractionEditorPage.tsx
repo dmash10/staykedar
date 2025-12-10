@@ -169,7 +169,7 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
             </div>
           </div>
         </CollapsibleTrigger>
-        
+
         <CollapsibleContent>
           <div className="border-t border-[#1A1A1A]">
             {/* Status Indicators */}
@@ -196,11 +196,10 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
                   <button
                     key={key}
                     onClick={() => setActiveTip(key)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${
-                      activeTip === key 
-                        ? 'text-purple-400 bg-purple-500/10 border-b-2 border-purple-500' 
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${activeTip === key
+                        ? 'text-purple-400 bg-purple-500/10 border-b-2 border-purple-500'
                         : 'text-gray-500 hover:text-gray-300 hover:bg-[#111111]'
-                    }`}
+                      }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{tip.title.split(' ')[0]}</span>
@@ -229,13 +228,12 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
                 <span className="text-xs font-medium text-gray-400">1,500 - 2,500 words</span>
               </div>
               <div className="h-2 bg-[#1A1A1A] rounded-full overflow-hidden">
-                <motion.div 
-                  className={`h-full rounded-full ${
-                    wordCount < 500 ? 'bg-red-500' :
-                    wordCount < 1000 ? 'bg-yellow-500' :
-                    wordCount < 1500 ? 'bg-blue-500' :
-                    wordCount <= 2500 ? 'bg-green-500' : 'bg-orange-500'
-                  }`}
+                <motion.div
+                  className={`h-full rounded-full ${wordCount < 500 ? 'bg-red-500' :
+                      wordCount < 1000 ? 'bg-yellow-500' :
+                        wordCount < 1500 ? 'bg-blue-500' :
+                          wordCount <= 2500 ? 'bg-green-500' : 'bg-orange-500'
+                    }`}
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min((wordCount / 2500) * 100, 100)}%` }}
                   transition={{ duration: 0.5 }}
@@ -314,7 +312,7 @@ export default function AttractionEditorPage() {
         .single();
 
       if (error) throw error;
-      
+
       if (data) {
         setFormData({
           name: data.name,
@@ -429,11 +427,12 @@ export default function AttractionEditorPage() {
       }
 
       navigate('/admin/attractions');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving attraction:', error);
+      const message = error instanceof Error ? error.message : 'Failed to save attraction';
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save attraction',
+        description: message,
         variant: 'destructive'
       });
     } finally {
@@ -517,16 +516,16 @@ export default function AttractionEditorPage() {
 
   if (loading) {
     return (
-      <AdminLayout title="Loading...">
+      <>
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title={isEditing ? 'Edit Attraction' : 'Create Attraction'}>
+    <>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
@@ -667,11 +666,10 @@ export default function AttractionEditorPage() {
                 <BookOpen className="w-5 h-5 text-purple-400" />
                 Full Description *
               </h2>
-              <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                wordCount < 1000 ? 'bg-yellow-500/10 text-yellow-400' :
-                wordCount <= 2500 ? 'bg-green-500/10 text-green-400' : 
-                'bg-orange-500/10 text-orange-400'
-              }`}>
+              <div className={`px-3 py-1 rounded-full text-xs font-medium ${wordCount < 1000 ? 'bg-yellow-500/10 text-yellow-400' :
+                  wordCount <= 2500 ? 'bg-green-500/10 text-green-400' :
+                    'bg-orange-500/10 text-orange-400'
+                }`}>
                 {wordCount} words
               </div>
             </div>
@@ -780,19 +778,18 @@ export default function AttractionEditorPage() {
                 FAQs for AI Search
               </h2>
               <div className="flex items-center gap-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  formData.faqs.length >= 5 ? 'bg-green-500/10 text-green-400' :
-                  formData.faqs.length >= 3 ? 'bg-yellow-500/10 text-yellow-400' :
-                  'bg-red-500/10 text-red-400'
-                }`}>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${formData.faqs.length >= 5 ? 'bg-green-500/10 text-green-400' :
+                    formData.faqs.length >= 3 ? 'bg-yellow-500/10 text-yellow-400' :
+                      'bg-red-500/10 text-red-400'
+                  }`}>
                   {formData.faqs.length}/5+ FAQs
                 </span>
               </div>
             </div>
-            
+
             <div className="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-3 mb-4">
               <p className="text-xs text-cyan-300">
-                <strong>🔍 AI Search Tip:</strong> FAQs help Google AI Overviews, ChatGPT, and Perplexity cite your content. 
+                <strong>🔍 AI Search Tip:</strong> FAQs help Google AI Overviews, ChatGPT, and Perplexity cite your content.
                 Add 5-6 common questions travelers ask. Each answer should be 2-3 sentences with specific details.
               </p>
             </div>
@@ -896,7 +893,7 @@ export default function AttractionEditorPage() {
         {/* Sidebar - 1 column */}
         <div className="space-y-6">
           {/* Content Tips */}
-          <ContentTips 
+          <ContentTips
             wordCount={wordCount}
             hasDescription={formData.description.length > 100}
             hasSeo={!!formData.meta_title && !!formData.meta_description}
@@ -1030,7 +1027,7 @@ export default function AttractionEditorPage() {
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 

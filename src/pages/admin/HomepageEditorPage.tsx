@@ -139,16 +139,16 @@ export default function HomepageEditorPage() {
 
   if (isLoading) {
     return (
-      <AdminLayout title="Homepage Editor">
+      <>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Homepage Editor">
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -392,7 +392,7 @@ export default function HomepageEditorPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </>
   );
 }
 

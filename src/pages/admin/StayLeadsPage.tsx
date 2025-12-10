@@ -137,7 +137,7 @@ export default function StayLeadsPage() {
     };
 
     return (
-        <AdminLayout title="Stay Leads">
+        <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                 <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-none text-white">
@@ -377,6 +377,6 @@ export default function StayLeadsPage() {
                     )}
                 </CardContent>
             </Card>
-        </AdminLayout>
+        </>
     );
 }

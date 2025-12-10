@@ -4,7 +4,7 @@ import { AlertCircle } from 'lucide-react';
 
 export default function ErrorLogsPage() {
     return (
-        <AdminLayout title="Error Logs">
+        <>
             <div className="space-y-6">
                 <Card className="bg-[#111111] border-[#2A2A2A]">
                     <CardHeader>
@@ -21,6 +21,6 @@ export default function ErrorLogsPage() {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </>
     );
 }

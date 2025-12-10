@@ -16,8 +16,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Supabase configuration
-const SUPABASE_URL = 'https://hvvldwgwvrtcdlwehxoe.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2dmxkd2d3dnJ0Y2Rsd2VoeG9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzNjI2MzYsImV4cCI6MjA3NjkzODYzNn0.RNPDPaS8huNjVJmr_3Nb9JGJM0J0jc4IQ3jJ9RM5yms';
+// Supabase configuration
+// Load environment variables
+import dotenv from 'dotenv';
+dotenv.config();
+
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+
 
 // Base URL
 const BASE_URL = 'https://staykedarnath.in';

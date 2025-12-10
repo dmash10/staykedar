@@ -228,16 +228,16 @@ export default function EmailCampaignsPage() {
 
   if (isLoading) {
     return (
-      <AdminLayout title="Email Campaigns">
+      <>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Email Campaigns">
+    <>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -546,7 +546,7 @@ export default function EmailCampaignsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
+    </>
   );
 }
 

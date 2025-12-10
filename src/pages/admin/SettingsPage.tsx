@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Settings, Save, Loader2, Globe, Mail, Phone, Facebook, Twitter, Instagram,
-  Search, Image, Share2, Code, MapPin, Building2, FileText, Download, CheckCircle
+  Search, Image, Share2, Code, MapPin, Building2, FileText, Download, CheckCircle, Zap
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -106,8 +106,7 @@ async function generateSitemapXML(baseUrl: string, options: {
   // Fetch SEO cities
   const { data: cities } = await supabase
     .from('seo_cities')
-    .select('slug, updated_at')
-    .eq('is_active', true);
+    .select('slug, updated_at');
 
   cities?.forEach(city => {
     urls.push({
@@ -279,12 +278,12 @@ export default function SettingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_content')
-        .select('content')
+        .select('value')
         .eq('key', 'global_settings')
         .maybeSingle();
 
       if (error) throw error;
-      return data?.content as unknown as SiteSettings | null;
+      return data?.value ? JSON.parse(data.value) : null;
     }
   });
 
@@ -332,7 +331,8 @@ export default function SettingsPage() {
         .from('site_content')
         .upsert({
           key: 'global_settings',
-          content: newSettings as any
+          section: 'global',
+          value: JSON.stringify(newSettings)
         }, { onConflict: 'key' });
 
       if (settingsError) throw settingsError;
@@ -476,20 +476,45 @@ export default function SettingsPage() {
     saveSeoMutation.mutate(seoData);
   };
 
+  const handleTriggerPriceAlerts = async () => {
+    try {
+      toast({
+        title: "Checking Prices...",
+        description: "Scanning wishlists and packages for price drops.",
+      });
+
+      const { data, error } = await supabase.functions.invoke('check-price-alerts');
+
+      if (error) throw error;
+
+      toast({
+        title: "Price Check Complete",
+        description: `Processed ${data.processed || 0} alerts. Sent ${data.details?.filter((d: any) => d.status === 'sent').length || 0} emails.`,
+      });
+
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to run price check: " + (error as Error).message,
+        variant: "destructive"
+      });
+    }
+  };
+
   const isLoading = settingsLoading || seoLoading;
 
   if (isLoading) {
     return (
-      <AdminLayout title="Settings">
+      <>
         <div className="flex justify-center items-center h-64">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Settings">
+    <>
       <div className="max-w-5xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-[#1A1A1A] border border-[#2A2A2A]">
@@ -500,6 +525,10 @@ export default function SettingsPage() {
             <TabsTrigger value="seo" className="data-[state=active]:bg-orange-600">
               <Search className="w-4 h-4 mr-2" />
               SEO
+            </TabsTrigger>
+            <TabsTrigger value="automation" className="data-[state=active]:bg-orange-600">
+              <Zap className="w-4 h-4 mr-2" />
+              Automation
             </TabsTrigger>
           </TabsList>
 
@@ -1303,8 +1332,43 @@ export default function SettingsPage() {
               </div>
             </form>
           </TabsContent>
+
+          {/* Automation Tab */}
+          <TabsContent value="automation">
+            <Card className="bg-[#111111] border-[#2A2A2A]">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-yellow-500" />
+                  Marketing Automation
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Trigger automated marketing tasks and price checks.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+
+                <div className="flex items-center justify-between p-4 rounded-lg border border-[#2A2A2A] bg-[#1A1A1A]">
+                  <div className="space-y-1">
+                    <h4 className="text-base font-medium text-white">Price Drop Alerts</h4>
+                    <p className="text-sm text-gray-400">
+                      Check all wishlisted items for price drops and send email notifications to users.
+                      <br />
+                      <span className="text-xs text-orange-400">Runs logic: Price &lt; Target Price AND Not notified in 7 days.</span>
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleTriggerPriceAlerts}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                  >
+                    Run Price Check Now
+                  </Button>
+                </div>
+
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
-    </AdminLayout>
+    </>
   );
 }

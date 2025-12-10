@@ -10,7 +10,7 @@ export default function BannersPage() {
     const [activeTab, setActiveTab] = useState('marquee');
 
     return (
-        <AdminLayout title="Banners & Marketing">
+        <>
             <div className="space-y-6">
                 <div className="flex flex-col gap-2">
                     <h1 className="text-3xl font-bold text-white">Banner Management</h1>
@@ -46,6 +46,6 @@ export default function BannersPage() {
                     </TabsContent>
                 </Tabs>
             </div>
-        </AdminLayout>
+        </>
     );
 }

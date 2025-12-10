@@ -1,0 +1,188 @@
+{
+    "name": "StayKedarnath - Daily Summary Report",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 24,
+                            "triggerAtHour": 8
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "Every Morning 8 AM",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "table": "stay_leads",
+                "returnAll": false,
+                "limit": 100,
+                "filters": {
+                    "filter": [
+                        {
+                            "column": "created_at",
+                            "condition": "gte",
+                            "value": "={{ $now.minus({ days: 1 }).toISO() }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "get-leads",
+            "name": "Get Yesterday Leads",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                500,
+                200
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Supabase account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "table": "bookings",
+                "returnAll": false,
+                "limit": 100,
+                "filters": {
+                    "filter": [
+                        {
+                            "column": "created_at",
+                            "condition": "gte",
+                            "value": "={{ $now.minus({ days: 1 }).toISO() }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "get-bookings",
+            "name": "Get Yesterday Bookings",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                500,
+                400
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Supabase account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "combineAll",
+                "options": {}
+            },
+            "id": "merge-data",
+            "name": "Combine Data",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3,
+            "position": [
+                750,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "chatId": "REPLACE_WITH_YOUR_TELEGRAM_CHAT_ID",
+                "text": "📊 *DAILY SUMMARY - StayKedarnath*\n📅 {{ $now.format('DD MMM YYYY') }}\n\n━━━━━━━━━━━━━━━━━━━━\n\n📥 *NEW LEADS:* {{ $json.leads?.length || 0 }}\n✅ *NEW BOOKINGS:* {{ $json.bookings?.length || 0 }}\n💰 *REVENUE:* ₹{{ $json.bookings?.reduce((sum, b) => sum + (b.total_amount || 0), 0) || 0 }}\n\n━━━━━━━━━━━━━━━━━━━━\n\n🎯 *TODAY'S PRIORITIES:*\n• Follow up on pending leads\n• Check today's check-ins\n• Review payment status\n\n💪 Have a great day!",
+                "additionalFields": {
+                    "parse_mode": "Markdown"
+                }
+            },
+            "id": "telegram-summary",
+            "name": "Send Daily Summary",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                1000,
+                300
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Telegram Bot"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Every Morning 8 AM": {
+            "main": [
+                [
+                    {
+                        "node": "Get Yesterday Leads",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Get Yesterday Bookings",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Yesterday Leads": {
+            "main": [
+                [
+                    {
+                        "node": "Combine Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Yesterday Bookings": {
+            "main": [
+                [
+                    {
+                        "node": "Combine Data",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Combine Data": {
+            "main": [
+                [
+                    {
+                        "node": "Send Daily Summary",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [
+        {
+            "name": "StayKedarnath"
+        }
+    ]
+}

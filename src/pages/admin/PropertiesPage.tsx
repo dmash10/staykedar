@@ -56,7 +56,7 @@ export default function PropertiesPage() {
     };
 
     return (
-        <AdminLayout title="Property Management">
+        <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <Card className="bg-gradient-to-br from-purple-600 to-purple-700 border-none text-white">
@@ -225,6 +225,6 @@ export default function PropertiesPage() {
                     )}
                 </CardContent>
             </Card>
-        </AdminLayout>
+        </>
     );
 }

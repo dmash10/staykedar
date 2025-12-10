@@ -309,7 +309,7 @@ export default function MediaLibraryPage() {
   );
 
   return (
-    <AdminLayout title="Media Library">
+    <>
       <Tabs defaultValue="attractions" className="w-full mb-6">
         <TabsList className="bg-[#111111] border border-[#2A2A2A] text-slate-400">
           <TabsTrigger value="attractions" className="data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white">
@@ -483,6 +483,6 @@ export default function MediaLibraryPage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </AdminLayout>
+    </>
   );
 }

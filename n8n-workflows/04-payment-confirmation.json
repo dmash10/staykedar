@@ -1,0 +1,165 @@
+{
+    "name": "StayKedarnath - Payment Confirmation",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "payment-success",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Razorpay Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Extract payment details from Razorpay webhook\nconst payload = $input.first().json;\n\nconst paymentData = {\n  payment_id: payload.payload?.payment?.entity?.id || payload.razorpay_payment_id,\n  order_id: payload.payload?.order?.entity?.id || payload.razorpay_order_id,\n  amount: (payload.payload?.payment?.entity?.amount || 0) / 100, // Convert paise to rupees\n  status: payload.event || 'payment.captured',\n  customer_email: payload.payload?.payment?.entity?.email,\n  customer_phone: payload.payload?.payment?.entity?.contact,\n  booking_id: payload.payload?.payment?.entity?.notes?.booking_id\n};\n\nreturn [{ json: paymentData }];"
+            },
+            "id": "parse-payment",
+            "name": "Parse Payment Data",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "table": "bookings",
+                "filters": {
+                    "filter": [
+                        {
+                            "column": "id",
+                            "condition": "eq",
+                            "value": "={{ $json.booking_id }}"
+                        }
+                    ]
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "payment_status": "paid",
+                        "payment_id": "={{ $json.payment_id }}",
+                        "status": "confirmed"
+                    }
+                },
+                "options": {}
+            },
+            "id": "update-booking",
+            "name": "Update Booking Status",
+            "type": "n8n-nodes-base.supabase",
+            "typeVersion": 1,
+            "position": [
+                750,
+                300
+            ],
+            "credentials": {
+                "supabaseApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Supabase account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "chatId": "REPLACE_WITH_YOUR_TELEGRAM_CHAT_ID",
+                "text": "💰 *PAYMENT RECEIVED!*\n\n✅ Amount: ₹{{ $json.amount }}\n🆔 Payment ID: {{ $json.payment_id }}\n📞 Customer: {{ $json.customer_phone }}\n📧 Email: {{ $json.customer_email }}\n\n🎉 Booking confirmed! Generate voucher now.",
+                "additionalFields": {
+                    "parse_mode": "Markdown"
+                }
+            },
+            "id": "telegram-notify",
+            "name": "Notify Payment Received",
+            "type": "n8n-nodes-base.telegram",
+            "typeVersion": 1.2,
+            "position": [
+                1000,
+                300
+            ],
+            "credentials": {
+                "telegramApi": {
+                    "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+                    "name": "Telegram Bot"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify({ success: true }) }}",
+                "options": {}
+            },
+            "id": "respond-webhook",
+            "name": "Respond OK",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                1250,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Razorpay Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Parse Payment Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parse Payment Data": {
+            "main": [
+                [
+                    {
+                        "node": "Update Booking Status",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update Booking Status": {
+            "main": [
+                [
+                    {
+                        "node": "Notify Payment Received",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Notify Payment Received": {
+            "main": [
+                [
+                    {
+                        "node": "Respond OK",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [
+        {
+            "name": "StayKedarnath"
+        }
+    ]
+}

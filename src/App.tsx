@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider } from "@/contexts/SupabaseAuthContext";
 import { EditProvider } from "@/contexts/EditContext";
 import { PluginProvider } from "@/contexts/PluginContext";
@@ -10,38 +10,39 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import CustomerRoute from "@/components/CustomerRoute";
 import PropertyOwnerRoute from "@/components/PropertyOwnerRoute";
 import AdminRoute from "@/components/AdminRoute";
+import AdminLayout from "@/components/admin/AdminLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Index from "./pages/Index";
-import About from "./pages/AboutUs";
+import About from "./pages/company/AboutUs";
 import Weather from "./pages/Weather";
 import LiveStatusPage from "./pages/LiveStatusPage";
-import Attractions from "./pages/Attractions";
-import AttractionDetail from "./pages/AttractionDetail";
+import Attractions from "./pages/attractions/Attractions";
+import AttractionDetail from "./pages/attractions/AttractionDetail";
 import NotFound from "./pages/NotFound";
-import ContentCreator from "./pages/ContentCreator";
-import PartnerWithUs from "./pages/PartnerWithUs";
-import Auth from "./pages/Auth";
-import Dashboard from './pages/Dashboard'; // Customer dashboard
+import ContentCreator from "./pages/company/ContentCreator";
+import PartnerWithUs from "./pages/company/PartnerWithUs";
+import Auth from "./pages/auth/Auth";
+import Dashboard from './pages/user/Dashboard'; // Customer dashboard
 import AdminDashboard from '@/pages/admin/Dashboard'; // Admin dashboard
-import Packages from "./pages/Packages";
-import PackageDetail from "./pages/PackageDetail";
-import CarRentals from "./pages/CarRentals";
-import TaxiServicePage from "./pages/TaxiServicePage";
-import StaysLocationPage from "./pages/StaysLocationPage";
-import AttractionsLocationPage from "./pages/AttractionsLocationPage";
-import TravelGuidePage from "./pages/TravelGuidePage";
-import RoutePage from "./pages/RoutePage";
-import PackagesFromCityPage from "./pages/PackagesFromCityPage";
+import Packages from "./pages/packages/Packages";
+import PackageDetail from "./pages/packages/PackageDetail";
+import CarRentals from "./pages/transport/CarRentals";
+import TaxiServicePage from "./pages/transport/TaxiServicePage";
+import StaysLocationPage from "./pages/stays/StaysLocationPage";
+import AttractionsLocationPage from "./pages/attractions/AttractionsLocationPage";
+import TravelGuidePage from "./pages/content/TravelGuidePage";
+import RoutePage from "./pages/transport/RoutePage";
+import PackagesFromCityPage from "./pages/packages/PackagesFromCityPage";
 import SEORoutesPage from "./pages/admin/SEORoutesPage";
-import DriverDetail from "./pages/DriverDetail";
-import DriverRegistration from "./pages/DriverRegistration";
+import DriverDetail from "./pages/transport/DriverDetail";
+import DriverRegistration from "./pages/transport/DriverRegistration";
 import { Helmet } from "react-helmet-async";
 import WhatsAppButton from "./components/WhatsAppButton";
-import ItineraryPage from "./pages/ItineraryPage";
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import AuthCallback from "./pages/AuthCallback";
+import ItineraryPage from "./pages/packages/ItineraryPage";
+import Blog from './pages/content/Blog';
+import BlogPost from './pages/content/BlogPost';
+import AuthCallback from "./pages/auth/AuthCallback";
 import AdminBlogList from '@/pages/admin/AdminBlogList';
 import AdminBlogEditor from '@/pages/admin/AdminBlogEditor';
 import AdminArticleList from '@/pages/admin/AdminArticleList';
@@ -65,10 +66,11 @@ import SEOCitiesPage from '@/pages/admin/SEOCitiesPage';
 import LiveStatusAdminPage from '@/pages/admin/LiveStatusAdminPage';
 import SEOItinerariesPage from '@/pages/admin/SEOItinerariesPage';
 import BannersPage from '@/pages/admin/BannersPage';
-import UrgentStaysPage from '@/pages/UrgentStaysPage';
+import UrgentStaysPage from '@/pages/stays/UrgentStaysPage';
 import InventoryManager from '@/pages/admin/InventoryManager';
 import BlindPropertiesPage from '@/pages/admin/BlindPropertiesPage';
-import StayLeadsPage from '@/pages/admin/StayLeadsPage';
+import LeadsPage from '@/pages/admin/LeadsPage';
+
 import AttractionEditorPage from '@/pages/admin/AttractionEditorPage';
 import MarqueeBannerManager from '@/pages/admin/MarqueeBannerManager';
 import PromoCodesPage from '@/pages/admin/PromoCodesPage';
@@ -84,33 +86,47 @@ import ReferralProgramPage from '@/pages/admin/ReferralProgramPage';
 import RolesPage from '@/pages/admin/RolesPage';
 import SystemHealthPage from '@/pages/admin/SystemHealthPage';
 import UserManagementPage from '@/pages/admin/UserManagementPage';
-import PluginDemo from './pages/PluginDemo';
-import TermsAndConditions from './pages/TermsAndConditions';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import ShippingPolicy from './pages/ShippingPolicy';
-import CancellationPolicy from './pages/CancellationPolicy';
-import DisclaimerPolicy from './pages/DisclaimerPolicy';
-import ContactUs from './pages/ContactUs';
-import StayListing from './pages/StayListing';
-import SmartStaysPage from './pages/SmartStaysPage';
-import PropertyAuditPage from './pages/PropertyAuditPage';
-import PropertyDetail from './pages/PropertyDetail';
-import UserBookings from './pages/UserBookings';
+import RefundDashboardPage from '@/pages/admin/RefundDashboardPage';
+import HostReliabilityPage from '@/pages/admin/HostReliabilityPage';
+import PaymentSettlementPage from '@/pages/admin/PaymentSettlementPage';
+import WhatsAppLogsPage from '@/pages/admin/WhatsAppLogsPage';
+import YatraCalendarPage from '@/pages/admin/YatraCalendarPage';
+import PropertyVerificationPage from '@/pages/admin/PropertyVerificationPage';
+import AnalyticsPage from '@/pages/admin/AnalyticsPage';
+import FinancePage from '@/pages/admin/FinancePage';
+import SalesDashboard from '@/pages/admin/SalesDashboard';
+import CommissionsDashboard from '@/pages/admin/CommissionsDashboard';
+import VoucherPrintPage from '@/pages/admin/VoucherPrintPage';
+import WalletPage from '@/pages/WalletPage';
+
+import WishlistPage from '@/pages/WishlistPage';
+
+import TermsAndConditions from './pages/legal/TermsAndConditions';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import ShippingPolicy from './pages/legal/ShippingPolicy';
+import CancellationPolicy from './pages/legal/CancellationPolicy';
+import DisclaimerPolicy from './pages/legal/DisclaimerPolicy';
+import ContactUs from './pages/company/ContactUs';
+import StayListing from './pages/stays/StayListing';
+import SmartStaysPage from './pages/stays/SmartStaysPage';
+import PropertyAuditPage from './pages/stays/PropertyAuditPage';
+import PropertyDetail from './pages/stays/PropertyDetail';
+import UserBookings from './pages/user/UserBookings';
 import UserTickets from './pages/user/UserTickets';
 import TicketDetail from './pages/user/TicketDetail';
-import PropertyOnboarding from "./pages/PropertyOnboarding";
-import PropertyManagement from './pages/PropertyManagement';
-import PropertyEdit from './pages/PropertyEdit';
-import RoomEdit from './pages/RoomEdit';
-import Signup from './pages/Signup';
-import Profile from './pages/Profile';
-import PropertyOwnerSignup from './pages/PropertyOwnerSignup';
+import PropertyOnboarding from "./pages/property-owner/PropertyOnboarding";
+import PropertyManagement from './pages/property-owner/PropertyManagement';
+import PropertyEdit from './pages/property-owner/PropertyEdit';
+import RoomEdit from './pages/property-owner/RoomEdit';
+import Signup from './pages/property-owner/Signup';
+import Profile from './pages/user/Profile';
+import PropertyOwnerSignup from './pages/property-owner/PropertyOwnerSignup';
 import BudgetCalculatorPage from "./pages/tools/BudgetCalculatorPage";
 import WeatherCheckPage from "./pages/tools/WeatherCheckPage";
 import ItineraryPlannerPage from "./pages/tools/ItineraryPlannerPage";
 import CompareCitiesPage from "./pages/compare/CompareCitiesPage";
 import CompareDirectoryPage from "./pages/compare/CompareDirectoryPage";
-import EmailVerification from './pages/EmailVerification';
+import EmailVerification from './pages/auth/EmailVerification';
 import RaiseTicket from './pages/support/RaiseTicket';
 import TrackTicket from './pages/support/TrackTicket';
 import PublicTicketDetail from './pages/support/PublicTicketDetail';
@@ -119,15 +135,14 @@ import HelpCategory from './pages/help/HelpCategory';
 import HelpArticle from './pages/help/HelpArticle';
 
 // Char Dham Hub Pages
-import BadrinathPage from './pages/BadrinathPage';
-import CharDhamPage from './pages/CharDhamPage';
-import DoDhamPage from './pages/DoDhamPage';
-import WorkFromPahadPage from './pages/WorkFromPahadPage';
+import BadrinathPage from './pages/chardham/BadrinathPage';
+import CharDhamPage from './pages/chardham/CharDhamPage';
+import DoDhamPage from './pages/chardham/DoDhamPage';
+import WorkFromPahadPage from './pages/chardham/WorkFromPahadPage';
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  console.log("DEBUG: App component rendering");
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -164,7 +179,6 @@ const App = () => {
                     <Route path="/stays/:propertyId" element={<PropertyDetail />} />
                     <Route path="/packages" element={<Packages />} />
                     <Route path="/packages/:slug" element={<PackageDetail />} />
-                    <Route path="/car-rentals" element={<CarRentals />} />
                     <Route path="/car-rentals" element={<CarRentals />} />
                     <Route path="/car-rentals/driver/:slug" element={<DriverDetail />} />
 
@@ -239,6 +253,16 @@ const App = () => {
                         <TicketDetail />
                       </CustomerRoute>
                     } />
+                    <Route path="/wallet" element={
+                      <ProtectedRoute>
+                        <WalletPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/wishlist" element={
+                      <ProtectedRoute>
+                        <WishlistPage />
+                      </ProtectedRoute>
+                    } />
 
                     {/* Property owner routes */}
                     <Route path="/dashboard/properties" element={
@@ -262,57 +286,72 @@ const App = () => {
                       </PropertyOwnerRoute>
                     } />
 
-                    {/* Admin routes - Use ADMIN Dashboard */}
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/admin/blog" element={<AdminBlogList />} />
-                    <Route path="/admin/blog/:postId" element={<AdminBlogEditor />} />
-                    <Route path="/admin/help/articles" element={<AdminArticleList />} />
-                    <Route path="/admin/help/articles/:articleId" element={<AdminArticleEditor />} />
-                    <Route path="/admin/users" element={<UsersPage />} />
-                    <Route path="/admin/bookings" element={<BookingsPage />} />
-                    <Route path="/admin/properties" element={<PropertiesPage />} />
-                    <Route path="/admin/packages" element={<PackagesPage />} />
-                    <Route path="/admin/media" element={<MediaLibraryPage />} />
-                    <Route path="/admin/settings" element={<SettingsPage />} />
-                    <Route path="/admin/revenue" element={<RevenuePage />} />
-                    <Route path="/admin/reviews" element={<ReviewsPage />} />
-                    <Route path="/admin/tickets" element={<SupportTicketsPage />} />
-                    <Route path="/admin/tickets/:ticketNumber" element={<AdminTicketDetail />} />
-                    <Route path="/admin/notifications" element={<NotificationsPage />} />
-                    <Route path="/admin/reports" element={<ReportsPage />} />
-                    <Route path="/admin/logs" element={<ActivityLogsPage />} />
-                    <Route path="/admin/plugins" element={<PluginsPage />} />
-                    <Route path="/admin/car-drivers" element={<CarDriversPage />} />
-                    <Route path="/admin/seo-cities" element={<SEOCitiesPage />} />
-                    <Route path="/admin/seo-routes" element={<SEORoutesPage />} />
-                    <Route path="/admin/seo-itineraries" element={<SEOItinerariesPage />} />
-                    <Route path="/admin/seo-itineraries" element={<SEOItinerariesPage />} />
-                    <Route path="/admin/live-status" element={<LiveStatusAdminPage />} />
-                    <Route path="/admin/attractions" element={<AttractionsLocationPage />} />
-                    <Route path="/admin/attractions/new" element={<AttractionEditorPage />} />
-                    <Route path="/admin/attractions/:id" element={<AttractionEditorPage />} />
-                    <Route path="/admin/banners" element={<BannersPage />} />
-                    <Route path="/admin/promos" element={<PromoCodesPage />} />
-                    <Route path="/admin/inventory" element={<InventoryManager />} />
-                    <Route path="/admin/blind-properties" element={<BlindPropertiesPage />} />
-                    <Route path="/admin/stay-leads" element={<StayLeadsPage />} />
-                    <Route path="/urgent-stays" element={<UrgentStaysPage />} />
-                    <Route path="/tools/kedarnath-budget-calculator" element={<BudgetCalculatorPage />} />
-                    <Route path="/tools/is-it-raining-in-kedarnath" element={<WeatherCheckPage />} />
-                    <Route path="/compare/:slug" element={<CompareCitiesPage />} />
-                    <Route path="/compare-cities" element={<CompareDirectoryPage />} />
-                    <Route path="/admin/testimonials" element={<TestimonialsPage />} />
-                    <Route path="/admin/faqs" element={<FAQPage />} />
-                    <Route path="/admin/marketing/email" element={<EmailCampaignsPage />} />
-                    <Route path="/admin/marketing/templates" element={<EmailTemplatesPage />} />
-                    <Route path="/admin/marketing/push" element={<PushNotificationsPage />} />
-                    <Route path="/admin/marketing/referrals" element={<ReferralProgramPage />} />
-                    <Route path="/admin/content/homepage" element={<HomepageEditorPage />} />
-                    <Route path="/admin/system/cache" element={<CacheManagementPage />} />
-                    <Route path="/admin/system/errors" element={<ErrorLogsPage />} />
-                    <Route path="/admin/system/roles" element={<RolesPage />} />
-                    <Route path="/admin/system/health" element={<SystemHealthPage />} />
-                    <Route path="/admin/users/manage" element={<UserManagementPage />} />
+                    {/* Admin routes - Use ADMIN Dashboard and AdminRoute wrapper */}
+
+                    {/* Admin routes - Nested Layout */}
+                    <Route path="/admin" element={
+                      <AdminRoute>
+                        <AdminLayout>
+                          <Outlet />
+                        </AdminLayout>
+                      </AdminRoute>
+                    }>
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="analytics" element={<AnalyticsPage />} />
+                      <Route path="finance" element={<FinancePage />} />
+                      <Route path="sales" element={<SalesDashboard />} />
+                      <Route path="commissions" element={<CommissionsDashboard />} />
+                      <Route path="print/voucher" element={<VoucherPrintPage />} />
+                      <Route path="blog" element={<AdminBlogList />} />
+                      <Route path="blog/:postId" element={<AdminBlogEditor />} />
+                      <Route path="help/articles" element={<AdminArticleList />} />
+                      <Route path="help/articles/:articleId" element={<AdminArticleEditor />} />
+                      <Route path="users" element={<UsersPage />} />
+                      <Route path="bookings" element={<BookingsPage />} />
+                      <Route path="properties" element={<PropertiesPage />} />
+                      <Route path="packages" element={<PackagesPage />} />
+                      <Route path="media" element={<MediaLibraryPage />} />
+                      <Route path="settings" element={<SettingsPage />} />
+                      <Route path="revenue" element={<RevenuePage />} />
+                      <Route path="reviews" element={<ReviewsPage />} />
+                      <Route path="tickets" element={<SupportTicketsPage />} />
+                      <Route path="tickets/:ticketNumber" element={<AdminTicketDetail />} />
+                      <Route path="notifications" element={<NotificationsPage />} />
+                      <Route path="reports" element={<ReportsPage />} />
+                      <Route path="logs" element={<ActivityLogsPage />} />
+                      <Route path="plugins" element={<PluginsPage />} />
+                      <Route path="car-drivers" element={<CarDriversPage />} />
+                      <Route path="seo-cities" element={<SEOCitiesPage />} />
+                      <Route path="seo-routes" element={<SEORoutesPage />} />
+                      <Route path="seo-itineraries" element={<SEOItinerariesPage />} />
+                      <Route path="live-status" element={<LiveStatusAdminPage />} />
+                      <Route path="attractions" element={<AttractionsLocationPage />} />
+                      <Route path="attractions/new" element={<AttractionEditorPage />} />
+                      <Route path="attractions/:id" element={<AttractionEditorPage />} />
+                      <Route path="banners" element={<BannersPage />} />
+                      <Route path="promos" element={<PromoCodesPage />} />
+                      <Route path="inventory" element={<InventoryManager />} />
+                      <Route path="blind-properties" element={<BlindPropertiesPage />} />
+                      <Route path="stay-leads" element={<LeadsPage />} />
+                      <Route path="testimonials" element={<TestimonialsPage />} />
+                      <Route path="faqs" element={<FAQPage />} />
+                      <Route path="marketing/email" element={<EmailCampaignsPage />} />
+                      <Route path="marketing/templates" element={<EmailTemplatesPage />} />
+                      <Route path="marketing/push" element={<PushNotificationsPage />} />
+                      <Route path="marketing/referrals" element={<ReferralProgramPage />} />
+                      <Route path="content/homepage" element={<HomepageEditorPage />} />
+                      <Route path="system/cache" element={<CacheManagementPage />} />
+                      <Route path="system/errors" element={<ErrorLogsPage />} />
+                      <Route path="system/roles" element={<RolesPage />} />
+                      <Route path="system/health" element={<SystemHealthPage />} />
+                      <Route path="users/manage" element={<UserManagementPage />} />
+                      <Route path="refunds" element={<RefundDashboardPage />} />
+                      <Route path="host-reliability" element={<HostReliabilityPage />} />
+                      <Route path="settlements" element={<PaymentSettlementPage />} />
+                      <Route path="whatsapp-logs" element={<WhatsAppLogsPage />} />
+                      <Route path="yatra-calendar" element={<YatraCalendarPage />} />
+                      <Route path="property-verification" element={<PropertyVerificationPage />} />
+                    </Route>
 
                     <Route path="*" element={<NotFound />} />
                   </Routes>

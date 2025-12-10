@@ -66,9 +66,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            console.log("SupabaseAuthContext: Auth state changed", _event, session?.user?.email);
+            console.log("SupabaseAuthContext: Auth state changed", _event);
+
             setSession(session);
-            setUser(session?.user ?? null);
+
+            // Only update user state if the user actually changed to prevent downstream re-renders
+            setUser(prevUser => {
+                const newUser = session?.user ?? null;
+                if (prevUser?.id === newUser?.id && prevUser?.email === newUser?.email && prevUser?.updated_at === newUser?.updated_at) {
+                    return prevUser; // Keep the same reference
+                }
+                return newUser;
+            });
+
             setIsLoading(false);
 
             // Update cache on auth changes

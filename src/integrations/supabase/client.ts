@@ -23,18 +23,18 @@ let connectionState = {
 };
 
 // Custom fetch with timeout
-const fetchWithTimeout = (url: RequestInfo | URL, options?: RequestInit, timeout = 10000) => {
+const fetchWithTimeout = (url: RequestInfo | URL, options?: RequestInit, timeout = 60000) => {
   return new Promise<Response>((resolve, reject) => {
     // Create abort controller for timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-    
+
     // Add signal to options
     const fetchOptions = {
       ...options,
       signal: controller.signal
     };
-    
+
     fetch(url, fetchOptions)
       .then(response => {
         clearTimeout(timeoutId);
@@ -64,13 +64,13 @@ export const supabase = createClient<Database>(supabaseUrl || '', supabaseKey ||
           console.error('Supabase fetch error:', err);
           // Track connection errors
           connectionState.connectionErrors++;
-          
+
           // If we've had too many errors, mark connection as unavailable
           if (connectionState.connectionErrors >= connectionState.maxConnectionErrors) {
             connectionState.isAvailable = false;
             scheduleReconnect();
           }
-          
+
           throw new Error('Network error when connecting to Supabase. Please check your connection and try again.');
         });
     }
@@ -87,7 +87,7 @@ const scheduleReconnect = () => {
   if (connectionState.reconnectTimeout) {
     clearTimeout(connectionState.reconnectTimeout);
   }
-  
+
   connectionState.reconnectTimeout = setTimeout(() => {
     checkSupabaseConnection(true)
       .then(available => {
@@ -110,13 +110,13 @@ const scheduleReconnect = () => {
 export const checkSupabaseConnection = async (force = false): Promise<boolean> => {
   // Don't check too frequently unless forced
   const now = Date.now();
-  if (!force && 
-      connectionState.lastChecked > 0 && 
-      now - connectionState.lastChecked < 60000 && // 1 minute cache
-      !connectionState.checkInProgress) {
+  if (!force &&
+    connectionState.lastChecked > 0 &&
+    now - connectionState.lastChecked < 60000 && // 1 minute cache
+    !connectionState.checkInProgress) {
     return connectionState.isAvailable;
   }
-  
+
   // Prevent multiple simultaneous checks
   if (connectionState.checkInProgress) {
     // Wait for the current check to complete
@@ -129,21 +129,21 @@ export const checkSupabaseConnection = async (force = false): Promise<boolean> =
       }, 100);
     });
   }
-  
+
   connectionState.checkInProgress = true;
-  
+
   try {
     // Try a simple query to check connection
     const { error } = await supabase.from('site_content').select('id').limit(1);
-    
+
     // Update connection state
     connectionState.lastChecked = now;
     connectionState.isAvailable = !error || error.code !== 'PGRST12';
-    
+
     if (connectionState.isAvailable) {
       connectionState.connectionErrors = 0;
     }
-    
+
     return connectionState.isAvailable;
   } catch (error) {
     console.error('Supabase connection error:', error);
@@ -158,19 +158,19 @@ export const checkSupabaseConnection = async (force = false): Promise<boolean> =
 // Function to handle Supabase errors consistently
 export const handleSupabaseError = (error: any): string => {
   console.error('Supabase error:', error);
-  
+
   if (typeof error === 'string') {
     return error;
   }
-  
+
   if (error?.message) {
     return error.message;
   }
-  
+
   if (error?.error_description) {
     return error.error_description;
   }
-  
+
   return 'An unknown error occurred. Please try again.';
 };
 
@@ -182,7 +182,7 @@ export const retryOperation = async <T>(
   onRetry?: (attempt: number, error: any) => void
 ): Promise<T> => {
   let lastError: any;
-  
+
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       // Check connection before operation
@@ -192,24 +192,24 @@ export const retryOperation = async <T>(
           throw new Error("Cannot connect to database. Please check your connection and try again.");
         }
       }
-      
+
       return await operation();
     } catch (error) {
       lastError = error;
       console.error(`Operation failed (attempt ${attempt + 1}/${maxRetries}):`, error);
-      
+
       // Call onRetry callback if provided
       if (onRetry) {
         onRetry(attempt + 1, error);
       }
-      
+
       if (attempt < maxRetries - 1) {
         // Wait before retrying with exponential backoff
         await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, attempt)));
       }
     }
   }
-  
+
   throw lastError;
 };
 
@@ -224,7 +224,7 @@ export const safeQuery = async <T>(
     if (!isConnected) {
       throw new Error("Cannot connect to database. Please check your connection and try again.");
     }
-    
+
     return await retryOperation(queryFn);
   } catch (error) {
     console.error(errorMessage, error);

@@ -177,7 +177,7 @@ export default function AttractionsPage() {
   };
 
   return (
-    <AdminLayout title="Attractions Management">
+    <>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
@@ -424,6 +424,6 @@ export default function AttractionsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
+    </>
   );
 }

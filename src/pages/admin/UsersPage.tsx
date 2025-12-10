@@ -99,7 +99,7 @@ export default function UsersPage() {
   };
 
   return (
-    <AdminLayout title="User Management">
+    <>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <Card className="bg-gradient-to-br from-indigo-600 to-indigo-700 border-none text-white">
@@ -284,6 +284,6 @@ export default function UsersPage() {
           )}
         </CardContent>
       </Card>
-    </AdminLayout>
+    </>
   );
 }

@@ -550,16 +550,16 @@ ${sourceLine}
 
     if (isLoading) {
         return (
-            <AdminLayout title="Live Status Manager">
+            <>
                 <div className="flex items-center justify-center h-96">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 </div>
-            </AdminLayout>
+            </>
         );
     }
 
     return (
-        <AdminLayout title="Live Status Manager">
+        <>
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -1097,7 +1097,7 @@ ${sourceLine}
                     </DialogContent>
                 </Dialog>
             </div>
-        </AdminLayout>
+        </>
     );
 };
 

@@ -240,7 +240,7 @@ export default function SupportTicketsPage() {
     const urgentCount = currentTabTickets.filter(t => t.priority === "urgent" && !["resolved", "closed"].includes(t.status)).length;
 
     return (
-        <AdminLayout title="Support Tickets">
+        <>
             <div className="p-6">
                 {/* Header */}
                 <div className="mb-6">
@@ -488,6 +488,6 @@ export default function SupportTicketsPage() {
                     </div>
                 </Tabs>
             </div>
-        </AdminLayout>
+        </>
     );
 }

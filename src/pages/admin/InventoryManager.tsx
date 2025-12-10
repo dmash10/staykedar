@@ -1,393 +1,460 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { InventoryKPIs } from '@/components/admin/inventory/InventoryKPIs';
+import { SurgeControl } from '@/components/admin/inventory/SurgeControl';
+import { QuickAddProperty } from '@/components/admin/inventory/QuickAddProperty';
+import { InventoryAnalytics } from '@/components/admin/inventory/InventoryAnalytics';
+import {
+    Zap, Search, LayoutGrid, List, Filter, MapPin,
+    MoreVertical, Edit2, Save, X, Trash2, History, Database,
+    CheckCircle, AlertCircle, TrendingUp, Building2, Download
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/components/ui/dialog';
+    DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+    DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuLabel,
+    DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
+    DropdownMenuCheckboxItem
+} from "@/components/ui/dropdown-menu";
 import {
-    Building2,
-    MapPin,
-    IndianRupee,
-    Clock,
-    Phone,
-    Plus,
-    Trash2,
-    CheckCircle,
-    XCircle,
-    Loader2,
-    Calendar
-} from 'lucide-react';
-import { format, isPast, addHours } from 'date-fns';
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { GlassCard } from '@/components/admin/dashboard/GlassCard';
+// import { Database as DBTypes } from "@/integrations/supabase/types";
+import { DataGrid, NeonStatusBadge } from '@/components/admin/ui/DataGrid';
 
-interface InventoryListing {
-    id: string;
-    hotel_name: string;
-    location: string;
-    room_type: string;
-    original_price: number;
-    discounted_price: number;
-    available_rooms: number;
-    valid_for_date: string;
-    expires_at: string;
-    contact_phone: string;
-    is_verified: boolean;
-    created_at: string;
-}
+// Type definition
+// type Property = DBTypes['public']['Tables']['blind_properties']['Row'];
+type Property = any;
 
-const DEFAULT_FORM: Partial<InventoryListing> = {
-    hotel_name: '',
-    location: 'Guptkashi',
-    room_type: 'Double Room',
-    original_price: 3000,
-    discounted_price: 1500,
-    available_rooms: 1,
-    valid_for_date: new Date().toISOString().slice(0, 10),
-    contact_phone: '',
-    is_verified: true
-};
+// --- MOCK DATA SEEDER ---
+const MOCK_PROPERTIES = [
+    {
+        internal_name: "Hotel Shiva Palace",
+        display_name: "Premium Hill View Stay",
+        location_slug: "sonprayag",
+        category: "premium",
+        base_price: 3500,
+        surge_price: 5000,
+        is_active: true,
+        rating: 4.5,
+        total_rooms: 12
+    },
+    {
+        internal_name: "Guptkashi Inn",
+        display_name: "Budget Pilgrim Halt",
+        location_slug: "guptkashi",
+        category: "budget",
+        base_price: 1200,
+        surge_price: 1500,
+        is_active: true,
+        rating: 3.8,
+        total_rooms: 20
+    },
+    {
+        internal_name: "Kedar Valley Resort",
+        display_name: "Luxury Valley Resort",
+        location_slug: "phata",
+        category: "luxury",
+        base_price: 8000,
+        surge_price: 12000,
+        is_active: false,
+        rating: 4.9,
+        total_rooms: 8
+    },
+    {
+        internal_name: "Sitapur Grand",
+        display_name: "Standard Yatra Stay",
+        location_slug: "sitapur",
+        category: "standard",
+        base_price: 2500,
+        surge_price: 2500,
+        is_active: true,
+        rating: 4.2,
+        total_rooms: 15
+    }
+];
 
-export default function InventoryManager() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState<Partial<InventoryListing>>(DEFAULT_FORM);
+export function InventoryManagerContent() {
+    // -- STATE --
+    const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+    const [density, setDensity] = useState<'compact' | 'normal'>('normal');
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterLocation, setFilterLocation] = useState("all");
+    const [filterStatus, setFilterStatus] = useState("all");
+
+    // Inline Editing State
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editValues, setEditValues] = useState<Partial<Property>>({});
+    const [isSeeding, setIsSeeding] = useState(false);
+
     const { toast } = useToast();
     const queryClient = useQueryClient();
 
-    // Fetch listings
-    const { data: listings, isLoading } = useQuery({
-        queryKey: ['admin-inventory'],
+    // -- QUERIES --
+    const { data: properties = [], isLoading } = useQuery({
+        queryKey: ['blind_properties'],
         queryFn: async () => {
             const { data, error } = await supabase
-                .from('inventory_listings')
+                .from('blind_properties' as any)
                 .select('*')
-                .order('created_at', { ascending: false });
-
+                .order('internal_name', { ascending: true });
             if (error) throw error;
-            return data as InventoryListing[];
-        }
+            return data as Property[];
+        },
+        staleTime: 1000 * 60 * 5 // 5 mins
     });
 
-    // Create mutation
-    const createMutation = useMutation({
-        mutationFn: async (data: Partial<InventoryListing>) => {
-            // Calculate expiry (default 12 hours from now for quick listing)
-            const expires_at = addHours(new Date(), 12).toISOString();
+    const isUsingMock = properties.length === 0;
+    const displayProperties = isUsingMock ? MOCK_PROPERTIES.map((p, i) => ({ ...p, id: `mock-${i}` })) as Property[] : properties;
 
-            const { error } = await supabase
-                .from('inventory_listings')
-                .insert({
-                    ...data,
-                    expires_at,
-                    created_by: (await supabase.auth.getUser()).data.user?.id
-                });
-
+    // -- MUTATIONS --
+    const toggleStatusMutation = useMutation({
+        mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
+            if (id.startsWith('mock')) {
+                toast({ title: "Simulation", description: `Property ${is_active ? 'Activated' : 'Deactivated'}` });
+                return;
+            }
+            const { error } = await (supabase.from('blind_properties') as any).update({ is_active }).eq('id', id);
             if (error) throw error;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-inventory'] });
-            setIsModalOpen(false);
-            setFormData(DEFAULT_FORM);
-            toast({ title: "Listed!", description: "Room inventory added successfully." });
-        },
-        onError: (error: any) => {
-            toast({ title: "Error", description: error.message, variant: "destructive" });
+            if (!isUsingMock) queryClient.invalidateQueries({ queryKey: ['blind_properties'] });
+            toast({ title: "Status Updated" });
         }
     });
 
-    // Toggle Verification mutation
-    const toggleVerifyMutation = useMutation({
-        mutationFn: async ({ id, is_verified }: { id: string; is_verified: boolean }) => {
-            const { error } = await supabase
-                .from('inventory_listings')
-                .update({ is_verified })
-                .eq('id', id);
-            if (error) throw error;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-inventory'] });
-        }
-    });
-
-    // Delete mutation
-    const deleteMutation = useMutation({
+    const updatePropertyMutation = useMutation({
         mutationFn: async (id: string) => {
-            const { error } = await supabase.from('inventory_listings').delete().eq('id', id);
+            if (id.startsWith('mock')) {
+                toast({ title: "Simulation", description: "Values updated locally." });
+                setEditingId(null);
+                return;
+            }
+            if (!editValues) return;
+            const { error } = await (supabase.from('blind_properties') as any).update(editValues).eq('id', id);
             if (error) throw error;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-inventory'] });
-            toast({ title: "Deleted", description: "Listing removed." });
+            if (!isUsingMock) queryClient.invalidateQueries({ queryKey: ['blind_properties'] });
+            setEditingId(null);
+            setEditValues({});
+            toast({ title: "Property Updated" });
         }
     });
 
-    const handleSubmit = () => {
-        if (!formData.hotel_name || !formData.contact_phone) {
-            toast({ title: "Missing Info", description: "Hotel Name and Phone are required", variant: "destructive" });
-            return;
-        }
-        createMutation.mutate(formData);
+    // -- ACTIONS --
+    const handleEditStart = (item: Property) => {
+        setEditingId(item.id);
+        setEditValues({
+            base_price: item.base_price,
+            surge_price: item.surge_price,
+            category: item.category
+        });
     };
 
-    // Config Query
-    const { data: config } = useQuery({
-        queryKey: ['app-config', 'urgent_deals_enabled'],
-        queryFn: async () => {
-            const { data } = await supabase.from('app_config').select('value').eq('key', 'urgent_deals_enabled').single();
-            return data?.value || false;
-        }
-    });
+    const handleSave = (id: string) => updatePropertyMutation.mutate(id);
 
-    // Config Mutation
-    const configMutation = useMutation({
-        mutationFn: async (enabled: boolean) => {
-            const { error } = await supabase.from('app_config').upsert({ key: 'urgent_deals_enabled', value: enabled });
+    const handleSeedData = async () => {
+        setIsSeeding(true);
+        try {
+            const { error } = await supabase.from('blind_properties' as any).insert(MOCK_PROPERTIES as any);
             if (error) throw error;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['app-config'] });
-            toast({ title: "Updated", description: "Widget visibility updated." });
+            toast({ title: "Mock Data Seeded", description: "Refresh to see DB data." });
+            queryClient.invalidateQueries({ queryKey: ['blind_properties'] });
+        } catch (e: any) {
+            toast({ title: "Seeding Failed", description: e.message, variant: "destructive" });
+        } finally {
+            setIsSeeding(false);
         }
-    });
+    };
+
+    // -- FILTERING --
+    const filteredProperties = useMemo(() => {
+        return displayProperties.filter(p => {
+            const matchesSearch = (p.internal_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (p.display_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesLocation = filterLocation === 'all' || p.location_slug === filterLocation;
+            const matchesStatus = filterStatus === 'all' ||
+                (filterStatus === 'active' ? p.is_active : !p.is_active);
+
+            return matchesSearch && matchesLocation && matchesStatus;
+        });
+    }, [displayProperties, searchTerm, filterLocation, filterStatus]);
+
+    // -- KANBAN COLUMNS --
+    const kanbanColumns = useMemo(() => {
+        return {
+            'Premium': filteredProperties.filter(p => p.category === 'premium'),
+            'Standard': filteredProperties.filter(p => p.category === 'standard'),
+            'Budget': filteredProperties.filter(p => p.category === 'budget'),
+            'Inactive': filteredProperties.filter(p => !p.is_active),
+        };
+    }, [filteredProperties]);
 
     return (
-        <AdminLayout title="Urgent Inventory">
-            <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                    <div>
-                        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                            <Clock className="w-6 h-6 text-red-500" />
-                            Last Minute Inventory
-                        </h2>
-                        <p className="text-gray-400">Manage urgent room listings for immediate booking.</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-[#1A1A1A] px-4 py-2 rounded-lg border border-[#333]">
-                            <span className="text-sm text-gray-400">Show on Stays Page</span>
-                            <Switch
-                                checked={config === true}
-                                onCheckedChange={(checked) => configMutation.mutate(checked)}
-                            />
-                        </div>
-                        <Button onClick={() => setIsModalOpen(true)} className="bg-red-600 hover:bg-red-700">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Urgent Room
-                        </Button>
+        <div className="space-y-6 animate-in fade-in duration-500 pb-10">
+
+            {/* 1. HEADER & KPI */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <InventoryKPIs />
+                <QuickAddProperty />
+            </div>
+
+            {/* 2. TOOLBAR */}
+            <div className="flex flex-col xl:flex-row items-center justify-between gap-4 bg-[#111] p-2 rounded-lg border border-[#222]">
+                <div className="flex items-center gap-2 w-full xl:w-auto">
+                    <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="w-auto">
+                        <TabsList className="bg-[#1A1A1A] border border-[#333]">
+                            <TabsTrigger value="list"><List className="w-4 h-4 mr-2" /> List</TabsTrigger>
+                            <TabsTrigger value="kanban"><LayoutGrid className="w-4 h-4 mr-2" /> Board</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                    <div className="h-8 w-px bg-[#333] mx-2 hidden xl:block"></div>
+                    <div className="relative flex-1 xl:w-80">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                        <Input
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search hotels, owners..."
+                            className="pl-9 bg-[#000] border-[#333] text-sm h-9"
+                        />
                     </div>
                 </div>
 
-                <Card className="bg-[#111111] border-[#2A2A2A]">
-                    <CardContent className="p-0">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="border-[#2A2A2A] hover:bg-transparent">
-                                    <TableHead className="text-gray-400">Hotel Details</TableHead>
-                                    <TableHead className="text-gray-400">Price Deal</TableHead>
-                                    <TableHead className="text-gray-400">Availability</TableHead>
-                                    <TableHead className="text-gray-400">Status</TableHead>
-                                    <TableHead className="text-right text-gray-400">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                                            Loading...
-                                        </TableCell>
-                                    </TableRow>
-                                ) : listings?.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                                            No active listings.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    listings?.map((item) => (
-                                        <TableRow key={item.id} className="border-[#2A2A2A] hover:bg-[#1A1A1A]">
-                                            <TableCell>
-                                                <div>
-                                                    <p className="font-bold text-white">{item.hotel_name}</p>
-                                                    <div className="flex items-center gap-1 text-xs text-gray-400">
-                                                        <MapPin className="w-3 h-3" /> {item.location}
-                                                    </div>
-                                                    <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
-                                                        <Phone className="w-3 h-3" /> {item.contact_phone}
-                                                    </div>
+                <div className="flex items-center gap-2 overflow-x-auto w-full xl:w-auto px-1">
+                    <Select value={filterLocation} onValueChange={setFilterLocation}>
+                        <SelectTrigger className="w-[140px] h-9 bg-[#1A1A1A] border-[#333] text-xs"><SelectValue placeholder="Location" /></SelectTrigger>
+                        <SelectContent className="bg-[#1A1A1A] border-[#333] text-gray-400">
+                            <SelectItem value="all">All Locations</SelectItem>
+                            <SelectItem value="sonprayag">Sonprayag</SelectItem>
+                            <SelectItem value="guptkashi">Guptkashi</SelectItem>
+                            <SelectItem value="phata">Phata</SelectItem>
+                            <SelectItem value="sitapur">Sitapur</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                        <SelectTrigger className="w-[110px] h-9 bg-[#1A1A1A] border-[#333] text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+                        <SelectContent className="bg-[#1A1A1A] border-[#333] text-gray-400">
+                            <SelectItem value="all">Status: All</SelectItem>
+                            <SelectItem value="active">Active Only</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-9 w-9 px-0 bg-[#1A1A1A] border-[#333]"><MoreVertical className="w-4 h-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-[#1A1A1A] border-[#333] text-gray-300">
+                            <DropdownMenuLabel>View Settings</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-[#333]" />
+                            <DropdownMenuItem onClick={() => setDensity('compact')} className="hover:bg-[#252525]">Compact View</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setDensity('normal')} className="hover:bg-[#252525]">Comfortable View</DropdownMenuItem>
+                            {isUsingMock && (
+                                <>
+                                    <DropdownMenuSeparator className="bg-[#333]" />
+                                    <DropdownMenuItem onClick={handleSeedData} className="text-yellow-500 hover:bg-[#252525]" disabled={isSeeding}>
+                                        <Database className="w-4 h-4 mr-2" /> Seed Database
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Button variant="outline" size="sm" className="h-9 bg-[#1A1A1A] border-[#333] text-gray-300 hover:bg-[#222]"
+                        onClick={() => {
+                            const csv = [["Internal Name", "Display Name", "Location", "Category", "Base Price", "Surge Price", "Status"]].concat(filteredProperties.map(p => [
+                                p.internal_name || '',
+                                p.display_name || '',
+                                p.location_slug || '',
+                                p.category || '',
+                                String(p.base_price),
+                                String(p.surge_price),
+                                p.is_active ? 'Active' : 'Inactive'
+                            ]));
+                            const blob = new Blob([csv.map(e => e.join(",")).join("\n")], { type: 'text/csv' });
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a'); a.href = url; a.download = 'inventory_export.csv'; a.click();
+                        }}
+                    >
+                        <Download className="w-3.5 h-3.5 mr-2" /> Export
+                    </Button>
+                </div>
+            </div>
+
+            {/* 3. MAIN CONTENT */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* LEFT: GRID/KANBAN */}
+                <div className="lg:col-span-3">
+                    {viewMode === 'list' ? (
+                        <DataGrid<Property>
+                            title="Property Portfolio"
+                            data={filteredProperties}
+                            searchable={false} // We have external search in this complex page
+                            icon={<Building2 className="w-5 h-5" />}
+                            columns={[
+                                {
+                                    key: 'internal_name',
+                                    label: 'Property',
+                                    sortable: true,
+                                    render: (row) => (
+                                        <div>
+                                            {editingId === row.id ? (
+                                                <Input
+                                                    value={editValues.display_name || row.display_name || ''}
+                                                    onChange={(e) => setEditValues(prev => ({ ...prev, display_name: e.target.value }))}
+                                                    className="h-7 text-xs bg-[#222]"
+                                                />
+                                            ) : (
+                                                <p className="font-medium text-white">{row.display_name}</p>
+                                            )}
+                                            <p className="text-xs text-slate-500">{row.internal_name} • <span className="uppercase">{row.location_slug}</span></p>
+                                        </div>
+                                    )
+                                },
+                                {
+                                    key: 'is_active',
+                                    label: 'Status',
+                                    sortable: true,
+                                    width: '120px',
+                                    render: (row) => (
+                                        <div className="flex justify-center">
+                                            <Switch
+                                                checked={row.is_active || false}
+                                                onCheckedChange={(checked) => toggleStatusMutation.mutate({ id: row.id, is_active: checked })}
+                                                className="data-[state=checked]:bg-emerald-500"
+                                            />
+                                        </div>
+                                    )
+                                },
+                                {
+                                    key: 'base_price',
+                                    label: 'Pricing (Base/Surge)',
+                                    render: (row) => (
+                                        <div className="font-mono text-xs">
+                                            {editingId === row.id ? (
+                                                <div className="flex gap-1 items-center">
+                                                    <Input className="w-16 h-6 p-1 bg-[#222]" type="number" value={editValues.base_price} onChange={e => setEditValues(p => ({ ...p, base_price: Number(e.target.value) }))} />
+                                                    <span className="text-slate-500">/</span>
+                                                    <Input className="w-16 h-6 p-1 bg-[#222]" type="number" value={editValues.surge_price} onChange={e => setEditValues(p => ({ ...p, surge_price: Number(e.target.value) }))} />
                                                 </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div>
-                                                    <p className="text-green-400 font-bold flex items-center">
-                                                        <IndianRupee className="w-3 h-3" /> {item.discounted_price}
-                                                    </p>
-                                                    <p className="text-gray-500 text-xs line-through">
-                                                        ₹{item.original_price}
-                                                    </p>
-                                                    <Badge variant="outline" className="text-[10px] border-red-900 bg-red-900/10 text-red-400 mt-1">
-                                                        {Math.round(((item.original_price - item.discounted_price) / item.original_price) * 100)}% OFF
+                                            ) : (
+                                                <>
+                                                    <span className="text-slate-300">₹{row.base_price}</span>
+                                                    <span className="text-slate-600 mx-1">/</span>
+                                                    <span className="text-amber-500">₹{row.surge_price}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    )
+                                },
+                                {
+                                    key: 'category',
+                                    label: 'Tier',
+                                    sortable: true,
+                                    render: (row) => <Badge variant="outline" className={`capitalize ${row.category === 'luxury' ? 'border-amber-500 text-amber-500' : 'border-slate-700 text-slate-400'}`}>{row.category}</Badge>
+                                }
+                            ]}
+                            actions={(row) => (
+                                editingId === row.id ? (
+                                    <div className="flex items-center gap-1">
+                                        <Button size="icon" variant="ghost" className="h-7 w-7 text-green-500" onClick={() => handleSave(row.id)}><Save className="w-3 h-3" /></Button>
+                                        <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500" onClick={() => setEditingId(null)}><X className="w-3 h-3" /></Button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-1">
+                                        <Button size="icon" variant="ghost" className="h-7 w-7 text-slate-400 hover:text-white" onClick={() => handleEditStart(row)}><Edit2 className="w-3 h-3" /></Button>
+                                    </div>
+                                )
+                            )}
+                            onExport={() => {
+                                const csv = [["Internal Name", "Display Name", "Location", "Category", "Base Price", "Surge Price", "Status"]].concat(filteredProperties.map(p => [
+                                    p.internal_name || '',
+                                    p.display_name || '',
+                                    p.location_slug || '',
+                                    p.category || '',
+                                    String(p.base_price),
+                                    String(p.surge_price),
+                                    p.is_active ? 'Active' : 'Inactive'
+                                ]));
+                                const blob = new Blob([csv.map(e => e.join(",")).join("\n")], { type: 'text/csv' });
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a'); a.href = url; a.download = 'inventory_export.csv'; a.click();
+                            }}
+                        />
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full items-start">
+                            {Object.entries(kanbanColumns).map(([groupName, items]) => (
+                                items.length > 0 && (
+                                    <div key={groupName} className="bg-[#111] border border-[#222] rounded-lg p-3 flex flex-col gap-3">
+                                        <div className="flex items-center justify-between pb-2 border-b border-[#222]">
+                                            <h4 className="font-bold text-gray-400 uppercase text-xs tracking-wider flex items-center gap-2">
+                                                <div className={`w-2 h-2 rounded-full ${groupName === 'Inactive' ? 'bg-red-500' : 'bg-blue-500'}`} />
+                                                {groupName}
+                                            </h4>
+                                            <Badge variant="outline" className="text-[10px] text-gray-500 border-gray-800">{items.length}</Badge>
+                                        </div>
+                                        {items.map(prop => (
+                                            <GlassCard key={prop.id} className="p-3 bg-[#161616] border-[#252525] group hover:border-[#333] transition-all">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-gray-200">{prop.display_name}</p>
+                                                        <p className="text-[10px] text-gray-500 uppercase">{prop.internal_name}</p>
+                                                    </div>
+                                                    <Badge variant={prop.is_active ? "default" : "destructive"} className="text-[9px] h-5">
+                                                        {prop.is_active ? 'ON' : 'OFF'}
                                                     </Badge>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="text-sm text-gray-300">
-                                                    {item.available_rooms} Rooms left
+                                                <div className="flex justify-between items-end mt-2">
+                                                    <div>
+                                                        <p className="text-[10px] text-gray-500">Rate</p>
+                                                        <p className="font-mono text-sm text-green-400 font-bold">₹{prop.surge_price}</p>
+                                                    </div>
+                                                    <Button size="icon" variant="ghost" className="h-6 w-6 text-gray-400 hover:text-white" onClick={() => handleEditStart(prop)}>
+                                                        <Edit2 className="w-3 h-3" />
+                                                    </Button>
                                                 </div>
-                                                <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                                                    <Calendar className="w-3 h-3" />
-                                                    For: {format(new Date(item.valid_for_date), 'MMM dd')}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-col gap-2">
-                                                    {isPast(new Date(item.expires_at)) ? (
-                                                        <Badge variant="destructive" className="w-fit">Expired</Badge>
-                                                    ) : (
-                                                        <div className="flex items-center gap-2">
-                                                            <Switch
-                                                                checked={item.is_verified}
-                                                                onCheckedChange={(c) => toggleVerifyMutation.mutate({ id: item.id, is_verified: c })}
-                                                            />
-                                                            <span className={`text-xs ${item.is_verified ? 'text-green-400' : 'text-yellow-400'}`}>
-                                                                {item.is_verified ? 'Live' : 'Pending'}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => deleteMutation.mutate(item.id)}
-                                                    className="hover:bg-red-900/20 text-gray-500 hover:text-red-400"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
-
-                {/* Create Modal */}
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                    <DialogContent className="bg-[#111111] border-[#2A2A2A] text-white">
-                        <DialogHeader>
-                            <DialogTitle>Post Urgent Inventory</DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Hotel Name</Label>
-                                    <Input
-                                        value={formData.hotel_name}
-                                        onChange={(e) => setFormData({ ...formData, hotel_name: e.target.value })}
-                                        className="bg-[#1A1A1A] border-[#2A2A2A]"
-                                        placeholder="e.g. Kedarnath View"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Location</Label>
-                                    <Input
-                                        value={formData.location}
-                                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                        className="bg-[#1A1A1A] border-[#2A2A2A]"
-                                        placeholder="e.g. Rampur"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Original Price</Label>
-                                    <Input
-                                        type="number"
-                                        value={formData.original_price}
-                                        onChange={(e) => setFormData({ ...formData, original_price: parseInt(e.target.value) })}
-                                        className="bg-[#1A1A1A] border-[#2A2A2A]"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Discount Price</Label>
-                                    <Input
-                                        type="number"
-                                        value={formData.discounted_price}
-                                        onChange={(e) => setFormData({ ...formData, discounted_price: parseInt(e.target.value) })}
-                                        className="bg-[#1A1A1A] border-[#2A2A2A] text-green-400 font-bold"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Rooms Available</Label>
-                                    <Input
-                                        type="number"
-                                        value={formData.available_rooms}
-                                        onChange={(e) => setFormData({ ...formData, available_rooms: parseInt(e.target.value) })}
-                                        className="bg-[#1A1A1A] border-[#2A2A2A]"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Contact Phone</Label>
-                                    <Input
-                                        value={formData.contact_phone}
-                                        onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                                        className="bg-[#1A1A1A] border-[#2A2A2A]"
-                                        placeholder="Important for booking"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Valid For Date (Check-in)</Label>
-                                <Input
-                                    type="date"
-                                    value={formData.valid_for_date}
-                                    onChange={(e) => setFormData({ ...formData, valid_for_date: e.target.value })}
-                                    className="bg-[#1A1A1A] border-[#2A2A2A]"
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-2 mt-2 p-3 bg-blue-900/20 rounded border border-blue-900/50">
-                                <Building2 className="w-5 h-5 text-blue-400" />
-                                <p className="text-xs text-blue-200">
-                                    Listing will expire automatically in 12 hours unless renewed.
-                                </p>
-                            </div>
+                                            </GlassCard>
+                                        ))}
+                                    </div>
+                                )
+                            ))}
                         </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsModalOpen(false)} className="border-[#2A2A2A] text-gray-300">
-                                Cancel
-                            </Button>
-                            <Button onClick={handleSubmit} disabled={createMutation.isPending} className="bg-red-600 hover:bg-red-700">
-                                {createMutation.isPending ? "Posting..." : "Post Live"}
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                    )}
+                </div>
+
+                {/* RIGHT: SIDEBAR */}
+                <div className="lg:col-span-1 space-y-6">
+                    <SurgeControl />
+                </div>
+
             </div>
-        </AdminLayout>
+
+            {/* 4. FULL WIDTH ANALYTICS */}
+            <InventoryAnalytics />
+        </div >
+
+    );
+}
+
+export default function InventoryManager() {
+    return (
+        <>
+            <InventoryManagerContent />
+        </>
     );
 }

@@ -234,16 +234,16 @@ export default function AdminArticleEditor() {
 
     if (isLoading || categoriesLoading) {
         return (
-            <AdminLayout title={pageTitle}>
+            <>
                 <div className="flex justify-center items-center h-64">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-            </AdminLayout>
+            </>
         );
     }
 
     return (
-        <AdminLayout title={pageTitle}>
+        <>
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Button
@@ -534,6 +534,6 @@ export default function AdminArticleEditor() {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </>
     );
 }

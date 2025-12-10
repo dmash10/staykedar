@@ -693,7 +693,7 @@ export default function SEOCitiesPage() {
   };
 
   return (
-    <AdminLayout title="SEO Cities Manager">
+    <>
       <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1632,7 +1632,7 @@ export default function SEOCitiesPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </AdminLayout>
+    </>
   );
 }
 

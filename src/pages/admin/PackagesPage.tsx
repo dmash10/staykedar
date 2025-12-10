@@ -446,7 +446,7 @@ export default function PackagesPage() {
   };
 
   return (
-    <AdminLayout title="Package Management">
+    <>
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <Card className="bg-[#111111] border-[#2A2A2A]">
@@ -1170,6 +1170,6 @@ export default function PackagesPage() {
           </form>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </>
   );
 }

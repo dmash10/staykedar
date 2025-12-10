@@ -118,7 +118,7 @@ export default function ReviewsPage() {
     };
 
     return (
-        <AdminLayout title="Reviews Management">
+        <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <Card className="bg-gradient-to-br from-yellow-600 to-yellow-700 border-none text-white">
@@ -272,7 +272,7 @@ export default function ReviewsPage() {
                     )}
                 </CardContent>
             </Card>
-        </AdminLayout>
+        </>
     );
 }
 

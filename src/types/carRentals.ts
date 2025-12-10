@@ -3,6 +3,15 @@
 export interface CarDriver {
   id: string;
   name: string;
+  // Compatibility with DB
+  driver_name?: string;
+  driver_phone?: string;
+  car_model?: string | null;
+  car_number?: string | null;
+  photo_url?: string | null;
+  status?: string;
+  location?: string | null;
+
   slug: string;
   phone: string;
   whatsapp?: string;
@@ -19,12 +28,14 @@ export interface CarDriver {
   is_verified: boolean;
   is_featured: boolean;
   is_active: boolean;
+  available: boolean; // Added via migration
   price_per_km?: number;
   base_city: string;
   created_at: string;
   updated_at: string;
   // Joined data
-  vehicles?: CarVehicle[];
+  car_vehicles?: CarVehicle[]; // Correct relation name in DB is car_vehicles? table is car_vehicles.
+  vehicles?: CarVehicle[]; // Aliased in fetch? usually car_vehicles
 }
 
 export interface CarVehicle {
@@ -76,7 +87,7 @@ export interface CarRoutePricing {
 
 export interface CarBooking {
   id: string;
-  booking_id: string;
+  booking_id: string; // Booking Reference ID (e.g. BK-123)
   driver_id?: string;
   vehicle_id?: string;
   route_id?: string;
@@ -104,6 +115,12 @@ export interface CarBooking {
   driver?: CarDriver;
   vehicle?: CarVehicle;
   route?: CarRoute;
+
+  // Frontend/Schema mismatch fix fields (optional)
+  check_in?: string; // If bookings table is shared with hotels??
+  check_out?: string;
+  booking_date?: string;
+  adults?: number;
 }
 
 export interface CarReview {
@@ -200,5 +217,3 @@ export const LANGUAGES = [
   'Marathi',
   'Tamil',
 ] as const;
-
-

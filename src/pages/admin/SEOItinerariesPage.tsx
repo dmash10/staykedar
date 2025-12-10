@@ -125,7 +125,7 @@ export default function SEOItinerariesPage() {
     // ... existing filteredItineraries ...
 
     return (
-        <AdminLayout title="SEO Itinerary Engine">
+        <>
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -383,6 +383,6 @@ export default function SEOItinerariesPage() {
                     </AlertDialogContent>
                 </AlertDialog>
             </div>
-        </AdminLayout>
+        </>
     );
 }

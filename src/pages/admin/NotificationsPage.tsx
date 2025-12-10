@@ -165,16 +165,16 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <AdminLayout title="Notifications">
+      <>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Notifications">
+    <>
       <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -370,6 +370,6 @@ export default function NotificationsPage() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </>
   );
 }
