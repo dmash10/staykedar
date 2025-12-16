@@ -3,10 +3,9 @@
  * 
  * This component is designed to maximize visibility in AI-generated search results.
  * Key optimizations:
- * 1. Schema.org FAQPage markup (JSON-LD)
- * 2. Semantic HTML with itemscope/itemtype attributes
- * 3. Clear, concise Q&A format that AI can easily parse
- * 4. Collapsible design for good UX without sacrificing SEO
+ * 1. Schema.org FAQPage markup (JSON-LD only - no microdata to avoid duplicates)
+ * 2. Clear, concise Q&A format that AI can easily parse
+ * 3. Collapsible design for good UX without sacrificing SEO
  */
 
 import { useState } from 'react';
@@ -64,10 +63,8 @@ export default function AIOptimizedFAQ({
       )}
 
       {/* FAQ Section with Semantic HTML */}
-      <section 
+      <section
         className={`${className}`}
-        itemScope 
-        itemType="https://schema.org/FAQPage"
         aria-label="Frequently Asked Questions"
       >
         {/* Section Header */}
@@ -88,12 +85,8 @@ export default function AIOptimizedFAQ({
           {faqs.map((faq, index) => (
             <article
               key={index}
-              itemScope
-              itemProp="mainEntity"
-              itemType="https://schema.org/Question"
-              className={`bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 ${
-                openIndex === index ? 'shadow-lg border-[#0071c2]/30' : 'shadow-sm hover:shadow-md'
-              }`}
+              className={`bg-white rounded-xl border border-gray-200 overflow-hidden transition-all duration-300 ${openIndex === index ? 'shadow-lg border-[#0071c2]/30' : 'shadow-sm hover:shadow-md'
+                }`}
             >
               {/* Question - Always visible to crawlers */}
               <button
@@ -101,8 +94,7 @@ export default function AIOptimizedFAQ({
                 className="w-full flex items-center justify-between p-4 md:p-5 text-left group"
                 aria-expanded={openIndex === index}
               >
-                <h3 
-                  itemProp="name"
+                <h3
                   className={`${compact ? 'text-sm' : 'text-base md:text-lg'} font-semibold text-gray-900 pr-4 group-hover:text-[#0071c2] transition-colors`}
                 >
                   {faq.question}
@@ -124,18 +116,13 @@ export default function AIOptimizedFAQ({
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    itemScope
-                    itemProp="acceptedAnswer"
-                    itemType="https://schema.org/Answer"
+
                   >
-                    <div 
-                      className="px-4 md:px-5 pb-4 md:pb-5 border-t border-gray-100 pt-4"
-                      itemProp="text"
-                    >
+                    <div className="px-4 md:px-5 pb-4 md:pb-5 border-t border-gray-100 pt-4">
                       {/* Parse answer for paragraphs */}
                       {faq.answer.split('\n').map((paragraph, pIndex) => (
-                        <p 
-                          key={pIndex} 
+                        <p
+                          key={pIndex}
                           className={`${compact ? 'text-sm' : 'text-base'} text-gray-600 leading-relaxed ${pIndex > 0 ? 'mt-3' : ''}`}
                         >
                           {paragraph}
@@ -146,15 +133,10 @@ export default function AIOptimizedFAQ({
                 )}
               </AnimatePresence>
 
-              {/* Hidden answer for crawlers when collapsed */}
+              {/* Hidden answer for screen readers when collapsed */}
               {openIndex !== index && (
-                <div 
-                  className="sr-only"
-                  itemScope
-                  itemProp="acceptedAnswer"
-                  itemType="https://schema.org/Answer"
-                >
-                  <div itemProp="text">{faq.answer}</div>
+                <div className="sr-only">
+                  <div>{faq.answer}</div>
                 </div>
               )}
             </article>
