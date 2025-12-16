@@ -166,7 +166,6 @@ const Index = () => {
                 title="Kedarnath Yatra - Frequently Asked Questions"
                 description="Everything you need to know about planning your sacred journey to Kedarnath"
                 faqs={KedarnathTravelFAQs}
-                showSchema={false}
               />
             </div>
           </section>
