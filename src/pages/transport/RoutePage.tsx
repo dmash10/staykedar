@@ -782,6 +782,7 @@ const RoutePage = () => {
             title={`${route.from_city} to ${route.to_city} FAQs`}
             description={`Common questions about traveling from ${route.from_city} to ${route.to_city}`}
             faqs={faqItems}
+            showSchema={false}
           />
         </Container>
       </section>

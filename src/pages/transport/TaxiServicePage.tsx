@@ -1196,6 +1196,7 @@ const TaxiServicePage = () => {
               title={`Taxi Service FAQs - ${city.name}`}
               description={`Common questions about taxi services from ${city.name} for Kedarnath Yatra`}
               faqs={cityFaqs}
+              showSchema={false}
             />
           </Container>
         </section>

@@ -529,6 +529,7 @@ const AttractionsLocationPage = () => {
             title={`${city.name} Attractions FAQs`}
             description={`Common questions about sightseeing and tourist places in ${city.name}`}
             faqs={faqItems}
+            showSchema={false}
           />
         </Container>
       </section>

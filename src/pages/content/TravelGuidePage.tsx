@@ -336,8 +336,8 @@ const TravelGuidePage = () => {
                           key={item.id}
                           href={`#${item.id}`}
                           className={`block px-3 py-2 rounded-lg text-sm transition-colors ${activeSection === item.id
-                              ? 'bg-indigo-100 text-indigo-700 font-medium'
-                              : 'text-gray-600 hover:bg-gray-100'
+                            ? 'bg-indigo-100 text-indigo-700 font-medium'
+                            : 'text-gray-600 hover:bg-gray-100'
                             }`}
                           onClick={() => setActiveSection(item.id)}
                         >
@@ -661,6 +661,7 @@ const TravelGuidePage = () => {
                     title={`${city.name} Travel FAQs`}
                     description={`Common questions about traveling to ${city.name} for Kedarnath Yatra`}
                     faqs={allFaqs}
+                    showSchema={false}
                   />
                 </section>
               )}

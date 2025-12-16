@@ -825,6 +825,7 @@ const StaysLocationPage = () => {
             title={`Hotels & Stays FAQs - ${city.name}`}
             description={`Common questions about accommodation in ${city.name} for Kedarnath pilgrims`}
             faqs={cityFaqs}
+            showSchema={false}
           />
         </Container>
       </section>

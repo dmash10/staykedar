@@ -529,6 +529,7 @@ const PackagesFromCityPage = () => {
             title={`Kedarnath Packages from ${city.name} FAQs`}
             description={`Common questions about tour packages starting from ${city.name}`}
             faqs={faqItems}
+            showSchema={false}
           />
         </Container>
       </section>
