@@ -82,10 +82,10 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
   const [activeTip, setActiveTip] = useState<string>('structure');
 
   const getWordCountStatus = () => {
-    if (wordCount < 500) return { color: 'text-red-400', bg: 'bg-red-500/10', status: 'Too Short', icon: AlertTriangle };
-    if (wordCount < 1000) return { color: 'text-yellow-400', bg: 'bg-yellow-500/10', status: 'Needs More', icon: AlertTriangle };
-    if (wordCount < 1500) return { color: 'text-blue-400', bg: 'bg-blue-500/10', status: 'Good', icon: CheckCircle2 };
-    if (wordCount <= 2500) return { color: 'text-green-400', bg: 'bg-green-500/10', status: 'Optimal', icon: CheckCircle2 };
+    if (wordCount < 200) return { color: 'text-red-400', bg: 'bg-red-500/10', status: 'Too Short', icon: AlertTriangle };
+    if (wordCount < 350) return { color: 'text-yellow-400', bg: 'bg-yellow-500/10', status: 'Needs More', icon: AlertTriangle };
+    if (wordCount <= 500) return { color: 'text-green-400', bg: 'bg-green-500/10', status: 'Optimal', icon: CheckCircle2 };
+    if (wordCount <= 800) return { color: 'text-blue-400', bg: 'bg-blue-500/10', status: 'Good', icon: CheckCircle2 };
     return { color: 'text-orange-400', bg: 'bg-orange-500/10', status: 'Consider Trimming', icon: AlertTriangle };
   };
 
@@ -97,12 +97,11 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
       title: 'Content Structure',
       icon: FileText,
       items: [
-        { label: 'Overview', desc: '150-200 words - What makes it special, spiritual significance' },
-        { label: 'How to Reach', desc: '300-400 words - Routes, transportation, trek details' },
-        { label: 'Best Time to Visit', desc: '200-300 words - Season breakdown, weather, crowds' },
-        { label: 'What to Expect', desc: '300-400 words - The experience, facilities, photo spots' },
-        { label: 'Essential Tips', desc: '200-300 words - Pro tips, warnings, what to carry' },
-        { label: 'FAQs', desc: '4-6 common questions for schema markup' },
+        { label: 'Overview', desc: '80-100 words - Special vibe & purpose' },
+        { label: 'Journey & Planning', desc: '100 words - Route & Best Time' },
+        { label: 'Expectations', desc: '80-100 words - Experience & Facilities' },
+        { label: 'Highlights', desc: 'Bulleted list of main features' },
+        { label: 'FAQs', desc: '4-5 key questions for AI Search' },
       ]
     },
     seo: {
@@ -111,8 +110,8 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
       items: [
         { label: 'Meta Title', desc: 'Max 60 chars, include location + keyword' },
         { label: 'Meta Description', desc: 'Max 160 chars, action-oriented with CTA' },
-        { label: 'First 100 Words', desc: 'Include primary keyword naturally' },
-        { label: 'Heading Hierarchy', desc: 'Use H2 for sections, H3 for subsections' },
+        { label: 'Keywords', desc: 'Include primary keyword in first 50 words' },
+        { label: 'Heading Hierarchy', desc: 'Use H2 for sections, H3 for FAQs' },
         { label: 'Internal Links', desc: 'Link to related attractions & packages' },
         { label: 'Image Alt Text', desc: 'Descriptive text for all images' },
       ]
@@ -121,11 +120,11 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
       title: 'Writing Tips',
       icon: BookOpen,
       items: [
-        { label: 'Be Specific', desc: '"18 km trek" not "nearby attraction"' },
+        { label: 'Be Concise', desc: 'Aim for 350-400 words total' },
         { label: 'Local Insights', desc: 'Add knowledge locals would share' },
         { label: 'Actionable Info', desc: 'Timings, prices, what to carry' },
         { label: 'Honest Assessment', desc: 'Real difficulty, honest warnings' },
-        { label: 'Short Paragraphs', desc: '2-4 sentences max for readability' },
+        { label: 'Short Paragraphs', desc: '2-3 sentences max' },
         { label: 'Address "You"', desc: 'Write directly to the reader' },
       ]
     },
@@ -138,7 +137,7 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
         { label: '🛣️ Route', desc: 'Specific directions, distances' },
         { label: '☀️ Weather', desc: 'Seasonal variations, expectations' },
         { label: '📝 Note', desc: 'Important but non-critical info' },
-        { label: 'Rule', desc: 'Use 1-3 cards max, only if helpful' },
+        { label: 'Rule', desc: 'Use 1-2 cards max, only if helpful' },
       ]
     }
   };
@@ -197,8 +196,8 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
                     key={key}
                     onClick={() => setActiveTip(key)}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${activeTip === key
-                        ? 'text-purple-400 bg-purple-500/10 border-b-2 border-purple-500'
-                        : 'text-gray-500 hover:text-gray-300 hover:bg-[#111111]'
+                      ? 'text-purple-400 bg-purple-500/10 border-b-2 border-purple-500'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-[#111111]'
                       }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -225,24 +224,23 @@ const ContentTips = ({ wordCount, hasDescription, hasSeo, hasImages }: {
             <div className="p-4 border-t border-[#1A1A1A] bg-[#0D0D0D]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-gray-500">Word Count Target</span>
-                <span className="text-xs font-medium text-gray-400">1,500 - 2,500 words</span>
+                <span className="text-xs font-medium text-gray-400">350 - 500 words</span>
               </div>
               <div className="h-2 bg-[#1A1A1A] rounded-full overflow-hidden">
                 <motion.div
-                  className={`h-full rounded-full ${wordCount < 500 ? 'bg-red-500' :
-                      wordCount < 1000 ? 'bg-yellow-500' :
-                        wordCount < 1500 ? 'bg-blue-500' :
-                          wordCount <= 2500 ? 'bg-green-500' : 'bg-orange-500'
+                  className={`h-full rounded-full ${wordCount < 200 ? 'bg-red-500' :
+                    wordCount < 350 ? 'bg-yellow-500' :
+                      wordCount <= 500 ? 'bg-green-500' : 'bg-orange-500'
                     }`}
                   initial={{ width: 0 }}
-                  animate={{ width: `${Math.min((wordCount / 2500) * 100, 100)}%` }}
+                  animate={{ width: `${Math.min((wordCount / 500) * 100, 100)}%` }}
                   transition={{ duration: 0.5 }}
                 />
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-[10px] text-gray-600">0</span>
-                <span className="text-[10px] text-gray-600">1,500</span>
-                <span className="text-[10px] text-gray-600">2,500</span>
+                <span className="text-[10px] text-gray-600">350</span>
+                <span className="text-[10px] text-gray-600">500+</span>
               </div>
             </div>
           </div>
@@ -667,8 +665,8 @@ export default function AttractionEditorPage() {
                 Full Description *
               </h2>
               <div className={`px-3 py-1 rounded-full text-xs font-medium ${wordCount < 1000 ? 'bg-yellow-500/10 text-yellow-400' :
-                  wordCount <= 2500 ? 'bg-green-500/10 text-green-400' :
-                    'bg-orange-500/10 text-orange-400'
+                wordCount <= 2500 ? 'bg-green-500/10 text-green-400' :
+                  'bg-orange-500/10 text-orange-400'
                 }`}>
                 {wordCount} words
               </div>
@@ -779,8 +777,8 @@ export default function AttractionEditorPage() {
               </h2>
               <div className="flex items-center gap-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${formData.faqs.length >= 5 ? 'bg-green-500/10 text-green-400' :
-                    formData.faqs.length >= 3 ? 'bg-yellow-500/10 text-yellow-400' :
-                      'bg-red-500/10 text-red-400'
+                  formData.faqs.length >= 3 ? 'bg-yellow-500/10 text-yellow-400' :
+                    'bg-red-500/10 text-red-400'
                   }`}>
                   {formData.faqs.length}/5+ FAQs
                 </span>

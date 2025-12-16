@@ -26,7 +26,7 @@ export function AIBlogGenerator({ editor, onMetadataGenerated }: AIBlogGenerator
     const [isLoading, setIsLoading] = useState(false);
 
     // Use API key from environment variables
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
     const generateBlog = async () => {
         if (!topic) {
@@ -94,25 +94,22 @@ You are an expert travel writer for Staykedar, specializing in Kedarnath Yatra a
 Remember: Output ONLY the JSON. No other text before or after.
             `;
 
-            // Use gemini-2.5-flash model with Google Search grounding (free tier)
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            // Use OpenAI model
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: systemPrompt }]
-                    }],
-                    tools: [{
-                        googleSearch: {}
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        topK: 40,
-                        topP: 0.95,
-                        maxOutputTokens: 8192,
-                    }
+                    model: 'gpt-5-mini-2025-08-07',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: `Generate a blog post about: ${topic}.` }
+                    ],
+                    response_format: { type: "json_object" },
+                    temperature: 1,
+                    max_completion_tokens: 16384
                 })
             });
 
@@ -122,7 +119,7 @@ Remember: Output ONLY the JSON. No other text before or after.
                 throw new Error(data.error?.message || 'Failed to generate content');
             }
 
-            const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            const generatedText = data.choices?.[0]?.message?.content;
 
             if (generatedText) {
                 // Extract JSON from the response (handle code blocks)
@@ -184,10 +181,10 @@ Remember: Output ONLY the JSON. No other text before or after.
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Sparkles className="h-5 w-5 text-purple-500" />
-                        AI Blog Generator (Gemini 2.5 Flash + Google Search)
+                        AI Blog Generator (OpenAI)
                     </DialogTitle>
                     <DialogDescription>
-                        Enter a topic and Gemini will search the web for current data and write a complete blog with title, slug, excerpt, and content.
+                        Enter a topic and our AI will search the web for current data and write a complete blog with title, slug, excerpt, and content.
                     </DialogDescription>
                 </DialogHeader>
 

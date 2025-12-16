@@ -58,6 +58,7 @@ import ReviewsPage from '@/pages/admin/ReviewsPage';
 import SupportTicketsPage from '@/pages/admin/SupportTicketsPage';
 import AdminTicketDetail from '@/pages/admin/AdminTicketDetail';
 import NotificationsPage from '@/pages/admin/NotificationsPage';
+import AttractionsPage from '@/pages/admin/AttractionsPage';
 import ReportsPage from '@/pages/admin/ReportsPage';
 import ActivityLogsPage from '@/pages/admin/ActivityLogsPage';
 import PluginsPage from '@/pages/admin/PluginsPage';
@@ -325,7 +326,7 @@ const App = () => {
                       <Route path="seo-routes" element={<SEORoutesPage />} />
                       <Route path="seo-itineraries" element={<SEOItinerariesPage />} />
                       <Route path="live-status" element={<LiveStatusAdminPage />} />
-                      <Route path="attractions" element={<AttractionsLocationPage />} />
+                      <Route path="attractions" element={<AttractionsPage />} />
                       <Route path="attractions/new" element={<AttractionEditorPage />} />
                       <Route path="attractions/:id" element={<AttractionEditorPage />} />
                       <Route path="banners" element={<BannersPage />} />

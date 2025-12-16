@@ -45,17 +45,8 @@ const Hero = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Defer banner fetch until after initial render to optimize LCP
-  const [shouldFetchBanners, setShouldFetchBanners] = useState(false);
-
-  useEffect(() => {
-    // Defer banner fetch to after initial paint
-    const timer = setTimeout(() => {
-      setShouldFetchBanners(true);
-    }, 100); // Small delay to ensure LCP element renders first
-
-    return () => clearTimeout(timer);
-  }, []);
+  // Optimize LCP: Fetch immediately, react-query handles the background loading
+  const shouldFetchBanners = true;
 
   // Fetch hero banners (deferred)
   const { data: banners = [] } = useQuery({

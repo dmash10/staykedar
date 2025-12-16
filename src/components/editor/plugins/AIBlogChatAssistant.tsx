@@ -33,7 +33,7 @@ export function AIBlogChatAssistant({ editor, onMetadataGenerated }: AIBlogChatA
     const [isGenerating, setIsGenerating] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
     useEffect(() => {
         if (isOpen && messages.length === 0) {
@@ -86,14 +86,18 @@ export function AIBlogChatAssistant({ editor, onMetadataGenerated }: AIBlogChatA
         const c = messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
         c.push({ role: 'user', parts: [{ text: ui }] });
 
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        const r = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
             body: JSON.stringify({
-                contents: c,
-                systemInstruction: {
-                    parts: [{
-                        text: `You are a helpful travel blog assistant. 
+                model: 'gpt-5-mini-2025-08-07',
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are a helpful travel blog assistant. 
 You can help brainstorm topics, share news, and generate content.
 
 CAPABILITIES:
@@ -103,17 +107,19 @@ CAPABILITIES:
 
 If asked "what can you do?" or "list actions", LIST all the capabilities above.
 Tell user to click "Generate Blog Now" button when ready for full generation.
-Never output JSON in chat.` }]
-                },
-                tools: isSearchEnabled ? [{ googleSearch: {} }] : undefined,
-                generationConfig: { temperature: 0.8, maxOutputTokens: 1024 }
+Never output JSON in chat.`
+                    },
+                    ...c.map(m => ({ role: m.role === 'model' ? 'assistant' : m.role, content: m.parts[0].text }))
+                ],
+                temperature: 1,
+                max_completion_tokens: 16384
             })
         });
 
         const d = await r.json();
         if (!r.ok) throw new Error(d.error?.message || 'Failed');
 
-        const ar = d.candidates?.[0]?.content?.parts?.[0]?.text;
+        const ar = d.choices?.[0]?.message?.content;
         if (ar) setMessages(p => [...p, { role: 'assistant', content: ar, timestamp: Date.now() }]);
     };
 
@@ -152,7 +158,7 @@ Generate a complete, AI-SEARCH-OPTIMIZED blog post. Output ONLY valid JSON in th
 ═══════════════════════════════════════════════════════════
 🎯 AI SEARCH OPTIMIZATION (Critical for Google AI Overviews)
 ═══════════════════════════════════════════════════════════
-Google AI Mode (Gemini), ChatGPT, and Perplexity select content based on:
+Google AI Mode, ChatGPT, and Perplexity select content based on:
 
 1. DIRECT ANSWERS FIRST - Start sections with the answer
    Bad: "The weather in the region varies..."
@@ -263,13 +269,17 @@ OUTPUT RULES
 
 Now generate the blog post as JSON:`;
 
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        const r = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: pr }] }],
-                tools: isSearchEnabled ? [{ googleSearch: {} }] : undefined,
-                generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+                model: 'gpt-5-mini-2025-08-07',
+                messages: [{ role: 'user', content: pr }],
+                temperature: 1,
+                max_completion_tokens: 16384
             })
         });
 
@@ -278,7 +288,7 @@ Now generate the blog post as JSON:`;
 
         if (!r.ok) throw new Error(d.error?.message || 'Gen failed');
 
-        let t = d.candidates?.[0]?.content?.parts?.[0]?.text;
+        let t = d.choices?.[0]?.message?.content;
         if (!t) throw new Error('No content');
 
         t = t.trim().replace(/^```json\\s*/i, '').replace(/^```\\s*/i, '').replace(/```\\s*$/i, '').trim();
@@ -311,38 +321,38 @@ Now generate the blog post as JSON:`;
                     AI Assistant
                 </Button>
             </SheetTrigger>
-            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-0">
-                <SheetHeader className="px-6 pt-6 pb-4 border-b">
+            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-0 bg-[#111111] border-[#1A1A1A] text-white">
+                <SheetHeader className="px-6 pt-6 pb-4 border-b border-[#1A1A1A]">
                     <div className="flex flex-col gap-2">
-                        <SheetTitle className="flex items-center gap-2 text-xl">
+                        <SheetTitle className="flex items-center gap-2 text-xl text-white">
                             <Sparkles className="h-5 w-5 text-purple-500" />
                             AI Writing Assistant
                         </SheetTitle>
                         <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Blog ideas, drafts & research</span>
-                            <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1">
-                                <Globe className={isSearchEnabled ? 'text-green-500 h-3 w-3' : 'text-gray-400 h-3 w-3'} />
+                            <span className="text-sm text-gray-400">Blog ideas, drafts & research</span>
+                            <div className="flex items-center gap-2 bg-[#1A1A1A] rounded-full px-3 py-1 border border-[#2A2A2A]">
+                                <Globe className={isSearchEnabled ? 'text-green-500 h-3 w-3' : 'text-gray-500 h-3 w-3'} />
                                 <Switch
                                     checked={isSearchEnabled}
                                     onCheckedChange={setIsSearchEnabled}
-                                    className="scale-75"
+                                    className="scale-75 data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-[#333]"
                                 />
-                                <span className="text-xs font-medium text-slate-600">{isSearchEnabled ? 'Web' : 'Local'}</span>
+                                <span className="text-xs font-medium text-gray-400">{isSearchEnabled ? 'Web' : 'Local'}</span>
                             </div>
                         </div>
                     </div>
                 </SheetHeader>
 
-                <ScrollArea className="flex-1 px-6 py-4 bg-slate-50/50" ref={scrollRef}>
+                <ScrollArea className="flex-1 px-6 py-4 bg-[#0A0A0A]" ref={scrollRef}>
                     <div className="space-y-6">
                         {messages.map((m, i) => (
                             <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-purple-100' : 'bg-white border shadow-sm'}`}>
-                                    {m.role === 'user' ? <User className="h-4 w-4 text-purple-600" /> : <Bot className="h-4 w-4 text-purple-500" />}
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-purple-500/20' : 'bg-[#1A1A1A] border border-[#2A2A2A]'}`}>
+                                    {m.role === 'user' ? <User className="h-4 w-4 text-purple-400" /> : <Bot className="h-4 w-4 text-purple-400" />}
                                 </div>
                                 <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${m.role === 'user'
                                     ? 'bg-purple-600 text-white rounded-tr-none'
-                                    : 'bg-white border text-slate-700 rounded-tl-none'
+                                    : 'bg-[#1A1A1A] border border-[#2A2A2A] text-gray-200 rounded-tl-none'
                                     }`}>
                                     <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                                 </div>
@@ -350,10 +360,10 @@ Now generate the blog post as JSON:`;
                         ))}
                         {isGenerating && (
                             <div className="flex gap-3">
-                                <div className="h-8 w-8 rounded-full bg-white border shadow-sm flex items-center justify-center shrink-0">
-                                    <Bot className="h-4 w-4 text-purple-500" />
+                                <div className="h-8 w-8 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center shrink-0">
+                                    <Bot className="h-4 w-4 text-purple-400" />
                                 </div>
-                                <div className="bg-white border rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
                                     <div className="flex gap-1">
                                         <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                                         <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -365,15 +375,15 @@ Now generate the blog post as JSON:`;
                     </div>
                 </ScrollArea>
 
-                <div className="p-4 border-t bg-white">
+                <div className="p-4 border-t border-[#1A1A1A] bg-[#111111]">
                     <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-hide">
-                        <Button variant="outline" size="sm" onClick={() => setInput("Give me 5 blog topic ideas")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                            <Lightbulb className="h-3 w-3 mr-1.5" />Topic Ideas
+                        <Button variant="outline" size="sm" onClick={() => setInput("Give me 5 blog topic ideas")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                            <Lightbulb className="h-3 w-3 mr-1.5 text-amber-400" />Topic Ideas
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setInput("Find latest news on Char Dham")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                            <Globe className="h-3 w-3 mr-1.5" />Latest News
+                        <Button variant="outline" size="sm" onClick={() => setInput("Find latest news on Char Dham")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                            <Globe className="h-3 w-3 mr-1.5 text-blue-400" />Latest News
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setInput("Generate blog now")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100">
+                        <Button variant="outline" size="sm" onClick={() => setInput("Generate blog now")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20">
                             <Sparkles className="h-3 w-3 mr-1.5" />Generate Full Blog
                         </Button>
                     </div>
@@ -385,19 +395,19 @@ Now generate the blog post as JSON:`;
                             onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
                             placeholder="Ask AI to write, research, or brainstorm..."
                             disabled={isGenerating}
-                            className="pr-12 py-6 rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-purple-500"
+                            className="pr-12 py-6 rounded-xl bg-[#1A1A1A] border-[#2A2A2A] text-white placeholder:text-gray-500 focus-visible:ring-purple-500 focus-visible:ring-offset-0 focus-visible:border-purple-500"
                         />
                         <Button
                             onClick={() => sendMessage()}
                             disabled={isGenerating || !input.trim()}
                             size="icon"
-                            className="absolute right-1.5 top-1.5 h-9 w-9 bg-purple-600 hover:bg-purple-700 rounded-lg transition-all"
+                            className="absolute right-1.5 top-1.5 h-9 w-9 bg-purple-600 hover:bg-purple-700 rounded-lg transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         </Button>
                     </div>
                     <div className="text-center mt-2">
-                        <span className="text-[10px] text-slate-400">AI can make mistakes. Review generated content.</span>
+                        <span className="text-[10px] text-gray-600">AI can make mistakes. Review generated content.</span>
                     </div>
                 </div>
             </SheetContent>

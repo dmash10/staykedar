@@ -316,12 +316,14 @@ export default function PromoBanner({ position = 'homepage', className = '' }: P
                     <>
                         <button
                             onClick={() => setCurrentIndex((prev) => (prev - 1 + activeBanners.length) % activeBanners.length)}
+                            aria-label="Previous banner"
                             className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
                         <button
                             onClick={() => setCurrentIndex((prev) => (prev + 1) % activeBanners.length)}
+                            aria-label="Next banner"
                             className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
                         >
                             <ChevronRight className="w-6 h-6" />
@@ -333,6 +335,7 @@ export default function PromoBanner({ position = 'homepage', className = '' }: P
                                 <button
                                     key={idx}
                                     onClick={() => setCurrentIndex(idx)}
+                                    aria-label={`Go to slide ${idx + 1}`}
                                     className={`w-2 h-2 rounded-full transition-all ${idx === currentIndex ? 'w-6 bg-white' : 'bg-white/50'
                                         }`}
                                 />
@@ -412,6 +415,7 @@ export default function PromoBanner({ position = 'homepage', className = '' }: P
                                 <button
                                     key={idx}
                                     onClick={() => setCurrentIndex(idx)}
+                                    aria-label={`Go to slide ${idx + 1}`}
                                     className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentIndex ? 'w-4 bg-white' : 'bg-white/40'
                                         }`}
                                 />

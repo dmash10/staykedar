@@ -11,117 +11,18 @@ interface MainSearchBarProps {
     className?: string;
 }
 
-// Destination data with more details
-const destinations = [
-    { 
-        value: "kedarnath", 
-        label: "Kedarnath", 
-        type: "Temple Town",
-        icon: Mountain,
-        description: "Sacred Jyotirlinga Temple",
-        popular: true,
-        elevation: "3,583m"
-    },
-    { 
-        value: "badrinath", 
-        label: "Badrinath", 
-        type: "Temple Town",
-        icon: Mountain,
-        description: "Char Dham Pilgrimage",
-        popular: true,
-        elevation: "3,133m"
-    },
-    { 
-        value: "sonprayag", 
-        label: "Sonprayag", 
-        type: "Base Camp",
-        icon: Tent,
-        description: "Gateway to Kedarnath",
-        popular: true,
-        elevation: "1,829m"
-    },
-    { 
-        value: "guptakashi", 
-        label: "Guptakashi", 
-        type: "Town",
-        icon: Building,
-        description: "Ancient Vishwanath Temple",
-        popular: true,
-        elevation: "1,319m"
-    },
-    { 
-        value: "gaurikund", 
-        label: "Gaurikund", 
-        type: "Trek Start",
-        icon: Mountain,
-        description: "Start of Kedarnath Trek",
-        popular: false,
-        elevation: "1,982m"
-    },
-    { 
-        value: "chopta", 
-        label: "Chopta", 
-        type: "Hill Station",
-        icon: Mountain,
-        description: "Mini Switzerland of India",
-        popular: true,
-        elevation: "2,680m"
-    },
-    { 
-        value: "tungnath", 
-        label: "Tungnath", 
-        type: "Temple",
-        icon: Mountain,
-        description: "Highest Shiva Temple",
-        popular: false,
-        elevation: "3,680m"
-    },
-    { 
-        value: "rudraprayag", 
-        label: "Rudraprayag", 
-        type: "Town",
-        icon: Building,
-        description: "Confluence of Rivers",
-        popular: false,
-        elevation: "610m"
-    },
-    { 
-        value: "rishikesh", 
-        label: "Rishikesh", 
-        type: "City",
-        icon: Building,
-        description: "Yoga Capital of World",
-        popular: true,
-        elevation: "340m"
-    },
-    { 
-        value: "haridwar", 
-        label: "Haridwar", 
-        type: "City",
-        icon: Building,
-        description: "Gateway to Gods",
-        popular: true,
-        elevation: "314m"
-    },
-    { 
-        value: "ukhimath", 
-        label: "Ukhimath", 
-        type: "Town",
-        icon: Home,
-        description: "Winter seat of Kedarnath",
-        popular: false,
-        elevation: "1,311m"
-    },
-    { 
-        value: "triyuginarayan", 
-        label: "Triyuginarayan", 
-        type: "Temple",
-        icon: Mountain,
-        description: "Divine Wedding Venue",
-        popular: false,
-        elevation: "1,980m"
-    },
-];
+import { supabase } from "@/integrations/supabase/client";
+
+interface Destination {
+    id: string;
+    slug: string;
+    name: string;
+    type: string;
+    description: string;
+    elevation: string;
+    is_popular: boolean;
+    image_url: string;
+}
 
 const MainSearchBar: React.FC<MainSearchBarProps> = ({
     initialLocation = "kedarnath",
@@ -132,6 +33,30 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
     className = ""
 }) => {
     const navigate = useNavigate();
+    const [destinations, setDestinations] = useState<Destination[]>([]);
+
+    // Fetch destinations on mount
+    useEffect(() => {
+        const fetchDestinations = async () => {
+            const { data } = await supabase
+                .from('destinations')
+                .select('*')
+                .order('display_order', { ascending: true });
+
+            if (data) setDestinations(data);
+        };
+        fetchDestinations();
+    }, []);
+
+    // Icon mapping helper
+    const getDestinationIcon = (type: string) => {
+        const lowerType = type?.toLowerCase() || '';
+        if (lowerType.includes('base camp') || lowerType.includes('camp')) return Tent;
+        if (lowerType.includes('town') || lowerType.includes('city') || lowerType.includes('stay')) return Building;
+        if (lowerType.includes('home')) return Home;
+        return Mountain; // Default for Temple, Hill Station, etc.
+    };
+
     const [location, setLocation] = useState(initialLocation);
     const [checkIn, setCheckIn] = useState<Date | null>(initialCheckIn);
     const [checkOut, setCheckOut] = useState<Date | null>(initialCheckOut);
@@ -158,13 +83,13 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
     const shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     // Filter destinations based on search
-    const filteredDestinations = destinations.filter(dest => 
-        dest.label.toLowerCase().includes(locationSearch.toLowerCase()) ||
-        dest.description.toLowerCase().includes(locationSearch.toLowerCase()) ||
-        dest.type.toLowerCase().includes(locationSearch.toLowerCase())
+    const filteredDestinations = destinations.filter(dest =>
+        dest.name.toLowerCase().includes(locationSearch.toLowerCase()) ||
+        (dest.description && dest.description.toLowerCase().includes(locationSearch.toLowerCase())) ||
+        (dest.type && dest.type.toLowerCase().includes(locationSearch.toLowerCase()))
     );
 
-    const popularDestinations = destinations.filter(d => d.popular);
+    const popularDestinations = destinations.filter(d => d.is_popular);
 
     // Update state when props change
     useEffect(() => {
@@ -316,8 +241,8 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
     const selectQuickDates = (type: 'tonight' | 'tomorrow' | 'weekend' | 'nextWeek') => {
         const now = new Date();
         now.setHours(0, 0, 0, 0);
-        
-        switch(type) {
+
+        switch (type) {
             case 'tonight':
                 setCheckIn(now);
                 const tomorrow = new Date(now);
@@ -423,16 +348,16 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
         );
     };
 
-    const selectedDestination = destinations.find(d => d.value === location);
+    const selectedDestination = destinations.find(d => d.slug === location);
 
     return (
         <form ref={formRef} onSubmit={handleSubmit} className={`relative ${className}`}>
-            {/* Yellow outer container - like Booking.com */}
-            <div className="bg-[#FFB700] p-[3px] rounded-lg shadow-2xl">
+            {/* Premium Search Container */}
+            <div className="bg-white p-2 rounded-xl shadow-xl border border-blue-100/50 backdrop-blur-sm">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-[3px]">
                     {/* Location */}
                     <div className="md:col-span-3 relative">
-                        <div 
+                        <div
                             className="bg-white py-3 px-4 flex items-center h-14 md:h-auto cursor-pointer rounded-md md:rounded-l-md md:rounded-r-none hover:bg-gray-50 transition-colors"
                             onClick={() => {
                                 setShowLocationDropdown(!showLocationDropdown);
@@ -447,13 +372,13 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                 <label className="block text-xs text-gray-600">Where are you going?</label>
                                 <div className="flex items-center justify-between w-full">
                                     <span className="text-gray-800 truncate text-sm md:text-base font-medium">
-                                        {selectedDestination?.label || location}
+                                        {selectedDestination?.name || (location === "kedarnath" ? "Kedarnath" : location)}
                                     </span>
                                     <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Location Dropdown */}
                         {showLocationDropdown && (
                             <div
@@ -492,19 +417,18 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                             <div className="flex flex-wrap gap-2">
                                                 {popularDestinations.slice(0, 6).map((dest) => (
                                                     <button
-                                                        key={dest.value}
+                                                        key={dest.slug}
                                                         type="button"
-                                                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                                            location === dest.value 
-                                                                ? 'bg-[#0071c2] text-white' 
+                                                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${location === dest.slug
+                                                                ? 'bg-[#0071c2] text-white'
                                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                        }`}
+                                                            }`}
                                                         onClick={() => {
-                                                            setLocation(dest.value);
+                                                            setLocation(dest.slug);
                                                             closeAllDropdowns();
                                                         }}
                                                     >
-                                                        {dest.label}
+                                                        {dest.name}
                                                     </button>
                                                 ))}
                                             </div>
@@ -517,32 +441,30 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                             <p className="text-center text-gray-500 py-4 text-sm">No destinations found</p>
                                         ) : (
                                             filteredDestinations.map((dest) => {
-                                                const IconComponent = dest.icon;
+                                                const IconComponent = getDestinationIcon(dest.type);
                                                 return (
                                                     <button
-                                                        key={dest.value}
+                                                        key={dest.slug}
                                                         type="button"
-                                                        className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 transition-colors ${
-                                                            location === dest.value 
-                                                                ? 'bg-[#e6f4ff]' 
+                                                        className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 transition-colors ${location === dest.slug
+                                                                ? 'bg-[#e6f4ff]'
                                                                 : 'hover:bg-gray-50'
-                                                        }`}
+                                                            }`}
                                                         onClick={() => {
-                                                            setLocation(dest.value);
+                                                            setLocation(dest.slug);
                                                             closeAllDropdowns();
                                                         }}
                                                     >
-                                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                                            location === dest.value ? 'bg-[#0071c2]' : 'bg-gray-100'
-                                                        }`}>
-                                                            <IconComponent className={`w-5 h-5 ${location === dest.value ? 'text-white' : 'text-gray-600'}`} />
+                                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${location === dest.slug ? 'bg-[#0071c2]' : 'bg-gray-100'
+                                                            }`}>
+                                                            <IconComponent className={`w-5 h-5 ${location === dest.slug ? 'text-white' : 'text-gray-600'}`} />
                                                         </div>
                                                         <div className="flex-grow">
                                                             <div className="flex items-center gap-2">
-                                                                <span className={`font-medium text-sm ${location === dest.value ? 'text-[#0071c2]' : 'text-gray-800'}`}>
-                                                                    {dest.label}
+                                                                <span className={`font-medium text-sm ${location === dest.slug ? 'text-[#0071c2]' : 'text-gray-800'}`}>
+                                                                    {dest.name}
                                                                 </span>
-                                                                {dest.popular && (
+                                                                {dest.is_popular && (
                                                                     <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-medium">
                                                                         Popular
                                                                     </span>
@@ -550,7 +472,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                                             </div>
                                                             <p className="text-xs text-gray-500">{dest.description} • {dest.elevation}</p>
                                                         </div>
-                                                        {location === dest.value && (
+                                                        {location === dest.slug && (
                                                             <Check className="w-5 h-5 text-[#0071c2]" />
                                                         )}
                                                     </button>
@@ -565,7 +487,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
 
                     {/* Dates */}
                     <div className="md:col-span-3 relative">
-                        <div 
+                        <div
                             className="bg-white py-3 px-4 flex items-center h-14 md:h-auto cursor-pointer rounded-md md:rounded-none hover:bg-gray-50 transition-colors"
                             onClick={() => {
                                 setShowCalendar(!showCalendar);
@@ -582,7 +504,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                     <span className="truncate text-sm md:text-base font-medium">
                                         {checkIn && checkOut
                                             ? `${formatDateShort(checkIn)} — ${formatDateShort(checkOut)}`
-                                            : checkIn 
+                                            : checkIn
                                                 ? `${formatDateShort(checkIn)} — Select`
                                                 : "Select dates"}
                                     </span>
@@ -590,7 +512,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Calendar Dropdown */}
                         {showCalendar && (
                             <div
@@ -719,7 +641,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
 
                     {/* Guests */}
                     <div className="md:col-span-4 relative">
-                        <div 
+                        <div
                             className="bg-white py-3 px-4 flex items-center h-14 md:h-auto cursor-pointer rounded-md md:rounded-none hover:bg-gray-50 transition-colors"
                             onClick={() => {
                                 setShowGuestModal(!showGuestModal);
@@ -740,7 +662,7 @@ const MainSearchBar: React.FC<MainSearchBarProps> = ({
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Guest Dropdown */}
                         {showGuestModal && (
                             <div

@@ -6,6 +6,10 @@ import MarqueeBanner from "../components/home/MarqueeBanner";
 import WhyUs from "../components/home/WhyUs";
 import FeaturedDestinations from "../components/home/FeaturedDestinations";
 import CuratedPackages from "../components/home/CuratedPackages";
+import PropertyShowcase from "../components/home/PropertyShowcase";
+import LiveActivityFeed from "../components/home/LiveActivityFeed";
+import WeatherTrekWidget from "../components/home/WeatherTrekWidget";
+import MobileQuickActions from "../components/home/MobileQuickActions";
 import HowItWorks from "../components/home/HowItWorks";
 import TrustSignals from "../components/home/TrustSignals";
 import PromoBanner from "../components/home/PromoBanner";
@@ -13,6 +17,7 @@ import PluginRenderer from "../components/plugins/PluginRenderer";
 import { GlobalSchemaMarkup } from "../components/SEO/SchemaMarkup";
 import AIOptimizedFAQ, { KedarnathTravelFAQs } from "../components/SEO/AIOptimizedFAQ";
 import { useSEOSettings, generateOrganizationSchema, generateWebsiteSchema } from "../hooks/useSEOSettings";
+
 
 const Index = () => {
   // Load SEO settings from database
@@ -77,7 +82,7 @@ const Index = () => {
 
         {/* Dynamic Favicon from Admin Settings */}
         {/* Dynamic Favicon from Admin Settings with Cache Busting */}
-        {seo.site_favicon && <link rel="icon" href={`${seo.site_favicon}?v=${new Date().getTime()}`} />}
+        {seo.site_favicon && <link rel="icon" href={seo.site_favicon} />}
 
         {/* Open Graph for Social Sharing - Dynamic */}
         <meta property="og:type" content="website" />
@@ -137,9 +142,20 @@ const Index = () => {
           {/* Animated Marquee Banner - Below Hero */}
           <MarqueeBanner />
 
+          {/* Live Activity Feed - Social Proof & Urgency */}
+          <LiveActivityFeed />
+
           <WhyUs />
           <FeaturedDestinations />
+
+          {/* Weather & Trek Status Widget */}
+          <WeatherTrekWidget />
+
           <CuratedPackages />
+
+          {/* Property Showcase - Verified Stays */}
+          <PropertyShowcase />
+
           <HowItWorks />
           <TrustSignals />
 
@@ -155,12 +171,12 @@ const Index = () => {
           </section>
 
           {/* Plugin Renderers */}
-          <div className="fixed bottom-20 right-4 z-10">
+          <div className="fixed bottom-20 right-4 z-10 md:bottom-4">
             <PluginRenderer pluginName="Live Chat" />
           </div>
 
           {/* Legal Ownership for Verification */}
-          <div className="bg-gray-50 pb-4 text-center">
+          <div className="bg-gray-50 pb-16 md:pb-4 text-center">
             <p className="text-[10px] text-gray-400">
               Owned and Operated by Ashutosh Singh
             </p>
@@ -171,6 +187,9 @@ const Index = () => {
 
         {/* Popup Banner (shows after delay) */}
         <PromoBanner position="popup" />
+
+        {/* Mobile Quick Actions Bar */}
+        <MobileQuickActions />
       </div>
     </>
   );

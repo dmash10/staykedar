@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sparkles, Send, User, Bot, Loader2, Globe, Lightbulb, Mountain, FileText, Image, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -49,29 +48,33 @@ export function AIAttractionAssistant({ onAttractionGenerated, currentData }: AI
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
-    const [isSearchEnabled, setIsSearchEnabled] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    
+    // GPT-5 Nano Feature Toggles
+    const [webSearchEnabled, setWebSearchEnabled] = useState(true);
+    const [imageGenEnabled, setImageGenEnabled] = useState(true);
+    const [codeInterpreterEnabled, setCodeInterpreterEnabled] = useState(false);
+
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
     // Check API key on mount
     useEffect(() => {
         if (!apiKey) {
-            console.error('❌ VITE_GEMINI_API_KEY is not set in environment variables!');
+            console.error('❌ VITE_OPENAI_API_KEY is not set in environment variables!');
         } else {
-            console.log('✅ Gemini API key found (length:', apiKey.length, ')');
+            console.log('✅ OpenAI API key found');
         }
     }, [apiKey]);
 
     // Detect what the user wants to edit
     const detectEditMode = (userInput: string): EditMode => {
         const lower = userInput.toLowerCase();
-        
+
         if (/\b(seo|meta|title|meta.?title|meta.?desc|search engine|google)\b/.test(lower)) {
             return 'seo';
         }
-        if (/\b(description|content|text|rewrite|improve|enhance|story|narrative)\b/.test(lower) && 
+        if (/\b(description|content|text|rewrite|improve|enhance|story|narrative)\b/.test(lower) &&
             !/\b(short.?desc|meta.?desc)\b/.test(lower)) {
             return 'description';
         }
@@ -120,9 +123,9 @@ Or click **Generate Attraction** after describing what you need!`;
         if (scrollRef.current) {
             requestAnimationFrame(() => {
                 scrollRef.current?.scrollTo({
-                        top: scrollRef.current.scrollHeight,
-                        behavior: 'smooth'
-                    });
+                    top: scrollRef.current.scrollHeight,
+                    behavior: 'smooth'
+                });
             });
         }
     }, [messages]);
@@ -131,10 +134,10 @@ Or click **Generate Attraction** after describing what you need!`;
         if (!input.trim() && !forceGen) return;
         if (!apiKey) { toast.error('API Key missing'); return; }
 
-        const userMessage: Message = { 
-            role: 'user', 
-            content: forceGen ? 'Generate full attraction details' : input, 
-            timestamp: Date.now() 
+        const userMessage: Message = {
+            role: 'user',
+            content: forceGen ? 'Generate full attraction details' : input,
+            timestamp: Date.now()
         };
         setMessages(p => [...p, userMessage]);
         const currentInput = forceGen ? 'Generate complete attraction details' : input;
@@ -144,14 +147,14 @@ Or click **Generate Attraction** after describing what you need!`;
         try {
             const editMode = forceGen ? 'full' : detectEditMode(currentInput);
             console.log(`📝 Edit mode detected: ${editMode}`);
-            
+
             await genAttraction(currentInput, editMode);
         } catch (e: any) {
             console.error('Generation error:', e);
-            setMessages(p => [...p, { 
-                role: 'assistant', 
-                content: `❌ Error: ${e.message}\n\nPlease try again with a simpler request.`, 
-                timestamp: Date.now() 
+            setMessages(p => [...p, {
+                role: 'assistant',
+                content: `❌ Error: ${e.message}\n\nPlease try again with a simpler request.`,
+                timestamp: Date.now()
             }]);
         } finally {
             setIsGenerating(false);
@@ -160,100 +163,110 @@ Or click **Generate Attraction** after describing what you need!`;
 
     const genAttraction = async (userInput: string, editMode: EditMode) => {
         console.log(`🚀 Starting ${editMode} generation...`);
-        
+
         // Validate API key
         if (!apiKey) {
-            throw new Error('Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your .env file.');
+            throw new Error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your .env file.');
         }
 
         const context = messages.slice(-4).map(m => `${m.role}: ${m.content}`).join('\n');
-        
+
         // Build prompt based on edit mode
-        const prompt = buildPrompt(userInput, editMode, context);
-        console.log('📝 Prompt length:', prompt.length);
+        const systemPrompt = buildPrompt(userInput, editMode, context);
+        console.log('📝 Prompt length:', systemPrompt.length);
 
-        // Use gemini-2.5-pro for attraction editor (user specified)
-        const modelName = 'gemini-2.5-pro';
+        // GPT-5 Nano with 400k context, 128k output
+        const modelName = 'gpt-5-nano-2025-08-07';
         console.log(`🤖 Using model: ${modelName}`);
-        
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                tools: isSearchEnabled ? [{ googleSearch: {} }] : undefined,
-                generationConfig: { temperature: 0.7, maxOutputTokens: editMode === 'full' ? 8192 : 4096 }
-            })
-        });
 
-        const data = await response.json();
-        console.log('📥 API Response status:', response.status);
-        console.log('📥 API Response data:', JSON.stringify(data).substring(0, 500));
-        
-        if (!response.ok) {
-            console.error('❌ API Error:', data);
-            throw new Error(data.error?.message || `API Error: ${response.status}`);
-        }
+        try {
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: modelName,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        ...messages.slice(-4).map(m => ({
+                            role: m.role,
+                            content: m.content
+                        })),
+                        { role: 'user', content: userInput }
+                    ],
+                    max_completion_tokens: 16384,
+                    response_format: { type: "json_object" }
+                })
+            });
 
-        // Check for blocked content
-        if (data.candidates?.[0]?.finishReason === 'SAFETY') {
-            throw new Error('Content was blocked by safety filters. Try a different request.');
-        }
+            const data = await response.json();
+            console.log('📥 API Response status:', response.status);
 
-        let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text) {
-            console.error('❌ No text in response. Full response:', JSON.stringify(data, null, 2));
-            // Try alternative response structure
-            text = data.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('');
+            if (!response.ok) {
+                console.error('❌ API Error:', data);
+                throw new Error(data.error?.message || `API Error: ${response.status}`);
+            }
+
+            let text = data.choices?.[0]?.message?.content;
             if (!text) {
+                console.error('❌ No text in response. Full response:', JSON.stringify(data, null, 2));
                 throw new Error('No content generated - API returned empty response');
             }
-        }
-        
-        console.log('📥 AI Response received, length:', text.length);
-        console.log('📥 First 300 chars:', text.substring(0, 300));
 
-        // Parse JSON
-        const parsedData = parseJsonResponse(text);
-        
-        if (!parsedData || Object.keys(parsedData).length === 0) {
-            console.error('❌ Parsing returned empty data. Full response:', text);
-            throw new Error('Could not parse AI response - check console for details');
-        }
-        
-        console.log('✅ Parsed data fields:', Object.keys(parsedData));
+            console.log('📥 AI Response received, length:', text.length);
+            console.log('📥 First 300 chars:', text.substring(0, 300));
 
-        // Merge with current data based on edit mode
-        const finalData = mergeData(parsedData, editMode);
-        
-        // Send to parent - MERGE mode for partial edits, REPLACE for full
-        const updateMode = editMode === 'full' ? 'replace' : 'merge';
-        onAttractionGenerated(finalData, updateMode);
+            // Parse JSON
+            const parsedData = parseJsonResponse(text);
 
-        // Success message
-        const modeMessages: Record<EditMode, string> = {
-            full: `✨ **${finalData.name || 'Attraction'}** generated! All fields updated.`,
-            description: `✅ Description updated! Review the new content.`,
-            seo: `✅ SEO metadata generated! Check meta title & description.`,
-            images: `✅ New images found! Review the gallery.`,
-            details: `✅ Details updated! Check location, elevation, etc.`,
-            faqs: `✅ FAQs generated! Review the questions & answers.`
-        };
+            if (!parsedData || Object.keys(parsedData).length === 0) {
+                console.error('❌ Parsing returned empty data. Full response:', text);
+                throw new Error('Could not parse AI response - check console for details');
+            }
 
-        setMessages(p => [...p, { 
-            role: 'assistant', 
-            content: modeMessages[editMode], 
-            timestamp: Date.now() 
-        }]);
-        
-        toast.success(editMode === 'full' ? 'Attraction generated!' : 'Content updated!');
-        
-        if (editMode === 'full') {
-            setIsOpen(false);
+            console.log('✅ Parsed data fields:', Object.keys(parsedData));
+
+            // Merge with current data based on edit mode
+            const finalData = mergeData(parsedData, editMode);
+
+            // Send to parent - MERGE mode for partial edits, REPLACE for full
+            const updateMode = editMode === 'full' ? 'replace' : 'merge';
+            onAttractionGenerated(finalData, updateMode);
+
+            // Success message
+            const modeMessages: Record<EditMode, string> = {
+                full: `✨ **${finalData.name || 'Attraction'}** generated! All fields updated.`,
+                description: `✅ Description updated! Review the new content.`,
+                seo: `✅ SEO metadata generated! Check meta title & description.`,
+                images: `✅ New images found! Review the gallery.`,
+                details: `✅ Details updated! Check location, elevation, etc.`,
+                faqs: `✅ FAQs generated! Review the questions & answers.`
+            };
+
+            setMessages(p => [...p, {
+                role: 'assistant',
+                content: modeMessages[editMode],
+                timestamp: Date.now()
+            }]);
+
+            toast.success(editMode === 'full' ? 'Attraction generated!' : 'Content updated!');
+
+            if (editMode === 'full') {
+                setIsOpen(false);
+            }
+        } catch (error: any) {
+            console.error('Generation error:', error);
+            setMessages(p => [...p, {
+                role: 'assistant',
+                content: `❌ Error: ${error.message}\n\nPlease try again.`,
+                timestamp: Date.now()
+            }]);
         }
     };
 
-    const buildPrompt = (userInput: string, editMode: EditMode, context: string): string => {
+    function buildPrompt(userInput: string, editMode: EditMode, context: string): string {
         const currentInfo = currentData?.name ? `
 CURRENT ATTRACTION DATA:
 - Name: ${currentData.name}
@@ -300,63 +313,28 @@ OUTPUT ONLY JSON:
 }
 
 ═══════════════════════════════════════════════════════════
-CONTENT STRUCTURE (1,800-2,500 words)
+CONTENT STRUCTURE (350-400 words total)
 ═══════════════════════════════════════════════════════════
 
-<h2>About [Attraction Name]</h2> (150-200 words)
+<h2>About [Attraction Name]</h2> (80-100 words)
 What makes it special. Share the vibe. Why visit?
 IMPORTANT: Replace [Attraction Name] with the actual attraction name!
 
-<h2>History & Spiritual Significance</h2> (200-300 words)
-Legends, mythology, cultural importance. Religious customs if applicable.
+<h2>History & Significance</h2> (60-80 words)
+Brief legends or cultural importance. Refrain from long stories.
 
-<h2>How to Reach</h2> (300-400 words)
-- From RISHIKESH: Distance, route, transport
-- From HARIDWAR: Distance, route, transport
-- From DELHI: Distance, route, best way
-- Trek details if applicable
+<h2>How to Reach & Best Time</h2> (80-100 words)
+Concise route info from Rishikesh/Delhi/Haridwar. Best months to visit.
 
-<h2>Best Time to Visit</h2> (200-300 words)
-Month-by-month breakdown. Weather. Crowds. When to avoid.
+<h2>Experience & Tips</h2> (80-100 words)
+What to expect, essential items to carry, and one pro tip.
 
-<h2>What to Expect</h2> (300-400 words)
-The experience. Facilities. Time needed. Photo spots.
-
-<h2>Things to Do</h2> (150-200 words)
-List activities, experiences, and tips in bullet format:
+<h2>Things to Do</h2> (Bullet points)
 <ul>
-<li>Main attractions to visit</li>
-<li>Activities available (photography, temple visits, etc.)</li>
-<li>Local experiences (hot springs, shopping, etc.)</li>
-<li>Trek preparation points</li>
-<li>Best photo spots</li>
+<li>Main highlight 1</li>
+<li>Main highlight 2</li>
+<li>Main highlight 3</li>
 </ul>
-
-<h2>Where to Stay Near [Place]</h2> (150-200 words)
-Accommodation options with practical details:
-- Budget stays (with approximate prices)
-- Mid-range hotels
-- GMVN/Government rest houses
-- Nearby villages with stays
-Include: "👉 Book your stay: <a href='https://staykedarnath.in/stays' target='_blank' rel='noopener'>View stays on StayKedarnath.in</a>"
-
-<h2>Local Tips</h2> (200-300 words)
-Insider advice and practical tips:
-- What to carry (specific items: "2L water, energy bars")
-- What to wear (weather-appropriate)
-- Safety considerations
-- Common mistakes to avoid
-- Money-saving tips
-- Best time of day to visit
-- Local customs to respect
-
-<h2>Nearby Attractions</h2> (100-150 words)
-2-3 places to combine with this visit. How far and worth it?
-
-<h2>Frequently Asked Questions</h2> (200-300 words)
-5-6 FAQs in format:
-<h3>Question here?</h3>
-<p>Direct answer...</p>
 
 ═══════════════════════════════════════════════════════════
 WRITING STYLE
@@ -515,83 +493,37 @@ DON'T:
 ✗ Write walls of text - keep paragraphs 2-4 sentences
 
 ═══════════════════════════════════════════════════════════
-📝 CONTENT STRUCTURE (Target: 1,800-2,500 words)
+📝 CONTENT STRUCTURE (Target: 350-400 words TOTAL)
 ═══════════════════════════════════════════════════════════
 
-<h2>About [Attraction Name]</h2> (150-200 words)
+<h2>About [Attraction Name]</h2> (80-100 words)
 - Hook the reader with what makes this place special
 - Share the vibe: Is it peaceful? Adventurous? Spiritual?
 - Why should someone make the effort to visit?
-IMPORTANT: Replace [Attraction Name] with the actual attraction name (e.g., "About Deoria Tal")
 
-<h2>History & Spiritual Significance</h2> (200-300 words)
-- The legends and mythology (for religious sites)
-- Cultural importance to pilgrims
-- Any interesting stories or local beliefs
-- Religious customs visitors should know
+<h2>History & Significance</h2> (50-70 words)
+- Brief legends or cultural importance
+- Keep it concise and interesting
 
-<h2>How to Reach</h2> (300-400 words)
-- FROM RISHIKESH: Distance, route, time, transport options
-- FROM HARIDWAR: Distance, route, time, transport options  
-- FROM DELHI: Distance, route, time, best transport
-- Trek details if applicable: trail description, terrain, markers
-- Pro tips for the journey
+<h2>Journey & Planning</h2> (100-120 words)
+- How to Reach (Briefly from Rishikesh/Delhi)
+- Trek details if applicable (Distance, difficulty)
+- Best Time to Visit (Months & Weather)
 
-<h2>Best Time to Visit</h2> (200-300 words)
-- MONTH-BY-MONTH breakdown with specific conditions
-- Weather expectations (temperature ranges, rainfall)
-- Crowd levels by season
-- Special festivals or events
-- When to AVOID (be honest!)
+<h2>Essential Tips & Experience</h2> (80-100 words)
+- What to expect (facilities/views)
+- Pro Tips (What to carry, safety)
+- Where to Stay (Brief mention)
 
-<h2>What to Expect</h2> (300-400 words)
-- The experience: What will you see, feel, do?
-- Facilities available (or lack thereof - be honest)
-- How much time you really need
-- Best spots for photography
-- What surprised you about this place
-
-<h2>Things to Do</h2> (150-200 words)
-List activities and experiences in bullet format:
+<h2>Highlights</h2>
 <ul>
-<li>Visit main temples/attractions</li>
-<li>Photography opportunities and best spots</li>
-<li>Local experiences (hot springs, markets, etc.)</li>
-<li>Trek preparation activities</li>
-<li>Cultural experiences</li>
+<li>Highlight 1</li>
+<li>Highlight 2</li>
+<li>Highlight 3</li>
 </ul>
 
-<h2>Where to Stay Near [Attraction Name]</h2> (150-200 words)
-Provide accommodation options with practical details:
-- Budget options (₹500-1000 range)
-- Mid-range hotels (₹1000-2500)
-- GMVN/Government rest houses
-- Nearby villages with homestays
-IMPORTANT: Add this link: "👉 Book your stay: <a href='https://staykedarnath.in/stays' target='_blank' rel='noopener'>View stays on StayKedarnath.in</a>"
-
-<h2>Local Tips</h2> (200-300 words)
-Insider advice travelers need:
-- What to carry: Be specific ("2L water, energy bars, rain jacket")
-- What to wear: Weather-appropriate clothing
-- Safety tips and precautions
-- Common mistakes to avoid
-- Money-saving hacks
-- Best time of day to visit
-- Local customs and etiquette
-
-<h2>Nearby Attractions</h2> (100-150 words)
-- 2-3 places you can combine with this visit
-- How far each is and if it's worth the detour
-
-<h2>Frequently Asked Questions</h2> (200-300 words)
-IMPORTANT FOR AI SEARCH - Write 5-6 FAQs in this format:
-<h3>Is [attraction] safe for beginners?</h3>
-<p>Direct, helpful answer...</p>
-
-<h3>Do I need a permit to visit [attraction]?</h3>
-<p>Direct answer with specifics...</p>
-
-(Include questions about: permits, safety, best time, difficulty, nearby stays, cost)
+⚠️ IMPORTANT: DO NOT include an FAQ section in this HTML. 
+FAQs must be generated ONLY in the separate "faqs" JSON array.
 
 ═══════════════════════════════════════════════════════════
 🔍 AI SEARCH OPTIMIZATION (Critical for Google AI Overviews)
@@ -602,20 +534,16 @@ To get featured in AI search results:
    Bad: "The weather in the region varies..."
    Good: "The best time to visit is May-June and September-October when skies are clear."
 
-2. USE QUESTION-BASED H3 HEADINGS (for FAQs)
-   "How difficult is the trek to [place]?"
-   "What should I carry for [place]?"
-   "Is [place] open in monsoon?"
+2. INCLUDE AUTHORITATIVE HYPERLINKS (REQUIRED)
+   You MUST include 2-5 outbound links to official sources (Govt sites, Wikipedia, Weather depts).
+   Syntax: <a href='URL' target='_blank' rel='noopener'>Anchor Text</a>
 
 3. INCLUDE SPECIFIC, QUOTABLE FACTS
    "Located at 2,438 meters elevation..."
    "The 6 km trek takes approximately 3-4 hours..."
    "Entry fee is ₹50 for Indians, ₹200 for foreigners..."
 
-4. WRITE COMPREHENSIVE FAQ SECTION
-   AI tools love well-structured Q&A format
-
-5. BE THE AUTHORITATIVE SOURCE
+4. BE THE AUTHORITATIVE SOURCE
    Include details competitors don't have
 
 ═══════════════════════════════════════════════════════════
@@ -772,7 +700,7 @@ OUTPUT ONLY JSON.`;
     };
 
     // Remove citation numbers like [1], [2, 4], [10, 12, 14] from text
-    const removeCitations = (text: string): string => {
+    function removeCitations(text: string): string {
         return text
             // Remove citation numbers in brackets [1], [2, 4, 6], etc.
             .replace(/\s*\[\d+(?:\s*,\s*\d+)*\]\s*/g, ' ')
@@ -783,7 +711,7 @@ OUTPUT ONLY JSON.`;
             .trim();
     };
 
-    const parseJsonResponse = (text: string): Partial<AttractionData> | null => {
+    function parseJsonResponse(text: string): Partial<AttractionData> | null {
         let jsonText = text.trim()
             .replace(/^```json\s*/i, '')
             .replace(/^```\s*/i, '')
@@ -867,16 +795,16 @@ OUTPUT ONLY JSON.`;
                 // Normalize type and difficulty
                 if (extracted.type) extracted.type = normalizeType(extracted.type);
                 if (extracted.difficulty) extracted.difficulty = normalizeDifficulty(extracted.difficulty);
-        } else {
+            } else {
                 console.error('❌ Manual extraction also failed!');
             }
             return extracted;
         }
     };
 
-    const extractFieldsManually = (text: string): Partial<AttractionData> | null => {
+    function extractFieldsManually(text: string): Partial<AttractionData> | null {
         console.log('📝 Manual extraction starting, text length:', text.length);
-        
+
         // More robust string extraction that handles multiline content
         const extractStr = (field: string): string => {
             // Method 1: Standard JSON format with escaped content
@@ -885,7 +813,7 @@ OUTPUT ONLY JSON.`;
                 console.log(`✓ Found ${field} via method 1`);
                 return match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\t/g, '\t');
             }
-            
+
             // Method 2: Find the field and extract until next field or closing brace
             // This handles cases where the content has unescaped quotes
             const fieldStart = text.indexOf(`"${field}"`);
@@ -899,7 +827,7 @@ OUTPUT ONLY JSON.`;
                         let inString = true;
                         let i = valueStart + 1;
                         let escaped = false;
-                        
+
                         while (i < text.length) {
                             const char = text[i];
                             if (escaped) {
@@ -926,35 +854,35 @@ OUTPUT ONLY JSON.`;
                     }
                 }
             }
-            
+
             // Method 3: Try with single quotes
             match = text.match(new RegExp(`"${field}"\\s*:\\s*'([^']*)'`));
             if (match) {
                 console.log(`✓ Found ${field} via method 3`);
                 return match[1];
             }
-            
+
             // Method 4: Unquoted value (for enums)
             match = text.match(new RegExp(`"${field}"\\s*:\\s*([A-Za-z][A-Za-z\\s]+?)(?=[,}\\n])`));
             if (match) {
                 console.log(`✓ Found ${field} via method 4`);
                 return match[1].trim();
             }
-            
+
             console.log(`✗ Could not find ${field}`);
             return '';
         };
-        
+
         // Extract long content like description that might span many lines
         const extractLongContent = (field: string): string => {
             const startPattern = `"${field}"\\s*:\\s*"`;
             const startMatch = text.match(new RegExp(startPattern));
             if (!startMatch) return '';
-            
+
             const startIndex = text.indexOf(startMatch[0]) + startMatch[0].length;
             let endIndex = startIndex;
             let escaped = false;
-            
+
             for (let i = startIndex; i < text.length; i++) {
                 if (escaped) {
                     escaped = false;
@@ -973,16 +901,16 @@ OUTPUT ONLY JSON.`;
                     }
                 }
             }
-            
+
             if (endIndex > startIndex) {
                 const content = text.substring(startIndex, endIndex);
                 console.log(`✓ Found ${field} via long content extraction, length: ${content.length}`);
                 return content.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\t/g, '\t');
             }
-            
+
             return '';
         };
-        
+
         const extractArr = (field: string): string[] => {
             const match = text.match(new RegExp(`"${field}"\\s*:\\s*\\[([^\\]]*?)\\]`, 's'));
             if (match) {
@@ -1001,7 +929,7 @@ OUTPUT ONLY JSON.`;
         const extractType = (): string => {
             const val = extractStr('type');
             if (val) return val;
-            
+
             // Try to find type patterns in the raw text
             const typeMatch = text.match(/"type"\s*:\s*"?(Religious|Natural|Historical|Adventure)"?/i);
             return typeMatch ? typeMatch[1] : '';
@@ -1010,61 +938,61 @@ OUTPUT ONLY JSON.`;
         const extractDifficulty = (): string => {
             const val = extractStr('difficulty');
             if (val) return val;
-            
+
             // Try to find difficulty patterns
             const diffMatch = text.match(/"difficulty"\s*:\s*"?(Easy|Moderate|Moderate to Difficult|Difficult)"?/i);
             return diffMatch ? diffMatch[1] : '';
         };
 
         const result: Partial<AttractionData> = {};
-        
+
         const name = extractStr('name');
         if (name) result.name = name;
-        
+
         const shortDesc = extractStr('short_description');
         if (shortDesc) result.short_description = shortDesc;
-        
+
         // Use long content extraction for description
         let desc = extractLongContent('description');
         if (!desc) desc = extractStr('description');
         if (desc) result.description = desc;
-        
+
         const type = extractType();
         if (type) result.type = type;
-        
+
         const difficulty = extractDifficulty();
         if (difficulty) result.difficulty = difficulty;
-        
+
         const location = extractStr('location');
         if (location) result.location = location;
-        
+
         const elevation = extractStr('elevation');
         if (elevation) result.elevation = elevation;
-        
+
         const distance = extractStr('distance');
         if (distance) result.distance = distance;
-        
+
         const timeReq = extractStr('time_required');
         if (timeReq) result.time_required = timeReq;
-        
+
         const bestTime = extractStr('best_time');
         if (bestTime) result.best_time = bestTime;
-        
+
         const tags = extractArr('tags');
         if (tags.length) result.tags = tags;
-        
+
         const mainImg = extractStr('main_image');
         if (mainImg) result.main_image = mainImg;
-        
+
         const images = extractArr('images');
         if (images.length) result.images = images;
-        
+
         const rating = extractNum('rating');
         if (rating) result.rating = rating;
-        
+
         const metaTitle = extractStr('meta_title');
         if (metaTitle) result.meta_title = metaTitle;
-        
+
         const metaDesc = extractStr('meta_description');
         if (metaDesc) result.meta_description = metaDesc;
 
@@ -1093,16 +1021,16 @@ OUTPUT ONLY JSON.`;
         return Object.keys(result).length > 0 ? result : null;
     };
 
-    const mergeData = (newData: Partial<AttractionData>, editMode: EditMode): Partial<AttractionData> => {
+    function mergeData(newData: Partial<AttractionData>, editMode: EditMode): Partial<AttractionData> {
         // Validate type and difficulty values
         const validTypes = ['Religious', 'Natural', 'Historical', 'Adventure'];
         const validDifficulties = ['Easy', 'Moderate', 'Moderate to Difficult', 'Difficult'];
-        
+
         const getValidType = (val?: string): string => {
             if (val && validTypes.includes(val)) return val;
             return currentData?.type && validTypes.includes(currentData.type) ? currentData.type : 'Religious';
         };
-        
+
         const getValidDifficulty = (val?: string): string => {
             if (val && validDifficulties.includes(val)) return val;
             return currentData?.difficulty && validDifficulties.includes(currentData.difficulty) ? currentData.difficulty : 'Easy';
@@ -1165,45 +1093,70 @@ OUTPUT ONLY JSON.`;
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 border-0 shadow-sm">
+                <Button variant="outline" size="sm" className="gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 border-0 shadow-sm border-[#1A1A1A]">
                     <Sparkles className="h-4 w-4" />
                     AI Assistant
                 </Button>
             </SheetTrigger>
-            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-0">
-                <SheetHeader className="px-6 pt-6 pb-4 border-b">
+            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-0 bg-[#111111] border-[#1A1A1A] text-white">
+                <SheetHeader className="px-6 pt-6 pb-4 border-b border-[#1A1A1A]">
                     <div className="flex flex-col gap-2">
-                        <SheetTitle className="flex items-center gap-2 text-xl">
+                        <SheetTitle className="flex items-center gap-2 text-xl text-white">
                             <Sparkles className="h-5 w-5 text-purple-500" />
                             AI Assistant
+                            <span className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full font-normal">GPT-5 Nano</span>
                         </SheetTitle>
                         <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm text-gray-400">
                                 {currentData?.name ? `Editing: ${currentData.name}` : 'Create new attraction'}
                             </span>
-                            <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1">
-                                <Globe className={isSearchEnabled ? 'text-green-500 h-3 w-3' : 'text-gray-400 h-3 w-3'} />
-                                <Switch
-                                    checked={isSearchEnabled}
-                                    onCheckedChange={setIsSearchEnabled}
-                                    className="scale-75"
-                                />
-                                <span className="text-xs font-medium text-slate-600">{isSearchEnabled ? 'Web' : 'Local'}</span>
-                            </div>
+                        </div>
+                        {/* GPT-5 Nano Feature Toggles */}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            <button
+                                onClick={() => setWebSearchEnabled(!webSearchEnabled)}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${webSearchEnabled
+                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                    : 'bg-[#1A1A1A] text-gray-500 border border-[#2A2A2A]'
+                                    }`}
+                            >
+                                <Globe className="h-3 w-3" />
+                                Web Search
+                            </button>
+                            <button
+                                onClick={() => setImageGenEnabled(!imageGenEnabled)}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${imageGenEnabled
+                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                    : 'bg-[#1A1A1A] text-gray-500 border border-[#2A2A2A]'
+                                    }`}
+                            >
+                                <Image className="h-3 w-3" />
+                                Image Gen
+                            </button>
+                            <button
+                                onClick={() => setCodeInterpreterEnabled(!codeInterpreterEnabled)}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${codeInterpreterEnabled
+                                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                    : 'bg-[#1A1A1A] text-gray-500 border border-[#2A2A2A]'
+                                    }`}
+                            >
+                                <FileText className="h-3 w-3" />
+                                Code
+                            </button>
                         </div>
                     </div>
                 </SheetHeader>
 
-                <ScrollArea className="flex-1 px-6 py-4 bg-slate-50/50" ref={scrollRef}>
+                <ScrollArea className="flex-1 px-6 py-4 bg-[#0A0A0A]" ref={scrollRef}>
                     <div className="space-y-6">
                         {messages.map((m, i) => (
                             <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-purple-100' : 'bg-white border shadow-sm'}`}>
-                                    {m.role === 'user' ? <User className="h-4 w-4 text-purple-600" /> : <Bot className="h-4 w-4 text-purple-500" />}
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-purple-500/20' : 'bg-[#1A1A1A] border border-[#2A2A2A]'}`}>
+                                    {m.role === 'user' ? <User className="h-4 w-4 text-purple-400" /> : <Bot className="h-4 w-4 text-purple-400" />}
                                 </div>
                                 <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${m.role === 'user'
                                     ? 'bg-purple-600 text-white rounded-tr-none'
-                                    : 'bg-white border text-slate-700 rounded-tl-none'
+                                    : 'bg-[#1A1A1A] border border-[#2A2A2A] text-gray-200 rounded-tl-none'
                                     }`}>
                                     <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                                 </div>
@@ -1211,10 +1164,10 @@ OUTPUT ONLY JSON.`;
                         ))}
                         {isGenerating && (
                             <div className="flex gap-3">
-                                <div className="h-8 w-8 rounded-full bg-white border shadow-sm flex items-center justify-center shrink-0">
-                                    <Bot className="h-4 w-4 text-purple-500" />
+                                <div className="h-8 w-8 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center shrink-0">
+                                    <Bot className="h-4 w-4 text-purple-400" />
                                 </div>
-                                <div className="bg-white border rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
                                     <div className="flex gap-1">
                                         <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                                         <div className="h-2 w-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -1226,32 +1179,32 @@ OUTPUT ONLY JSON.`;
                     </div>
                 </ScrollArea>
 
-                <div className="p-4 border-t bg-white">
+                <div className="p-4 border-t border-[#1A1A1A] bg-[#111111]">
                     {/* Quick action buttons */}
                     <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-hide">
                         {currentData?.name ? (
                             <>
-                                <Button variant="outline" size="sm" onClick={() => setInput("Improve the description")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                                    <FileText className="h-3 w-3 mr-1.5" />Description
+                                <Button variant="outline" size="sm" onClick={() => setInput("Improve the description")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                                    <FileText className="h-3 w-3 mr-1.5 text-purple-400" />Description
                                 </Button>
-                                <Button variant="outline" size="sm" onClick={() => setInput("Generate SEO metadata")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                                    <Search className="h-3 w-3 mr-1.5" />SEO
+                                <Button variant="outline" size="sm" onClick={() => setInput("Generate SEO metadata")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                                    <Search className="h-3 w-3 mr-1.5 text-blue-400" />SEO
                                 </Button>
-                                <Button variant="outline" size="sm" onClick={() => setInput("Find better images")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                                    <Image className="h-3 w-3 mr-1.5" />Images
+                                <Button variant="outline" size="sm" onClick={() => setInput("Find better images")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                                    <Image className="h-3 w-3 mr-1.5 text-green-400" />Images
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <Button variant="outline" size="sm" onClick={() => setInput("Create Deoria Tal")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                                    <Mountain className="h-3 w-3 mr-1.5" />Deoria Tal
-                        </Button>
-                                <Button variant="outline" size="sm" onClick={() => setInput("Create Vasuki Tal")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                            <Mountain className="h-3 w-3 mr-1.5" />Vasuki Tal
-                        </Button>
+                                <Button variant="outline" size="sm" onClick={() => setInput("Create Deoria Tal")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                                    <Mountain className="h-3 w-3 mr-1.5 text-amber-400" />Deoria Tal
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => setInput("Create Vasuki Tal")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                                    <Mountain className="h-3 w-3 mr-1.5 text-amber-400" />Vasuki Tal
+                                </Button>
                             </>
                         )}
-                        <Button variant="outline" size="sm" onClick={() => sendMessage(true)} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100">
+                        <Button variant="outline" size="sm" onClick={() => sendMessage(true)} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20">
                             <Sparkles className="h-3 w-3 mr-1.5" />Generate All
                         </Button>
                     </div>
@@ -1263,19 +1216,19 @@ OUTPUT ONLY JSON.`;
                             onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
                             placeholder={currentData?.name ? "What would you like to improve?" : "Name an attraction to create..."}
                             disabled={isGenerating}
-                            className="pr-12 py-6 rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-purple-500"
+                            className="pr-12 py-6 rounded-xl bg-[#1A1A1A] border-[#2A2A2A] text-white placeholder:text-gray-500 focus-visible:ring-purple-500 focus-visible:ring-offset-0 focus-visible:border-purple-500"
                         />
                         <Button
                             onClick={() => sendMessage()}
                             disabled={isGenerating || !input.trim()}
                             size="icon"
-                            className="absolute right-1.5 top-1.5 h-9 w-9 bg-purple-600 hover:bg-purple-700 rounded-lg transition-all"
+                            className="absolute right-1.5 top-1.5 h-9 w-9 bg-purple-600 hover:bg-purple-700 rounded-lg transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         </Button>
                     </div>
                     <div className="text-center mt-2">
-                        <span className="text-[10px] text-slate-400">AI can make mistakes. Review generated content.</span>
+                        <span className="text-[10px] text-gray-600">AI can make mistakes. Review generated content.</span>
                     </div>
                 </div>
             </SheetContent>

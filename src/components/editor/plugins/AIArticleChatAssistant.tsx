@@ -34,7 +34,7 @@ export function AIArticleChatAssistant({ editor, onMetadataGenerated, categoryNa
     const [isGenerating, setIsGenerating] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
     useEffect(() => {
         if (isOpen && messages.length === 0) {
@@ -197,21 +197,27 @@ DO NOT use any other color!
 11. **BOLD TEXT COLOR:** When user says "change bold text color" or "make bold text [color]", find ALL <strong> tags (including list item headings like "Step 1:", "Note:", etc.) and wrap their content with <span style="color: #HEXCODE">. Example: <strong>Title:</strong> becomes <strong><span style="color: #FF0000">Title:</span></strong>
 12. **AUTO-LINKING:** When mentioning pages from the KNOWLEDGE list above, AUTOMATICALLY create hyperlinks using the exact URLs provided. Example: "Check your bookings" -> "Check your <a href="https://staykedarnath.in/dashboard/bookings">bookings</a>".`;
 
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        const r = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
             body: JSON.stringify({
-                contents: c,
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                tools: isSearchEnabled ? [{ googleSearch: {} }] : undefined,
-                generationConfig: { temperature: 0.7, maxOutputTokens: 4096 }
+                model: 'gpt-5-mini-2025-08-07',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    ...c.map(m => ({ role: m.role === 'model' ? 'assistant' : m.role, content: m.parts[0].text }))
+                ],
+                temperature: 1,
+                max_completion_tokens: 16384
             })
         });
 
         const d = await r.json();
         if (!r.ok) throw new Error(d.error?.message || 'Failed');
 
-        const ar = d.candidates?.[0]?.content?.parts?.[0]?.text;
+        const ar = d.choices?.[0]?.message?.content;
         console.log('🤖 AI RESPONSE:', ar);
         console.log('🔍 Has REPLACE_FULL:', ar?.includes('<<<REPLACE_FULL>>>'));
         console.log('🔍 Has APPEND:', ar?.includes('<<<APPEND>>>'));
@@ -423,13 +429,17 @@ OUTPUT RULES
 
 Now generate the article as JSON:`;
 
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        const r = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: pr }] }],
-                tools: isSearchEnabled ? [{ googleSearch: {} }] : undefined,
-                generationConfig: { temperature: 0.5, maxOutputTokens: 8192 } // Lower temperature for more factual content
+                model: 'gpt-4o-mini-search-preview-2025-03-11',
+                messages: [{ role: 'user', content: pr }],
+                temperature: 1,
+                max_completion_tokens: 16384
             })
         });
 
@@ -438,7 +448,7 @@ Now generate the article as JSON:`;
 
         if (!r.ok) throw new Error(d.error?.message || 'Gen failed');
 
-        let t = d.candidates?.[0]?.content?.parts?.[0]?.text;
+        let t = d.choices?.[0]?.message?.content;
         if (!t) throw new Error('No content');
 
         t = t.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
@@ -471,38 +481,38 @@ Now generate the article as JSON:`;
                     AI Assistant
                 </Button>
             </SheetTrigger>
-            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-0">
-                <SheetHeader className="px-6 pt-6 pb-4 border-b">
+            <SheetContent className="w-[400px] sm:w-[540px] flex flex-col p-0 bg-[#111111] border-[#1A1A1A] text-white">
+                <SheetHeader className="px-6 pt-6 pb-4 border-b border-[#1A1A1A]">
                     <div className="flex flex-col gap-2">
-                        <SheetTitle className="flex items-center gap-2 text-xl">
+                        <SheetTitle className="flex items-center gap-2 text-xl text-white">
                             <Sparkles className="h-5 w-5 text-blue-500" />
                             AI Editor Assistant
                         </SheetTitle>
                         <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Smart editing & writing helper</span>
-                            <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1">
-                                <Globe className={isSearchEnabled ? 'text-green-500 h-3 w-3' : 'text-gray-400 h-3 w-3'} />
+                            <span className="text-sm text-gray-400">Smart editing & writing helper</span>
+                            <div className="flex items-center gap-2 bg-[#1A1A1A] rounded-full px-3 py-1 border border-[#2A2A2A]">
+                                <Globe className={isSearchEnabled ? 'text-green-500 h-3 w-3' : 'text-gray-500 h-3 w-3'} />
                                 <Switch
                                     checked={isSearchEnabled}
                                     onCheckedChange={setIsSearchEnabled}
-                                    className="scale-75"
+                                    className="scale-75 data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-[#333]"
                                 />
-                                <span className="text-xs font-medium text-slate-600">{isSearchEnabled ? 'Web' : 'Local'}</span>
+                                <span className="text-xs font-medium text-gray-400">{isSearchEnabled ? 'Web' : 'Local'}</span>
                             </div>
                         </div>
                     </div>
                 </SheetHeader>
 
-                <ScrollArea className="flex-1 px-6 py-4 bg-slate-50/50" ref={scrollRef}>
+                <ScrollArea className="flex-1 px-6 py-4 bg-[#0A0A0A]" ref={scrollRef}>
                     <div className="space-y-6">
                         {messages.map((m, i) => (
                             <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-blue-100' : 'bg-white border shadow-sm'}`}>
-                                    {m.role === 'user' ? <User className="h-4 w-4 text-blue-600" /> : <Bot className="h-4 w-4 text-blue-500" />}
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-blue-500/20' : 'bg-[#1A1A1A] border border-[#2A2A2A]'}`}>
+                                    {m.role === 'user' ? <User className="h-4 w-4 text-blue-400" /> : <Bot className="h-4 w-4 text-blue-400" />}
                                 </div>
                                 <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${m.role === 'user'
                                     ? 'bg-blue-600 text-white rounded-tr-none'
-                                    : 'bg-white border text-slate-700 rounded-tl-none'
+                                    : 'bg-[#1A1A1A] border border-[#2A2A2A] text-gray-200 rounded-tl-none'
                                     }`}>
                                     <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                                 </div>
@@ -510,10 +520,10 @@ Now generate the article as JSON:`;
                         ))}
                         {isGenerating && (
                             <div className="flex gap-3">
-                                <div className="h-8 w-8 rounded-full bg-white border shadow-sm flex items-center justify-center shrink-0">
-                                    <Bot className="h-4 w-4 text-blue-500" />
+                                <div className="h-8 w-8 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center shrink-0">
+                                    <Bot className="h-4 w-4 text-blue-400" />
                                 </div>
-                                <div className="bg-white border rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                                <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
                                     <div className="flex gap-1">
                                         <div className="h-2 w-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                                         <div className="h-2 w-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -525,15 +535,15 @@ Now generate the article as JSON:`;
                     </div>
                 </ScrollArea>
 
-                <div className="p-4 border-t bg-white">
+                <div className="p-4 border-t border-[#1A1A1A] bg-[#111111]">
                     <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-hide">
-                        <Button variant="outline" size="sm" onClick={() => setInput("Fix grammar & spelling")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                            <Sparkles className="h-3 w-3 mr-1.5" />Fix Grammar
+                        <Button variant="outline" size="sm" onClick={() => setInput("Fix grammar & spelling")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                            <Sparkles className="h-3 w-3 mr-1.5 text-amber-400" />Fix Grammar
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setInput("Make it more professional")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7">
-                            <Bot className="h-3 w-3 mr-1.5" />Professional Tone
+                        <Button variant="outline" size="sm" onClick={() => setInput("Make it more professional")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-[#2A2A2A] bg-[#1A1A1A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white">
+                            <Bot className="h-3 w-3 mr-1.5 text-blue-400" />Professional Tone
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setInput("Generate article now")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100">
+                        <Button variant="outline" size="sm" onClick={() => setInput("Generate article now")} disabled={isGenerating} className="shrink-0 text-xs rounded-full h-7 border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20">
                             <Lightbulb className="h-3 w-3 mr-1.5" />Generate Full Article
                         </Button>
                     </div>
@@ -545,19 +555,19 @@ Now generate the article as JSON:`;
                             onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
                             placeholder="Ask AI to edit, write, or format..."
                             disabled={isGenerating}
-                            className="pr-12 py-6 rounded-xl bg-slate-50 border-slate-200 focus-visible:ring-blue-500"
+                            className="pr-12 py-6 rounded-xl bg-[#1A1A1A] border-[#2A2A2A] text-white placeholder:text-gray-500 focus-visible:ring-blue-500 focus-visible:ring-offset-0 focus-visible:border-blue-500"
                         />
                         <Button
                             onClick={() => sendMessage()}
                             disabled={isGenerating || !input.trim()}
                             size="icon"
-                            className="absolute right-1.5 top-1.5 h-9 w-9 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all"
+                            className="absolute right-1.5 top-1.5 h-9 w-9 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         </Button>
                     </div>
                     <div className="text-center mt-2">
-                        <span className="text-[10px] text-slate-400">AI can make mistakes. Review generated content.</span>
+                        <span className="text-[10px] text-gray-600">AI can make mistakes. Review generated content.</span>
                     </div>
                 </div>
             </SheetContent>

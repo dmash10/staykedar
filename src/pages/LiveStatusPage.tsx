@@ -133,6 +133,39 @@ const LiveStatusPage = () => {
         staleTime: 60000, // 1 minute
     });
 
+    // Fetch news from Google News RSS via Edge Function
+    interface NewsItem {
+        title: string;
+        content: string;
+        link: string;
+        published_at: string;
+        source: string;
+        category: string;
+    }
+
+    const { data: newsData, refetch: refetchNews } = useQuery({
+        queryKey: ['kedarnath-news'],
+        queryFn: async () => {
+            try {
+                const response = await fetch(
+                    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-news?limit=6`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                        }
+                    }
+                );
+                if (!response.ok) throw new Error('Failed to fetch news');
+                const data = await response.json();
+                return data.news as NewsItem[];
+            } catch (error) {
+                console.error('News fetch error:', error);
+                return [];
+            }
+        },
+        staleTime: 30 * 60 * 1000, // 30 minutes
+    });
+
     // Fetch FAQs from database
     const { data: faqs = [], refetch: refetchFaqs } = useQuery({
         queryKey: ['live-status-faqs'],
@@ -211,7 +244,7 @@ const LiveStatusPage = () => {
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
-        await Promise.all([refetchWeather(), refetchUpdates(), refetchFaqs()]);
+        await Promise.all([refetchWeather(), refetchUpdates(), refetchFaqs(), refetchNews()]);
         setLastUpdated(new Date());
         setTimeout(() => setIsRefreshing(false), 1000);
     };
@@ -396,6 +429,54 @@ const LiveStatusPage = () => {
                                             </div>
                                         </div>
                                     ))}
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+                    )}
+
+                    {/* News from Web Section */}
+                    {newsData && newsData.length > 0 && (
+                        <motion.div
+                            className="mb-8"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Newspaper className="w-5 h-5 text-purple-600" />
+                                        News from Web
+                                        <Badge variant="outline" className="text-xs font-normal text-purple-600 border-purple-300">
+                                            Auto-updated
+                                        </Badge>
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {newsData.slice(0, 6).map((news, idx) => (
+                                            <a
+                                                key={idx}
+                                                href={news.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="block bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all group"
+                                            >
+                                                <div className="flex items-start gap-2 mb-2">
+                                                    <Badge variant="outline" className={`${getCategoryColor(news.category)} text-white border-0 text-[10px] px-1.5 py-0`}>
+                                                        {news.category}
+                                                    </Badge>
+                                                    <span className="text-[10px] text-gray-400 ml-auto">{news.source.split(' - ')[1] || news.source}</span>
+                                                </div>
+                                                <h3 className="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-purple-700 transition-colors">
+                                                    {news.title}
+                                                </h3>
+                                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">{news.content}</p>
+                                                <div className="flex items-center gap-1 text-xs text-purple-500 mt-2">
+                                                    Read more →
+                                                </div>
+                                            </a>
+                                        ))}
+                                    </div>
                                 </CardContent>
                             </Card>
                         </motion.div>

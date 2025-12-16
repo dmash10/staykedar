@@ -4,7 +4,6 @@ import { TransitionLink } from "@/components/TransitionLink";
 import { Helmet } from "react-helmet";
 import { motion } from "framer-motion";
 import {
-    Calendar,
     MapPin,
     Clock,
     CheckCircle2,
@@ -15,7 +14,10 @@ import {
     Mail,
     ArrowLeft,
     Check,
-    Star
+    Star,
+    Info,
+    ShieldCheck,
+    CalendarDays
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
@@ -27,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PromoBanner from "@/components/home/PromoBanner";
 import { generatePackageSchema, generateBreadcrumbSchema } from "@/components/SEO/SchemaMarkup";
 import BookingModal from "@/components/packages/BookingModal";
+import AIOptimizedFAQ, { KedarnathTravelFAQs } from "@/components/SEO/AIOptimizedFAQ";
 
 interface PackageDetail {
     id: string;
@@ -151,101 +154,75 @@ const PackageDetail = () => {
         { name: pkg.title, url: `https://staykedarnath.in/packages/${slug}` }
     ]);
 
+    // Calculate pricing breakdown estimates
+    const basePrice = pkg.price;
+    const heliPrice = 3500; // Estimated add-on
+    const gstRate = 0.05;
+    const totalPrice = basePrice + (basePrice * gstRate);
+
     return (
         <>
             <Helmet>
-                <title>{pkg.title} - Kedarnath Yatra Package | StayKedarnath</title>
-                <meta name="description" content={`${pkg.title} - ${pkg.duration} Kedarnath package at ₹${pkg.price.toLocaleString()}. Includes: ${pkg.inclusions?.slice(0, 3).join(', ')}. Book your Char Dham Yatra now!`} />
-                <meta name="keywords" content={`${pkg.title}, Kedarnath package, Char Dham package, Kedarnath yatra, pilgrimage package, ${pkg.location}`} />
+                <title>{pkg.title} | Kedarnath Yatra 2026 Packages</title>
+                <meta name="description" content={`Book ${pkg.title} for 2026. ${pkg.duration} Kedarnath package starting ₹${pkg.price.toLocaleString()}. Includes transport, stay, meals. Best price guarantee.`} />
+                <meta name="keywords" content={`${pkg.title}, Kedarnath package 2026, Char Dham Yatra 2026, Kedarnath tour cost, registration`} />
                 <link rel="canonical" href={`https://staykedarnath.in/packages/${slug}`} />
 
-                {/* Open Graph */}
-                <meta property="og:type" content="product" />
-                <meta property="og:title" content={`${pkg.title} | StayKedarnath`} />
-                <meta property="og:description" content={pkg.description} />
-                {pkg.images?.[0] && <meta property="og:image" content={pkg.images[0]} />}
-                <meta property="og:url" content={`https://staykedarnath.in/packages/${slug}`} />
-                <meta property="product:price:amount" content={pkg.price.toString()} />
-                <meta property="product:price:currency" content="INR" />
-
-                {/* TouristTrip Schema */}
-                <script type="application/ld+json">
-                    {JSON.stringify(packageSchema)}
-                </script>
-
-                {/* Breadcrumb Schema */}
-                <script type="application/ld+json">
-                    {JSON.stringify(breadcrumbSchema)}
-                </script>
+                {/* Structure Data */}
+                <script type="application/ld+json">{JSON.stringify(packageSchema)}</script>
+                <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
             </Helmet>
 
-            <div className="min-h-screen flex flex-col bg-gray-50">
+            <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
                 <Nav />
 
-                <main className="flex-grow pb-12">
-                    {/* Image Gallery - Matching PropertyDetail style */}
+                <main className="flex-grow pb-16">
+                    {/* Compact Header & Breadcrumbs */}
                     <div className="bg-white border-b border-gray-200">
-                        <Container className="py-6">
-                            <div className="mb-4">
-                                <TransitionLink to="/packages" className="inline-flex items-center text-gray-500 hover:text-[#0071c2] transition-colors">
-                                    <ArrowLeft className="w-4 h-4 mr-2" />
-                                    Back to Packages
-                                </TransitionLink>
+                        <Container className="py-4">
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mb-3 font-medium">
+                                <TransitionLink to="/" className="hover:text-blue-600 transition-colors">Home</TransitionLink>
+                                <span>/</span>
+                                <TransitionLink to="/packages" className="hover:text-blue-600 transition-colors">Packages</TransitionLink>
+                                <span>/</span>
+                                <span className="text-slate-800 line-clamp-1">{pkg.title}</span>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 h-[400px] rounded-xl overflow-hidden mb-6">
-                                <div className="h-full">
-                                    <img
-                                        src={pkg.images[0] || "https://images.unsplash.com/photo-1535732820275-9ffd998cac22?q=80&w=1000"}
-                                        alt={pkg.title}
-                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-2 h-full">
-                                    {[1, 2, 3, 4].map((i) => (
-                                        <div key={i} className="relative overflow-hidden bg-gray-100">
-                                            {pkg.images[i] ? (
-                                                <img
-                                                    src={pkg.images[i]}
-                                                    alt={`${pkg.title} view ${i}`}
-                                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                    <MapPin className="w-8 h-8 opacity-20" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Title and Info */}
                             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-                                            Package
-                                        </span>
-                                        <div className="flex items-center gap-1 text-yellow-500">
-                                            <Star className="w-4 h-4 fill-current" />
-                                            <span className="text-sm font-medium text-gray-900">4.8 (Verified)</span>
+                                <div className="space-y-1.5">
+                                    <div className="flex items-center gap-2">
+                                        <div className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100">
+                                            Booking Open for 2026
+                                        </div>
+                                        <div className="flex items-center gap-1 text-amber-500">
+                                            <Star className="w-3.5 h-3.5 fill-current" />
+                                            <span className="text-xs font-bold text-slate-700">4.9 (120+ Verified)</span>
                                         </div>
                                     </div>
-                                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{pkg.title}</h1>
-                                    <div className="flex items-center text-gray-600 mb-4">
-                                        <MapPin className="w-4 h-4 mr-1" />
-                                        {pkg.location}
-                                        <span className="mx-2">•</span>
-                                        <Clock className="w-4 h-4 mr-1" />
-                                        {pkg.duration}
+                                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight leading-tight">
+                                        {pkg.title}
+                                    </h1>
+                                    <div className="flex items-center flex-wrap gap-4 text-sm text-slate-600 font-medium">
+                                        <div className="flex items-center gap-1.5">
+                                            <MapPin className="w-4 h-4 text-blue-600" />
+                                            {pkg.location}
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <Clock className="w-4 h-4 text-blue-600" />
+                                            {pkg.duration}
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-green-700">
+                                            <ShieldCheck className="w-4 h-4" />
+                                            Local Operator Verified
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" className="gap-2 rounded-lg">
+
+                                <div className="flex gap-2 shrink-0">
+                                    <Button variant="outline" size="sm" className="h-9 px-3 gap-2 rounded text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50">
                                         <Share2 className="w-4 h-4" /> Share
                                     </Button>
-                                    <Button variant="outline" size="sm" className="gap-2 rounded-lg">
+                                    <Button variant="outline" size="sm" className="h-9 px-3 gap-2 rounded text-slate-600 border-slate-200 hover:border-pink-300 hover:text-pink-600 hover:bg-pink-50">
                                         <Heart className="w-4 h-4" /> Save
                                     </Button>
                                 </div>
@@ -253,122 +230,234 @@ const PackageDetail = () => {
                         </Container>
                     </div>
 
-                    <Container className="py-8">
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Main Content */}
-                            <div className="lg:col-span-2 space-y-8">
-                                {/* Overview */}
-                                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                                    <h2 className="text-xl font-bold mb-4 text-gray-900">Overview</h2>
-                                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    <Container className="py-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Main Content Column */}
+                            <div className="lg:col-span-2 space-y-6">
+
+                                {/* Image Grid - Clean & No Scale Animations */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 h-[350px] rounded-lg overflow-hidden border border-slate-200">
+                                    <div className="h-full relative group">
+                                        <img
+                                            src={pkg.images[0] || "https://images.unsplash.com/photo-1535732820275-9ffd998cac22?q=80&w=1000"}
+                                            alt={pkg.title}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/10 transition-colors duration-300" />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 h-full">
+                                        {[1, 2, 3, 4].map((i) => (
+                                            <div key={i} className="relative overflow-hidden bg-slate-100 group">
+                                                {pkg.images[i] ? (
+                                                    <img
+                                                        src={pkg.images[i]}
+                                                        alt={`${pkg.title} view ${i}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                        <MapPin className="w-6 h-6" />
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/10 transition-colors duration-300" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Overview Section */}
+                                <div className="bg-white rounded-lg border border-slate-200 p-5">
+                                    <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                                        Package Overview
+                                        <span className="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">ID: {pkg.id.slice(0, 6)}</span>
+                                    </h2>
+                                    <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line">
                                         {pkg.description}
                                     </p>
 
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6">
                                         {pkg.features.map((feature, index) => (
-                                            <div key={index} className="flex items-center gap-3 text-gray-700 bg-gray-50 p-3 rounded-lg">
-                                                <CheckCircle2 className="w-5 h-5 text-[#0071c2] shrink-0" />
-                                                <span className="text-sm font-medium">{feature}</span>
+                                            <div key={index} className="flex items-center gap-2.5 text-slate-700 bg-slate-50 border border-slate-100 px-3 py-2 rounded text-xs font-medium">
+                                                <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+                                                {feature}
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
-                                {/* Itinerary */}
-                                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                                    <h2 className="text-xl font-bold mb-6 text-gray-900">Itinerary</h2>
-                                    <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                                {/* Compact Pricing Breakdown Table */}
+                                <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                                    <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                                        <h2 className="text-lg font-bold text-slate-900">2026 Pricing Breakdown</h2>
+                                        <span className="text-xs text-slate-500 font-medium">*Base rates per person</span>
+                                    </div>
+                                    <div className="p-0">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+                                                <tr>
+                                                    <th className="px-5 py-3 font-semibold">Inclusion Type</th>
+                                                    <th className="px-5 py-3 font-semibold text-right">Cost Estimate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                <tr className="hover:bg-slate-50/50">
+                                                    <td className="px-5 py-3 font-medium text-slate-700">Base Package Cost</td>
+                                                    <td className="px-5 py-3 text-right text-slate-900 font-bold">₹{basePrice.toLocaleString()}</td>
+                                                </tr>
+                                                <tr className="hover:bg-slate-50/50">
+                                                    <td className="px-5 py-3 font-medium text-slate-700">GST (5%)</td>
+                                                    <td className="px-5 py-3 text-right text-slate-600">₹{(basePrice * 0.05).toFixed(0)}</td>
+                                                </tr>
+                                                <tr className="bg-blue-50/30">
+                                                    <td className="px-5 py-3 font-bold text-blue-900">Total (Ex-Haridwar)</td>
+                                                    <td className="px-5 py-3 text-right font-bold text-blue-700">₹{totalPrice.toLocaleString()}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div className="px-5 py-3 bg-amber-50 border-t border-amber-100 text-xs text-amber-800 flex items-start gap-2">
+                                            <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                                            <div>
+                                                <strong>Add-on Note:</strong> Helicopter tickets (approx ₹{heliPrice}) are booked separately via IRCTC. We assist with the booking process at no extra agent fee.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Dense Itinerary */}
+                                <div className="bg-white rounded-lg border border-slate-200 p-5">
+                                    <h2 className="text-lg font-bold text-slate-900 mb-6">Detailed Itinerary</h2>
+                                    <div className="relative pl-6 border-l-2 border-slate-100 space-y-8">
                                         {pkg.itinerary.map((day, index) => (
-                                            <div key={index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-[#0071c2] text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                                    <span className="font-bold text-sm">{day.day}</span>
+                                            <div key={index} className="relative">
+                                                <div className="absolute -left-[31px] bg-white border-2 border-primary w-6 h-6 rounded-full flex items-center justify-center">
+                                                    <div className="w-2 h-2 bg-primary rounded-full" />
                                                 </div>
-                                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                                    <div className="flex items-center justify-between space-x-2 mb-1">
-                                                        <div className="font-bold text-gray-900">{day.title}</div>
+                                                <div className="bg-slate-50 rounded border border-slate-200 p-4 transition-colors hover:border-primary/20 hover:bg-blue-50/10">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <h3 className="font-bold text-slate-900 text-sm">Day {day.day}: {day.title}</h3>
+                                                        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Step {index + 1}</span>
                                                     </div>
-                                                    <div className="text-gray-600 text-sm">{day.description}</div>
+                                                    <p className="text-slate-600 text-sm leading-relaxed">{day.description}</p>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
-                                {/* Inclusions & Exclusions */}
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                                        <h3 className="text-lg font-bold text-green-700 mb-4 flex items-center">
-                                            <CheckCircle2 className="w-5 h-5 mr-2" /> Inclusions
+                                {/* Inclusions / Exclusions - Side by Side */}
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="bg-white p-5 rounded-lg border border-slate-200 h-full">
+                                        <h3 className="text-sm font-bold text-emerald-700 mb-3 flex items-center uppercase tracking-wide">
+                                            <CheckCircle2 className="w-4 h-4 mr-2" /> Inclusions
                                         </h3>
-                                        <ul className="space-y-3">
+                                        <ul className="space-y-2">
                                             {pkg.inclusions.map((item, index) => (
-                                                <li key={index} className="flex items-start text-sm text-gray-700">
-                                                    <Check className="w-4 h-4 text-green-600 mr-2 mt-0.5 shrink-0" />
+                                                <li key={index} className="flex items-start text-xs text-slate-600 leading-snug">
+                                                    <Check className="w-3 h-3 text-emerald-600 mr-2 mt-0.5 shrink-0" />
                                                     {item}
                                                 </li>
                                             ))}
                                         </ul>
                                     </div>
-                                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                                        <h3 className="text-lg font-bold text-red-700 mb-4 flex items-center">
-                                            <XCircle className="w-5 h-5 mr-2" /> Exclusions
+                                    <div className="bg-white p-5 rounded-lg border border-slate-200 h-full">
+                                        <h3 className="text-sm font-bold text-red-700 mb-3 flex items-center uppercase tracking-wide">
+                                            <XCircle className="w-4 h-4 mr-2" /> Exclusions
                                         </h3>
-                                        <ul className="space-y-3">
+                                        <ul className="space-y-2">
                                             {pkg.exclusions.map((item, index) => (
-                                                <li key={index} className="flex items-start text-sm text-gray-700">
-                                                    <XCircle className="w-4 h-4 text-red-400 mr-2 mt-0.5 shrink-0" />
+                                                <li key={index} className="flex items-start text-xs text-slate-600 leading-snug">
+                                                    <XCircle className="w-3 h-3 text-red-400 mr-2 mt-0.5 shrink-0" />
                                                     {item}
                                                 </li>
                                             ))}
                                         </ul>
                                     </div>
+                                </div>
+
+                                {/* FAQ Section for AI SEO */}
+                                <div className="pt-4">
+                                    <AIOptimizedFAQ
+                                        title="Common Questions about this Package"
+                                        description="Everything you need to know about the 2026 booking process."
+                                        faqs={KedarnathTravelFAQs}
+                                        compact={true}
+                                        className="border-none"
+                                    />
                                 </div>
                             </div>
 
-                            {/* Sidebar */}
+                            {/* Sidebar - Sticky Compact - REDESIGNED */}
                             <div className="lg:col-span-1">
-                                <div className="sticky top-24 space-y-6">
-                                    {/* Promo Banner */}
-                                    <PromoBanner position="sidebar" />
-
-                                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                                        <div className="mb-6">
-                                            <p className="text-sm text-gray-500 mb-1">Starting from</p>
-                                            <div className="flex items-baseline">
-                                                <span className="text-3xl font-bold text-[#0071c2]">₹{pkg.price.toLocaleString()}</span>
-                                                <span className="text-gray-500 ml-2">/ person</span>
+                                <div className="sticky top-20 space-y-4">
+                                    <div className="bg-white rounded-lg border border-blue-100 p-0 overflow-hidden">
+                                        {/* Price Header */}
+                                        <div className="bg-blue-600 p-5 text-white">
+                                            <p className="text-blue-100 text-xs font-semibold tracking-wider uppercase mb-1">Total Package Cost</p>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-3xl font-bold">₹{pkg.price.toLocaleString()}</span>
+                                                <span className="text-blue-100 text-sm font-medium">/ person</span>
+                                            </div>
+                                            <div className="mt-2 inline-flex items-center bg-blue-500/30 px-2 py-1 rounded text-[10px] font-medium border border-blue-400/30">
+                                                <Check className="w-3 h-3 mr-1" />
+                                                No Hidden Charges
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <Button onClick={handleEnquiry} className="w-full bg-[#0071c2] hover:bg-[#005a9c] h-12 text-lg rounded-lg font-semibold">
-                                                Book Now
+                                        {/* Actions */}
+                                        <div className="p-5 space-y-3 bg-white">
+                                            <Button onClick={handleEnquiry} className="w-full bg-slate-900 hover:bg-slate-800 text-white h-12 shadow-lg hover:shadow-xl transition-all duration-300 rounded font-bold">
+                                                Book This Package
                                             </Button>
-                                            <Button variant="outline" onClick={handleEnquiry} className="w-full h-12 rounded-lg font-semibold">
+                                            <Button variant="ghost" onClick={handleEnquiry} className="w-full h-11 border border-slate-200 text-slate-600 hover:text-blue-700 hover:border-blue-200 hover:bg-blue-50 bg-transparent font-semibold transition-all">
                                                 <Mail className="w-4 h-4 mr-2" /> Send Enquiry
                                             </Button>
-                                        </div>
 
-                                        <div className="mt-6 pt-6 border-t border-gray-100 space-y-4">
-                                            <div className="flex items-center text-sm text-gray-600">
-                                                <Phone className="w-4 h-4 mr-3 text-[#0071c2]" />
-                                                <span>+91 98765 43210</span>
-                                            </div>
-                                            <div className="flex items-center text-sm text-gray-600">
-                                                <Mail className="w-4 h-4 mr-3 text-[#0071c2]" />
-                                                <span>bookings@staykedarnath.com</span>
+                                            {/* Trust Badges - Simplified */}
+                                            <div className="pt-4 mt-2 border-t border-slate-100 grid grid-cols-2 gap-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center shrink-0">
+                                                        <ShieldCheck className="w-4 h-4 text-green-600" />
+                                                    </div>
+                                                    <div className="text-xs leading-tight">
+                                                        <span className="block font-bold text-slate-700">Verified</span>
+                                                        <span className="text-slate-500">Operator</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                                        <CalendarDays className="w-4 h-4 text-blue-600" />
+                                                    </div>
+                                                    <div className="text-xs leading-tight">
+                                                        <span className="block font-bold text-slate-700">Open</span>
+                                                        <span className="text-slate-500">For 2026</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
-                                        <h3 className="font-bold text-blue-900 mb-2">Need Help?</h3>
-                                        <p className="text-sm text-blue-800 mb-4">
-                                            Not sure which package is right for you? Our travel experts can help you customize your journey.
-                                        </p>
-                                        <Button variant="link" className="p-0 h-auto text-[#0071c2] font-semibold">
-                                            Contact Expert &rarr;
-                                        </Button>
+                                    {/* Sidebar Promo */}
+                                    <PromoBanner position="sidebar" />
+
+                                    {/* Contact Compact */}
+                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                                <Phone className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">Customer Support</h3>
+                                                <p className="text-[10px] text-slate-500">Available 9 AM - 9 PM</p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2 pl-[52px]">
+                                            <a href="tel:+919027475042" className="block text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">
+                                                +91 90274 75042
+                                            </a>
+                                            <a href="mailto:dmworkforash@gmail.com" className="block text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors">
+                                                dmworkforash@gmail.com
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

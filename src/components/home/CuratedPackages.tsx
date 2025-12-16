@@ -108,7 +108,7 @@ const CuratedPackages = () => {
                 </motion.div>
 
                 {/* Horizontal Scrollable Packages */}
-                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+                <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide perspective-1000">
                     {packages.map((pkg, index) => {
                         const badge = getCategoryBadge(pkg.category, pkg.is_featured);
                         const originalPrice = pkg.price ? Math.round(pkg.price * 1.2) : null;
@@ -118,18 +118,19 @@ const CuratedPackages = () => {
                                 key={pkg.id}
                                 initial={{ opacity: 0, x: 20 }}
                                 whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.3, delay: index * 0.1 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.2) }} // Cap stagger delay
                                 className="flex-shrink-0 w-[240px]"
                             >
-                                <div className={`bg-white rounded-xl overflow-hidden border h-full flex flex-col ${pkg.is_featured ? 'border-[#0071c2] shadow-md' : 'border-gray-200'}`}>
+                                <div className={`bg-white rounded-xl overflow-hidden border h-full flex flex-col transition-all duration-300 transform-gpu hover:-translate-y-1 ${pkg.is_featured ? 'border-[#0071c2] shadow-md' : 'border-gray-200'} hover:shadow-lg`}>
                                     {/* Image - Fixed height */}
-                                    <div className="relative h-[140px] overflow-hidden">
+                                    <div className="relative h-[140px] overflow-hidden bg-gray-100">
                                         <img
                                             src={pkg.images?.[0] || 'https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=600&q=80'}
                                             alt={pkg.title}
                                             loading="lazy"
-                                            className="w-full h-full object-cover"
+                                            decoding="async"
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
@@ -195,15 +196,6 @@ const CuratedPackages = () => {
                 </div>
             </Container>
 
-            <style>{`
-                .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                }
-                .scrollbar-hide {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            `}</style>
         </section>
     );
 };

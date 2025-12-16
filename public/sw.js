@@ -1,4 +1,4 @@
-const CACHE_NAME = 'staykedar-admin-v1';
+const CACHE_NAME = 'staykedar-admin-v2';
 const STATIC_ASSETS = [
     '/admin',
     '/offline.html',
@@ -32,6 +32,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     // Skip non-GET requests
     if (event.request.method !== 'GET') return;
+
+    // Skip non-http requests (extensions, data uris, etc)
+    if (!event.request.url.startsWith('http')) return;
 
     // Skip API requests and external resources
     if (event.request.url.includes('/api/') ||

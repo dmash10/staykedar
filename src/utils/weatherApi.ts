@@ -29,7 +29,7 @@ export interface ForecastDay {
 // Cache weather data in localStorage to minimize API calls
 const WEATHER_CACHE_KEY = 'kedarnath_weather_data_v3'; // Changed key to force fresh data
 const FORECAST_CACHE_KEY = 'kedarnath_forecast_data_v3'; // Changed key to force fresh data
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds (reduced for more frequent updates)
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
 
 // API credentials
 const WEATHER_API_KEY = '2925f874ba9d4a5b93531256251203'; // WeatherAPI.com API key
@@ -53,13 +53,13 @@ export const getWeatherData = async (): Promise<WeatherData | null> => {
       console.log('Using fixed weather data for demo');
       return getAccurateFallbackWeatherData();
     }
-    
+
     // Check if we have cached data that's still valid
     const cachedData = localStorage.getItem(WEATHER_CACHE_KEY);
     if (cachedData) {
       const { data, timestamp } = JSON.parse(cachedData);
       const isValid = Date.now() - timestamp < CACHE_DURATION;
-      
+
       if (isValid) {
         console.log('Using cached weather data');
         return data;
@@ -77,7 +77,7 @@ export const getWeatherData = async (): Promise<WeatherData | null> => {
     }
 
     const result = await response.json();
-    
+
     // Transform the API response into our format
     const weatherData: WeatherData = {
       location: 'Kedarnath',
@@ -104,7 +104,7 @@ export const getWeatherData = async (): Promise<WeatherData | null> => {
 
     // Cache the data
     localStorage.setItem(
-      WEATHER_CACHE_KEY, 
+      WEATHER_CACHE_KEY,
       JSON.stringify({
         data: weatherData,
         timestamp: Date.now()
@@ -119,7 +119,7 @@ export const getWeatherData = async (): Promise<WeatherData | null> => {
       description: "Using fallback weather information",
       variant: "destructive",
     });
-    
+
     // Return fallback data if API fails
     return getAccurateFallbackWeatherData();
   }
@@ -133,7 +133,7 @@ export const getForecastData = async (): Promise<ForecastDay[]> => {
     if (cachedData) {
       const { data, timestamp } = JSON.parse(cachedData);
       const isValid = Date.now() - timestamp < CACHE_DURATION;
-      
+
       if (isValid) {
         console.log('Using cached forecast data');
         return data;
@@ -145,16 +145,16 @@ export const getForecastData = async (): Promise<ForecastDay[]> => {
     if (weatherData && weatherData.forecast) {
       // Cache the data
       localStorage.setItem(
-        FORECAST_CACHE_KEY, 
+        FORECAST_CACHE_KEY,
         JSON.stringify({
           data: weatherData.forecast,
           timestamp: Date.now()
         })
       );
-      
+
       return weatherData.forecast;
     }
-    
+
     throw new Error('Forecast data not available');
   } catch (error) {
     console.error('Error fetching forecast data:', error);
@@ -167,15 +167,15 @@ const getAccurateFallbackWeatherData = (): WeatherData => {
   // Current time to determine if it's day or night
   const currentHour = new Date().getHours();
   const isDay = currentHour >= 6 && currentHour < 18 ? 1 : 0;
-  
+
   // Updated to match actual Kedarnath weather (partly cloudy)
   const currentCondition = {
     text: "Partly Cloudy",
     icon: "//cdn.weatherapi.com/weather/64x64/day/116.png"
   };
-  
+
   const forecastData = getAccurateFallbackForecastData();
-  
+
   return {
     location: 'Kedarnath',
     temperature: 1.5, // Updated to match today's range between max and min temps
@@ -195,7 +195,7 @@ const getAccurateFallbackWeatherData = (): WeatherData => {
 // Accurate fallback forecast data based on real conditions
 const getAccurateFallbackForecastData = (): ForecastDay[] => {
   const today = new Date();
-  
+
   return [
     {
       date: today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),

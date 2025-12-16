@@ -191,8 +191,10 @@ export default function MarqueeBanner() {
 
   const content = banners.length > 0 ? banners : defaultContent;
 
-  // Calculate how many times to repeat based on screen width
+  // Calculate how many times to repeat based on screen width - Throttled
   useEffect(() => {
+    let animationFrameId: number;
+
     const calculateRepeats = () => {
       const screenWidth = window.innerWidth;
       // Estimate ~300px per item average, need at least 2x screen width
@@ -202,9 +204,18 @@ export default function MarqueeBanner() {
       setRepeatCount(Math.max(itemsNeeded, 6)); // Minimum 6 repeats
     };
 
+    const throttledCalculate = () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(calculateRepeats);
+    };
+
     calculateRepeats();
-    window.addEventListener('resize', calculateRepeats);
-    return () => window.removeEventListener('resize', calculateRepeats);
+    window.addEventListener('resize', throttledCalculate, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', throttledCalculate);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
   }, [content.length]);
 
   const handleNavigate = (url: string) => {
@@ -239,6 +250,8 @@ export default function MarqueeBanner() {
           ref={trackRef}
           className="flex w-max"
           style={{
+            willChange: 'transform',
+            transform: 'translate3d(0,0,0)', // Trigger hardware acceleration
             animationName: 'marquee-scroll',
             animationDuration: `${speed}s`,
             animationTimingFunction: 'linear',

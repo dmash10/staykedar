@@ -1,52 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { TransitionLink } from "@/components/TransitionLink";
+import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin,
   Clock,
   Calendar,
   Mountain,
-  Star,
-  ArrowLeft,
-  ArrowRight,
-  Navigation,
-  Camera,
-  Footprints,
-  Sun,
-  CloudSnow,
-  AlertTriangle,
   CheckCircle2,
-  Share2,
-  Heart,
-  ChevronRight,
-  ChevronLeft,
-  Home,
-  Bed,
-  Package,
-  Phone,
-  MessageCircle,
+  ChevronDown,
+  ChevronUp,
   X,
-  ZoomIn,
-  Image as ImageIcon,
-  Loader2
+  MessageCircle,
+  BedDouble,
+  Compass,
+  ArrowRight,
+  ShieldCheck,
+  Heart,
+  Star,
+  Phone,
+  ClipboardCheck
 } from "lucide-react";
 
 import Container from "../../components/Container";
 import Nav from "../../components/Nav";
 import Footer from "../../components/Footer";
-import PromoBanner from "../../components/home/PromoBanner";
 import { supabase } from "@/integrations/supabase/client";
 import './AttractionContent.css';
 
-// FAQ interface for AI Search optimization
+// Intefaces
 interface FAQ {
   question: string;
   answer: string;
 }
 
-// Attraction data interface matching database
 interface Attraction {
   id: string;
   slug: string;
@@ -71,27 +57,29 @@ interface Attraction {
 }
 
 const difficultyColors = {
-  "Easy": "bg-emerald-100 text-emerald-700",
-  "Moderate": "bg-amber-100 text-amber-700",
-  "Moderate to Difficult": "bg-orange-100 text-orange-700",
-  "Difficult": "bg-red-100 text-red-700"
+  "Easy": "text-green-700 bg-green-50 border-green-200",
+  "Moderate": "text-amber-700 bg-amber-50 border-amber-200",
+  "Moderate to Difficult": "text-orange-700 bg-orange-50 border-orange-200",
+  "Difficult": "text-red-700 bg-red-50 border-red-200"
 };
 
 const AttractionDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   const [attraction, setAttraction] = useState<Attraction | null>(null);
-  const [relatedAttractions, setRelatedAttractions] = useState<Attraction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
+  const [nearbyAttractions, setNearbyAttractions] = useState<Attraction[]>([]);
 
-  // Image Gallery State
+  // Gallery
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // FAQ
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (slug) {
       fetchAttraction();
+      fetchNearbyAttractions();
     }
     window.scrollTo(0, 0);
   }, [slug]);
@@ -99,7 +87,6 @@ const AttractionDetail = () => {
   const fetchAttraction = async () => {
     setLoading(true);
     try {
-      // Fetch by slug
       const { data, error } = await (supabase as any)
         .from('attractions')
         .select('*')
@@ -109,755 +96,507 @@ const AttractionDetail = () => {
 
       if (error) throw error;
       setAttraction(data as any);
-
-      // Fetch related attractions
-      if (data) {
-        const { data: related, error: relatedError } = await (supabase as any)
-          .from('attractions')
-          .select('*')
-          .eq('is_active', true)
-          .neq('slug', slug)
-          .or(`type.eq.${data.type}`)
-          .limit(4);
-
-        if (!relatedError && related) {
-          setRelatedAttractions(related as any);
-        }
-      }
     } catch (error) {
-      console.error('Error fetching attraction:', error);
+      console.error('Error fetching:', error);
       setAttraction(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // Get all images (main + gallery)
-  const allImages = attraction
-    ? [attraction.main_image, ...(attraction.images || [])]
-    : [];
+  const fetchNearbyAttractions = async () => {
+    try {
+      const { data, error } = await (supabase as any)
+        .from('attractions')
+        .select('id, name, slug, main_image, location, type, short_description')
+        .neq('slug', slug) // Exclude current
+        .eq('is_active', true)
+        .limit(4);
 
-  const openLightbox = (index: number) => {
-    setCurrentImageIndex(index);
-    setLightboxOpen(true);
-    document.body.style.overflow = 'hidden';
+      if (error) throw error;
+      if (data) setNearbyAttractions(data as any);
+    } catch (error) {
+      console.error('Error fetching nearby:', error);
+    }
   };
 
-  const closeLightbox = () => {
-    setLightboxOpen(false);
-    document.body.style.overflow = 'unset';
-  };
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
-  };
-
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!lightboxOpen) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowRight') nextImage();
-      if (e.key === 'ArrowLeft') prevImage();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lightboxOpen]);
+  const allImages = attraction ? [attraction.main_image, ...(attraction.images || [])] : [];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Nav />
-        <div className="flex flex-col items-center justify-center py-40">
-          <Loader2 className="w-10 h-10 text-[#0071c2] animate-spin mb-4" />
-          <p className="text-gray-500">Loading attraction...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-[#0071c2] border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <Footer />
       </div>
     );
   }
 
   if (!attraction) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Nav />
         <Container className="py-20 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Attraction Not Found</h1>
-          <p className="text-gray-600 mb-8">The attraction you're looking for doesn't exist.</p>
-          <TransitionLink to="/attractions" className="text-[#0071c2] font-medium hover:underline">
-            ← Back to Attractions
-          </TransitionLink>
+          <h1 className="text-xl font-bold text-gray-900 mb-4">Attraction Not Found</h1>
+          <Link to="/attractions" className="text-[#0071c2] font-medium hover:underline text-sm">← Back to Attractions</Link>
         </Container>
         <Footer />
       </div>
     );
   }
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      await navigator.share({
-        title: attraction.name,
-        text: attraction.short_description,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white text-gray-900 font-sans antialiased text-base">
       <Helmet>
-        <title>{attraction.meta_title || `${attraction.name} - Things to Do Near Kedarnath`} | StayKedarnath</title>
-        <meta name="description" content={attraction.meta_description || `${attraction.short_description} Plan your visit to ${attraction.name} at ${attraction.elevation}. Best time: ${attraction.best_time}. ${attraction.difficulty} difficulty.`} />
-        <meta name="keywords" content={`${attraction.name}, ${(attraction.tags || []).join(', ')}, Kedarnath attractions, Uttarakhand tourism, ${attraction.type}`} />
-        <link rel="canonical" href={`https://staykedarnath.in/attractions/${attraction.slug}`} />
-
-        {/* Open Graph */}
-        <meta property="og:title" content={`${attraction.name} | StayKedarnath`} />
-        <meta property="og:description" content={attraction.short_description} />
-        <meta property="og:image" content={attraction.main_image} />
-        <meta property="og:url" content={`https://staykedarnath.in/attractions/${attraction.slug}`} />
-        <meta property="og:type" content="article" />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${attraction.name} | StayKedarnath`} />
-        <meta name="twitter:description" content={attraction.short_description} />
-        <meta name="twitter:image" content={attraction.main_image} />
-
-        {/* JSON-LD Schema for TouristAttraction - Critical for AI Search */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "TouristAttraction",
-            "name": attraction.name,
-            "description": attraction.short_description,
-            "image": attraction.main_image,
-            "url": `https://staykedarnath.in/attractions/${attraction.slug}`,
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": attraction.location || "Kedarnath",
-              "addressRegion": "Uttarakhand",
-              "addressCountry": "IN"
-            },
-            ...(attraction.elevation && {
-              "geo": {
-                "@type": "GeoCoordinates",
-                "elevation": attraction.elevation
-              }
-            }),
-            "touristType": attraction.type === "Religious" ? "Pilgrimage" : attraction.type,
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": attraction.rating,
-              "bestRating": 5,
-              "worstRating": 1,
-              "ratingCount": Math.floor(Math.random() * 200) + 50
-            },
-            "openingHours": attraction.best_time ? `Best time: ${attraction.best_time}` : undefined,
-            "isAccessibleForFree": true,
-            "publicAccess": true
-          })}
-        </script>
-
-        {/* JSON-LD Schema for FAQPage - Critical for AI Overviews */}
-        {attraction.faqs && attraction.faqs.length > 0 && (
-          <script type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              "mainEntity": attraction.faqs.map(faq => ({
-                "@type": "Question",
-                "name": faq.question,
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": faq.answer
-                }
-              }))
-            })}
-          </script>
-        )}
-
-        {/* JSON-LD Schema for BreadcrumbList - Helps AI understand site structure */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://staykedarnath.in"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Attractions",
-                "item": "https://staykedarnath.in/attractions"
-              },
-              {
-                "@type": "ListItem",
-                "position": 3,
-                "name": attraction.name,
-                "item": `https://staykedarnath.in/attractions/${attraction.slug}`
-              }
-            ]
-          })}
-        </script>
+        <title>{attraction.meta_title || attraction.name} | StayKedarnath</title>
+        <meta name="description" content={attraction.meta_description || attraction.short_description} />
       </Helmet>
 
       <Nav />
 
-      {/* Hero Section */}
-      <section className="relative h-[25vh] md:h-[30vh] overflow-hidden">
-        <img
-          src={attraction.main_image}
-          alt={attraction.name}
-          className="w-full h-full object-cover cursor-pointer"
-          onClick={() => openLightbox(0)}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-
-        {/* View Gallery Button */}
-        {allImages.length > 1 && (
-          <button
-            onClick={() => openLightbox(0)}
-            className="absolute bottom-4 right-4 md:bottom-6 md:right-6 flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 font-medium hover:bg-white transition-colors text-sm z-10"
-          >
-            <ImageIcon className="w-4 h-4" />
-            View {allImages.length} Photos
-          </button>
-        )}
-
-        {/* Back Button */}
-        <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
-          <TransitionLink
-            to="/attractions"
-            className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 font-medium hover:bg-white transition-colors text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Back to Attractions</span>
-            <span className="sm:hidden">Back</span>
-          </TransitionLink>
+      {/* 
+        HERO SECTION - Split Layout (Reference Inspired) 
+        Dark background with blur effect and content overlay
+      */}
+      <div className="relative bg-[#0f172a] text-white pt-10 pb-16 overflow-hidden">
+        {/* Background Blur Effect - DUMMY IMAGE */}
+        <div className="absolute inset-0 z-0 opacity-20">
+          <img
+            src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=80"
+            alt="Background"
+            className="w-full h-full object-cover blur-3xl scale-110"
+          />
         </div>
 
-        {/* Action Buttons */}
-        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex gap-2">
-          <button
-            onClick={() => setIsLiked(!isLiked)}
-            className={`p-2.5 rounded-full backdrop-blur-sm transition-colors ${isLiked ? 'bg-red-500 text-white' : 'bg-white/90 text-gray-700 hover:bg-white'}`}
-          >
-            <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-          </button>
-          <button
-            onClick={handleShare}
-            className="p-2.5 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 hover:bg-white transition-colors"
-          >
-            <Share2 className="w-5 h-5" />
-          </button>
-        </div>
+        <Container className="relative z-10">
+          {/* Breadcrumb - Light */}
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-400 mb-10">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/attractions" className="hover:text-white transition-colors">Attractions</Link>
+            <span>/</span>
+            <span className="text-white">{attraction.name}</span>
+          </div>
 
-        {/* Hero Content */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
-          <Container>
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-white/70 text-sm mb-3">
-              <TransitionLink to="/" className="hover:text-white">Home</TransitionLink>
-              <ChevronRight className="w-4 h-4" />
-              <TransitionLink to="/attractions" className="hover:text-white">Attractions</TransitionLink>
-              <ChevronRight className="w-4 h-4" />
-              <span className="text-white">{attraction.name}</span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="px-3 py-1 bg-[#0071c2] text-white text-xs font-semibold rounded-full">
+          {/* Grid Layout: 5/12 Text, 7/12 Image for WIDER feel */}
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* LEFT: Text Content (Col Span 5) */}
+            <div className="lg:col-span-5 space-y-5">
+              <span className="inline-block px-2.5 py-0.5 bg-blue-500/20 text-blue-200 text-[11px] font-bold uppercase tracking-wider rounded border border-blue-500/30">
                 {attraction.type}
               </span>
-              <span className={`px-3 py-1 text-xs font-medium rounded-full ${difficultyColors[attraction.difficulty]}`}>
-                {attraction.difficulty}
-              </span>
-              <div className="flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span className="text-white text-sm font-medium">{attraction.rating}</span>
+              <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold tracking-tight text-white leading-[1.1]">
+                {attraction.name}
+              </h1>
+              <p className="text-lg text-gray-300 leading-relaxed font-light">
+                {attraction.short_description}
+              </p>
+              <div className="flex items-center gap-6 pt-2 text-sm text-gray-300 font-medium">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-blue-400" />
+                  {attraction.location}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  {attraction.rating} / 5.0
+                </div>
               </div>
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">
-              {attraction.name}
-            </h1>
-
-            <div className="flex items-center gap-2 text-white/80">
-              <MapPin className="w-4 h-4" />
-              <span>{attraction.location}</span>
-            </div>
-          </Container>
-        </div>
-      </section>
-
-      {/* Destination Banner */}
-      <PromoBanner position="destination" />
-
-      {/* Quick Info Bar */}
-      <section className="bg-white border-b sticky top-0 z-30">
-        <Container>
-          <div className="flex items-center justify-between py-3 overflow-x-auto gap-4">
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <Mountain className="w-4 h-4 text-[#0071c2]" />
-                <span className="text-gray-600">{attraction.elevation}</span>
-              </div>
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <MapPin className="w-4 h-4 text-[#0071c2]" />
-                <span className="text-gray-600">{attraction.distance} from Kedarnath</span>
-              </div>
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <Clock className="w-4 h-4 text-[#0071c2]" />
-                <span className="text-gray-600">{attraction.time_required}</span>
-              </div>
-            </div>
-            <TransitionLink to="/stays" className="hidden md:flex">
-              <button className="px-4 py-2 bg-[#0071c2] text-white text-sm font-medium rounded-lg hover:bg-[#005a9c] transition-colors whitespace-nowrap">
-                Book Nearby Stay
-              </button>
-            </TransitionLink>
-          </div>
-        </Container>
-      </section>
-
-      {/* Main Content */}
-      <section className="py-8 md:py-12">
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* About Section */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"
+            {/* RIGHT: Gallery Card (Col Span 7) - WIDER ASPECT RATIO */}
+            <div className="lg:col-span-7 relative group">
+              <div
+                className="aspect-[2/1] rounded-lg overflow-hidden shadow-2xl border border-white/10 cursor-pointer relative bg-gray-900"
+                onClick={() => { setCurrentImageIndex(0); setLightboxOpen(true); }}
               >
-                {/* Description content - No extra spacing */}
-                <div
-                  className="attraction-content [&>*:first-child]:!mt-0"
-                  dangerouslySetInnerHTML={{ __html: attraction.description }}
+                <img
+                  src={attraction.main_image}
+                  alt={attraction.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2">
-                  {(attraction.tags || []).map((tag) => (
-                    <span key={tag} className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full">
-                      {tag}
-                    </span>
-                  ))}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+                <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur px-3 py-1.5 rounded text-xs font-medium text-white border border-white/10 flex items-center gap-2">
+                  <Compass className="w-3.5 h-3.5" />
+                  View Gallery
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Image Gallery Section */}
+              {/* Thumbnails Strip */}
               {allImages.length > 1 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900">Photo Gallery</h2>
-                    <span className="text-gray-500 text-sm">{allImages.length} photos</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {allImages.map((image, index) => (
-                      <motion.div
-                        key={index}
-                        className="relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group"
-                        whileHover={{ scale: 1.02 }}
-                        onClick={() => openLightbox(index)}
-                      >
-                        <img
-                          src={image}
-                          alt={`${attraction.name} - Photo ${index + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                          <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                        {index === 0 && (
-                          <span className="absolute top-2 left-2 px-2 py-1 bg-[#0071c2] text-white text-xs font-medium rounded">
-                            Main
-                          </span>
-                        )}
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
+                <div className="flex gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
+                  {allImages.slice(0, 5).map((img, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => { setCurrentImageIndex(idx); setLightboxOpen(true); }}
+                      className={`w-24 h-16 shrink-0 rounded overflow-hidden cursor-pointer border-2 transition-all ${currentImageIndex === idx ? 'border-blue-500' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                  {allImages.length > 5 && (
+                    <button
+                      onClick={() => { setCurrentImageIndex(0); setLightboxOpen(true); }}
+                      className="w-24 h-16 shrink-0 rounded bg-gray-800 border border-white/10 flex flex-col items-center justify-center text-xs text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+                    >
+                      <span>+{allImages.length - 5}</span>
+                      <span>More</span>
+                    </button>
+                  )}
+                </div>
               )}
-
-              {/* Key Information - Clean Card Design with Better Contrast */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-200"
-              >
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                  {/* Elevation Card */}
-                  <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200 hover:border-blue-400 transition-colors">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center mb-3 shadow-md">
-                        <Mountain className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.elevation}</div>
-                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Elevation</div>
-                    </div>
-                  </div>
-
-                  {/* Time Required Card */}
-                  <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200 hover:border-green-400 transition-colors">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center mb-3 shadow-md">
-                        <Clock className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.time_required}</div>
-                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Time Required</div>
-                    </div>
-                  </div>
-
-                  {/* Best Time Card */}
-                  <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200 hover:border-amber-400 transition-colors">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center mb-3 shadow-md">
-                        <Calendar className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.best_time}</div>
-                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Best Time</div>
-                    </div>
-                  </div>
-
-                  {/* Difficulty Card */}
-                  <div className="bg-purple-50 rounded-xl p-4 border-2 border-purple-200 hover:border-purple-400 transition-colors">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-14 h-14 rounded-full bg-purple-500 flex items-center justify-center mb-3 shadow-md">
-                        <Footprints className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{attraction.difficulty}</div>
-                      <div className="text-xs md:text-sm text-gray-700 font-semibold">Difficulty</div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Frequently Asked Questions - Minimal & Sophisticated Design */}
-              {attraction.faqs && attraction.faqs.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-100"
-                >
-                  <h2 className="text-3xl font-semibold text-gray-900 mb-10 tracking-tight">
-                    Frequently Asked Questions
-                  </h2>
-                  <div className="space-y-8">
-                    {attraction.faqs.map((faq, index) => (
-                      <article
-                        key={index}
-                        className="group pb-8 border-b border-gray-100 last:border-b-0 last:pb-0"
-                        itemScope
-                        itemType="https://schema.org/Question"
-                      >
-                        <h3
-                          className="text-lg font-semibold text-gray-900 mb-3 flex items-start gap-4 group-hover:text-[#0071c2] transition-colors duration-200"
-                          itemProp="name"
-                        >
-                          <span className="flex-shrink-0 text-[#0071c2] text-base font-normal mt-0.5 opacity-60">
-                            {String(index + 1).padStart(2, '0')}.
-                          </span>
-                          <span className="flex-1 leading-relaxed">{faq.question}</span>
-                        </h3>
-                        <div
-                          className="text-gray-600 leading-relaxed pl-10 text-[15px]"
-                          itemScope
-                          itemType="https://schema.org/Answer"
-                          itemProp="acceptedAnswer"
-                        >
-                          <div itemProp="text">
-                            {faq.answer.split('\n').map((paragraph, pIndex) => (
-                              <p key={pIndex} className="mb-3 last:mb-0">
-                                {paragraph}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Right Sidebar */}
-            <div className="space-y-6">
-              {/* Book Stay CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-gradient-to-br from-[#003580] to-[#0071c2] rounded-2xl p-6 text-white"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <Bed className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">Book Your Stay</h3>
-                    <p className="text-white/70 text-sm">Near {attraction.name}</p>
-                  </div>
-                </div>
-                <p className="text-white/80 text-sm mb-4">
-                  Find comfortable accommodations near this attraction for a hassle-free pilgrimage.
-                </p>
-                <TransitionLink to="/stays">
-                  <button className="w-full py-3 bg-white text-[#003580] font-semibold rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
-                    <Bed className="w-5 h-5" />
-                    Find Stays
-                  </button>
-                </TransitionLink>
-              </motion.div>
-
-              {/* Package CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                    <Package className="w-6 h-6 text-amber-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">Yatra Packages</h3>
-                    <p className="text-gray-500 text-sm">All-inclusive tours</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm mb-4">
-                  Explore curated packages that include this destination with accommodation, transport & meals.
-                </p>
-                <TransitionLink to="/packages">
-                  <button className="w-full py-3 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 transition-colors flex items-center justify-center gap-2">
-                    <Package className="w-5 h-5" />
-                    View Packages
-                  </button>
-                </TransitionLink>
-              </motion.div>
-
-              {/* Contact CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
-              >
-                <h3 className="font-bold text-lg text-gray-900 mb-4">Need Help Planning?</h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Our travel experts can help you plan the perfect itinerary.
-                </p>
-                <div className="space-y-3">
-                  <a href="tel:+919876543210" className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                    <Phone className="w-5 h-5 text-[#0071c2]" />
-                    <span className="text-gray-700 font-medium">+91 98765 43210</span>
-                  </a>
-                  <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
-                    <MessageCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-gray-700 font-medium">WhatsApp Us</span>
-                  </a>
-                </div>
-              </motion.div>
-
-              {/* Map Placeholder */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
-              >
-                <div className="aspect-video bg-gray-200 flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <MapPin className="w-8 h-8 mx-auto mb-2" />
-                    <p className="text-sm">Map View</p>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <button className="w-full py-2.5 border border-[#0071c2] text-[#0071c2] font-medium rounded-lg hover:bg-[#0071c2] hover:text-white transition-colors flex items-center justify-center gap-2">
-                    <Navigation className="w-4 h-4" />
-                    Get Directions
-                  </button>
-                </div>
-              </motion.div>
             </div>
           </div>
         </Container>
-      </section>
-
-      {/* Related Attractions */}
-      {relatedAttractions.length > 0 && (
-        <section className="py-12 bg-white">
-          <Container>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Nearby Attractions</h2>
-              <TransitionLink to="/attractions" className="text-[#0071c2] font-medium flex items-center gap-1 hover:gap-2 transition-all">
-                View All
-                <ArrowRight className="w-4 h-4" />
-              </TransitionLink>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {relatedAttractions.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <TransitionLink to={`/attractions/${item.slug}`}>
-                    <div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300">
-                      <div className="aspect-[4/3] overflow-hidden relative">
-                        <img
-                          src={item.main_image}
-                          alt={item.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <span className="px-2 py-1 bg-white/90 text-xs font-medium rounded-full text-gray-700">
-                            {item.type}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#0071c2] transition-colors line-clamp-1">
-                          {item.name}
-                        </h3>
-                        <div className="flex items-center gap-2 text-gray-500 text-sm">
-                          <MapPin className="w-3.5 h-3.5" />
-                          <span className="line-clamp-1">{item.distance}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </TransitionLink>
-                </motion.div>
-              ))}
-            </div>
-          </Container>
-        </section>
-      )}
-
-      {/* Bottom CTA - Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 md:hidden z-40">
-        <div className="flex gap-3">
-          <TransitionLink to="/stays" className="flex-1">
-            <button className="w-full py-3 bg-[#0071c2] text-white font-semibold rounded-xl flex items-center justify-center gap-2">
-              <Bed className="w-5 h-5" />
-              Book Stay
-            </button>
-          </TransitionLink>
-          <TransitionLink to="/packages" className="flex-1">
-            <button className="w-full py-3 border-2 border-[#0071c2] text-[#0071c2] font-semibold rounded-xl flex items-center justify-center gap-2">
-              <Package className="w-5 h-5" />
-              Packages
-            </button>
-          </TransitionLink>
-        </div>
       </div>
 
-      {/* Spacer for mobile bottom CTA */}
-      <div className="h-20 md:hidden" />
+      {/* MAIN CONTENT - Clean White Area */}
+      <main className="py-12 bg-white">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-      {/* Image Lightbox */}
-      <AnimatePresence>
-        {lightboxOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-50 flex items-center justify-center"
-            onClick={closeLightbox}
-          >
-            {/* Close Button */}
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 p-2 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-10"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            {/* LEFT COLUMN: Content (2/3) */}
+            <div className="lg:col-span-2 space-y-10">
 
-            {/* Image Counter */}
-            <div className="absolute top-4 left-4 px-4 py-2 bg-white/10 rounded-full text-white text-sm">
-              {currentImageIndex + 1} / {allImages.length}
+              {/* Highlights List - Clean Bullets */}
+              {attraction.tags && attraction.tags.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
+                    <span className="text-[#0071c2]">{attraction.name}</span> Highlights
+                  </h2>
+                  <ul className="grid gap-3">
+                    {attraction.tags.map(tag => (
+                      <li key={tag} className="flex items-start gap-3 text-[15px] text-gray-700 leading-relaxed">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 shrink-0" />
+                        {tag}
+                      </li>
+                    ))}
+                    {/* Hardcoded extras for demo layout */}
+                    <li className="flex items-start gap-3 text-[15px] text-gray-700 leading-relaxed">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400 mt-2 shrink-0" />
+                      Enjoy a hassle-free visit with our guided inputs and local connectivity.
+                    </li>
+                  </ul>
+                </section>
+              )}
+
+              {/* Overview Prose */}
+              <section className="border-t border-gray-100 pt-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-5">Overview</h2>
+                <div
+                  className="attraction-content prose prose-gray max-w-none prose-p:text-[15px] prose-p:leading-7 prose-headings:font-bold prose-headings:text-gray-900 prose-a:text-[#0071c2]"
+                  dangerouslySetInnerHTML={{ __html: attraction.description }}
+                />
+              </section>
+
+              {/* Why Choose StayKedarnath Section */}
+              <section className="bg-white py-8 border-t border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                  {/* Card 1 */}
+                  <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition-colors group flex items-start gap-4">
+                    <div className="w-12 h-12 shrink-0">
+                      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                        <rect x="8" y="14" width="48" height="42" rx="4" fill="#FFE0B2" />
+                        <rect x="8" y="14" width="48" height="12" rx="4" fill="#FF9800" />
+                        <rect x="16" y="8" width="4" height="12" rx="2" fill="#795548" />
+                        <rect x="44" y="8" width="4" height="12" rx="2" fill="#795548" />
+                        <circle cx="44" cy="42" r="12" fill="#4CAF50" />
+                        <path d="M39 42L42 45L49 38" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <rect x="16" y="32" width="8" height="6" rx="1" fill="#FFCC80" />
+                        <rect x="28" y="32" width="8" height="6" rx="1" fill="#FFCC80" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-sm mb-1">Book Now, Pay at Property</h3>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        <span className="text-[#0071c2] font-medium">FREE cancellation</span> on most rooms
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Card 2 */}
+                  <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition-colors group flex items-start gap-4">
+                    <div className="w-12 h-12 shrink-0">
+                      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                        <path d="M20 32V52C20 53.1046 20.8954 54 22 54H26C27.1046 54 28 53.1046 28 52V32C28 30.8954 27.1046 30 26 30H22C20.8954 30 20 30.8954 20 32Z" fill="#FF9800" />
+                        <path d="M28 34H40C43.3137 34 46 31.3137 46 28V26C46 24.8954 45.1046 24 44 24H36L38 14C38 11.7909 36.2091 10 34 10C32.8954 10 32 10.8954 32 12V20L28 30V34Z" fill="#FFCC80" />
+                        <circle cx="50" cy="18" r="12" fill="#4CAF50" />
+                        <path d="M45 18L48 21L55 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-sm mb-1">Verified Guest Reviews</h3>
+                      <p className="text-xs text-gray-600 leading-relaxed">Trusted info from guests</p>
+                    </div>
+                  </div>
+
+                  {/* Card 3 */}
+                  <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition-colors group flex items-start gap-4">
+                    <div className="w-12 h-12 shrink-0">
+                      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                        <circle cx="32" cy="32" r="24" fill="#FFE0B2" />
+                        <ellipse cx="32" cy="32" rx="10" ry="24" stroke="#FF9800" strokeWidth="2" />
+                        <line x1="8" y1="32" x2="56" y2="32" stroke="#FF9800" strokeWidth="2" />
+                        <path d="M14 20C20 20 26 18 32 18C38 18 44 20 50 20" stroke="#FF9800" strokeWidth="2" />
+                        <path d="M14 44C20 44 26 46 32 46C38 46 44 44 50 44" stroke="#FF9800" strokeWidth="2" />
+                        <circle cx="50" cy="14" r="10" fill="#2196F3" />
+                        <path d="M46 14H54M50 10V18" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-sm mb-1">100+ Verified Properties</h3>
+                      <p className="text-xs text-gray-600 leading-relaxed">Camps, Hotels & more</p>
+                    </div>
+                  </div>
+
+                  {/* Card 4 */}
+                  <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-4 transition-colors group flex items-start gap-4">
+                    <div className="w-12 h-12 shrink-0">
+                      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                        <circle cx="32" cy="28" r="16" fill="#BBDEFB" />
+                        <circle cx="32" cy="24" r="10" fill="#FFE0B2" />
+                        <path d="M22 24C22 24 24 22 32 22C40 22 42 24 42 24" stroke="#795548" strokeWidth="2" />
+                        <ellipse cx="28" cy="24" rx="1.5" ry="2" fill="#795548" />
+                        <ellipse cx="36" cy="24" rx="1.5" ry="2" fill="#795548" />
+                        <path d="M30 28C30 28 31 29 32 29C33 29 34 28 34 28" stroke="#795548" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M18 22V28C18 28 18 32 22 32" stroke="#2196F3" strokeWidth="3" strokeLinecap="round" />
+                        <path d="M46 22V28C46 28 46 32 42 32" stroke="#2196F3" strokeWidth="3" strokeLinecap="round" />
+                        <rect x="16" y="20" width="6" height="4" rx="2" fill="#2196F3" />
+                        <rect x="42" y="20" width="6" height="4" rx="2" fill="#2196F3" />
+                        <path d="M24 44C24 40 28 38 32 38C36 38 40 40 40 44V54H24V44Z" fill="#2196F3" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-sm mb-1">24/7 Customer Support</h3>
+                      <p className="text-xs text-gray-600 leading-relaxed">Always here to help</p>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Our Promise Banner */}
+                <div className="mt-6 bg-gradient-to-r from-[#003580] to-[#0071c2] rounded-xl p-5 flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-sm mb-0.5">
+                      We Only List Properties We'd Stay At Ourselves
+                    </h3>
+                    <p className="text-white/85 text-xs">
+                      Personally visited & verified.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+
+              {/* FAQ Accordion */}
+              {attraction.faqs && attraction.faqs.length > 0 && (
+                <section className="pt-8 border-t border-gray-100">
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">Must Know Before You Go</h2>
+                  <div className="space-y-3">
+                    {attraction.faqs.map((faq, idx) => (
+                      <div key={idx} className="border border-gray-200 rounded-lg overflow-hidden bg-white hover:border-blue-200 transition-colors">
+                        <button
+                          onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
+                          className="w-full text-left flex justify-between items-center p-4 bg-gray-50/50 hover:bg-gray-50"
+                        >
+                          <span className="font-semibold text-gray-900 pr-4 text-sm">{faq.question}</span>
+                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openFaqIndex === idx ? 'rotate-180' : ''}`} />
+                        </button>
+                        {openFaqIndex === idx && (
+                          <div className="p-4 pt-0 text-gray-600 text-sm leading-relaxed bg-gray-50/50 border-t border-gray-100">
+                            <div className="pt-3">{faq.answer}</div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
 
-            {/* Navigation Buttons */}
-            {allImages.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                  className="absolute left-4 p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-10"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                  className="absolute right-4 p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-10"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </>
+            {/* RIGHT COLUMN: Sidebar (Sticky) - Booking Card */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-24 space-y-6">
+
+                {/* BOOKING CARD */}
+                <div className="bg-gradient-to-b from-[#f0f9ff] to-white rounded-xl border border-blue-100 shadow-[0_4px_20px_rgba(0,113,194,0.08)] overflow-hidden">
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-6">
+                      <div>
+                        <p className="text-xs text-blue-600/80 font-bold uppercase tracking-wider mb-1">Starting from</p>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-bold text-gray-900">₹ Active</span>
+                          <span className="text-sm text-gray-400 line-through font-medium">₹ High</span>
+                        </div>
+                        <div className="mt-2.5">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 text-[10px] font-bold text-green-700 border border-green-200/60 shadow-sm">
+                            <CheckCircle2 className="w-3 h-3" /> Best Price Guaranteed
+                          </span>
+                        </div>
+                      </div>
+                      <div className="w-12 h-12 rounded-xl bg-white border border-blue-100 text-[#0071c2] flex items-center justify-center shadow-sm">
+                        <BedDouble className="w-6 h-6" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-2">
+                      <Link to="/stays" className="block w-full">
+                        <button className="w-full py-3.5 bg-[#0071c2] hover:bg-[#005a9c] text-white font-bold rounded-xl shadow-lg shadow-blue-900/10 transition-all hover:shadow-blue-900/20 text-sm uppercase tracking-wide flex items-center justify-center gap-2 group">
+                          Explore Stays <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </Link>
+                      <Link to="/packages" className="block w-full">
+                        <button className="w-full py-3.5 bg-white border border-blue-200 hover:border-blue-300 text-[#0071c2] font-bold rounded-xl transition-all shadow-sm hover:shadow text-sm">
+                          View Packages
+                        </button>
+                      </Link>
+                    </div>
+
+                    <div className="mt-5 pt-4 border-t border-blue-50/50 text-[11px] text-gray-500 text-center flex justify-center gap-4">
+                      <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> Instant Confirm</span>
+                      <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-green-500" /> Best Support</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Details - Text List Style (Clean) */}
+                <div className="bg-[#fcfdff] rounded-xl border border-blue-100 p-6 shadow-sm">
+                  <h3 className="flex items-center gap-2 font-bold text-sm text-[#0071c2] mb-5 uppercase tracking-wide border-b border-blue-50 pb-3">
+                    <Compass className="w-4 h-4" /> Trip Facts
+                  </h3>
+                  <div className="space-y-4 text-sm">
+                    <div className="grid grid-cols-3 gap-2 items-center group">
+                      <span className="text-gray-500 font-medium col-span-1 group-hover:text-blue-500 transition-colors">Elevation</span>
+                      <span className="font-semibold text-gray-900 col-span-2 text-right">{attraction.elevation || "-"}</span>
+                    </div>
+                    <div className="border-t border-dashed border-gray-100 my-1 opacity-50" />
+                    <div className="grid grid-cols-3 gap-2 items-center group">
+                      <span className="text-gray-500 font-medium col-span-1 group-hover:text-blue-500 transition-colors">Duration</span>
+                      <span className="font-semibold text-gray-900 col-span-2 text-right">{attraction.time_required}</span>
+                    </div>
+                    <div className="border-t border-dashed border-gray-100 my-1 opacity-50" />
+                    <div className="grid grid-cols-3 gap-2 items-center group">
+                      <span className="text-gray-500 font-medium col-span-1 group-hover:text-blue-500 transition-colors">Best Time</span>
+                      <span className="font-semibold text-gray-900 col-span-2 text-right">{attraction.best_time}</span>
+                    </div>
+                    <div className="border-t border-dashed border-gray-100 my-1 opacity-50" />
+                    <div className="grid grid-cols-3 gap-2 items-center pt-1">
+                      <span className="text-gray-500 font-medium col-span-1">Difficulty</span>
+                      <div className="col-span-2 flex justify-end">
+                        <span className={`font-bold px-3 py-1 rounded-md text-[10px] uppercase border ${difficultyColors[attraction.difficulty]}`}>
+                          {attraction.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Need Help Card */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 shadow-sm">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 text-[#0071c2] flex items-center justify-center shrink-0">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900 text-sm mb-1">Have questions?</p>
+                      <p className="text-xs text-gray-600 mb-3 leading-relaxed">Speak to our local experts in Kedarnath for the best advice.</p>
+                      <a href="https://wa.me/919876543210" className="inline-flex items-center gap-2 text-xs font-bold text-white bg-[#0071c2] hover:bg-[#005a9c] px-3 py-1.5 rounded-lg transition-colors">
+                        Call or WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          {/* NEARBY ATTRACTIONS (Premium Style with Real Data) */}
+          <div className="mt-16 pt-10 border-t border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center md:text-left">More Attractions in Kedarnath</h2>
+
+            {nearbyAttractions.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {nearbyAttractions.map((item, idx) => (
+                  <Link to={`/attractions/${item.slug}`} key={idx} className="group block bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-[#0071c2] transition-colors duration-300">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                      <img
+                        src={item.main_image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                      <div className="absolute bottom-3 left-3 text-white">
+                        <p className="text-[10px] font-bold uppercase tracking-wider bg-[#0071c2] px-2 py-0.5 rounded inline-block mb-1 shadow-sm">{item.type}</p>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-900 text-base mb-1 line-clamp-1 group-hover:text-[#0071c2] transition-colors">{item.name}</h3>
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2.5">
+                        <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="line-clamp-1">{item.location}</span>
+                      </div>
+                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed h-[36px]">
+                        {item.short_description}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 text-gray-500 text-sm">
+                No other attractions found.
+              </div>
             )}
 
-            {/* Main Image */}
-            <motion.img
-              key={currentImageIndex}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.2 }}
-              src={allImages[currentImageIndex]}
-              alt={`${attraction.name} - Photo ${currentImageIndex + 1}`}
-              className="max-w-[90vw] max-h-[85vh] object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="text-center mt-10">
+              <Link to="/attractions" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0071c2] hover:bg-[#005a9c] text-white rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                View All Attractions <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
 
-            {/* Thumbnail Strip */}
+        </Container>
+
+      </main>
+
+      {/* Lightbox Overlay */}
+      {
+        lightboxOpen && (
+          <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <img
+              src={allImages[currentImageIndex]}
+              alt="Gallery"
+              className="max-w-full max-h-[90vh] object-contain rounded-md shadow-2xl"
+            />
             {allImages.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 px-4 py-2 bg-black/50 rounded-full overflow-x-auto max-w-[90vw]">
-                {allImages.map((img, index) => (
+              <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2">
+                {allImages.map((_, idx) => (
                   <button
-                    key={index}
-                    onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(index); }}
-                    className={`w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${index === currentImageIndex ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'
-                      }`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white scale-110' : 'bg-white/30 hover:bg-white/50'}`}
+                  />
                 ))}
               </div>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <Footer />
-    </div>
+          </div>
+        )
+      }
+    </div >
   );
 };
 
 export default AttractionDetail;
-

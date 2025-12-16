@@ -145,56 +145,6 @@
   }
   </script>
 
-  <!-- FAQPage Schema - Critical for AI Overviews -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "How to reach Kedarnath Temple?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Kedarnath can be reached by a 16 km trek from Gaurikund, or by helicopter from Phata, Guptkashi, or Sitapur helipads. The trek takes 6-8 hours, while helicopter ride is 10-15 minutes. StayKedarnath offers helicopter booking services starting from ₹2,500 per person."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is the best time to visit Kedarnath?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "The best time to visit Kedarnath is May to June and September to October. The temple opens in April/May (Akshaya Tritiya) and closes in November (Bhai Dooj). Monsoon (July-August) should be avoided due to landslides."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Where can I stay near Kedarnath Temple?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Accommodation is available near the temple premises with basic facilities. For comfortable stays, book hotels in Gaurikund, Guptkashi, or Sitapur. StayKedarnath offers verified accommodations with prices ranging from ₹500 to ₹5,000 per night."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How to book Kedarnath helicopter tickets?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Kedarnath helicopter tickets can be booked through IRCTC or authorized partners like StayKedarnath. Helicopters operate from Phata, Guptkashi, and Sitapur helipads. Advance booking is recommended, especially during peak season."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is included in Char Dham Yatra package?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Char Dham Yatra packages typically include accommodation, meals, transportation, guide services, and temple darshan assistance. Packages range from 7 to 12 days covering Yamunotri, Gangotri, Kedarnath, and Badrinath temples."
-        }
-      }
-    ]
-  }
-  </script>
-
   <!-- Service Schema - Helicopter Services -->
   <script type="application/ld+json">
   {
@@ -317,7 +267,7 @@
       "lowPrice": "500",
       "highPrice": "5000",
       "priceCurrency": "INR",
-      "offerCount": "50+",
+      "offerCount": 50,
       "availability": "https://schema.org/InStock"
     },
     "aggregateRating": {
@@ -338,9 +288,21 @@
   <script type="module" src="/src/main.tsx"></script>
 
   <!-- Service Worker Registration -->
+  <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
+        // In development, unregister any existing service workers to avoid caching issues
+        if (window.location.hostname === 'localhost' || window.location.hostname === '0.0.0.0') {
+          navigator.serviceWorker.getRegistrations().then(function (registrations) {
+            for (let registration of registrations) {
+              registration.unregister();
+              console.log('SW unregistered (dev mode)');
+            }
+          });
+          return;
+        }
+
         navigator.serviceWorker.register('/sw.js')
           .then(function (registration) {
             console.log('SW registered: ', registration.scope);

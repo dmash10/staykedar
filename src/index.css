@@ -6,7 +6,8 @@
 
 @layer base {
   :root {
-    --background: 222 47% 6%; /* Deep Space Black #090E16 */
+    --background: 222 47% 6%;
+    /* Deep Space Black #090E16 */
     --foreground: 210 40% 98%;
 
     --card: 222 47% 10%;
@@ -15,7 +16,8 @@
     --popover: 222 47% 10%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%; /* Electric Blue */
+    --primary: 217 91% 60%;
+    /* Electric Blue */
     --primary-foreground: 222 47% 11%;
 
     --secondary: 217 19% 27%;
@@ -40,7 +42,7 @@
     --neon-green: #10b981;
     --neon-amber: #f59e0b;
     --neon-rose: #f43f5e;
-    
+
     --radius: 0.75rem;
   }
 
@@ -909,4 +911,14 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
+}
+
+/* Scrollbar Hiding Utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
