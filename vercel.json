@@ -5,17 +5,6 @@
       "destination": "/api/:path*"
     },
     {
-      "source": "/:path((?!api|_next|.*\\..*).*)",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(googlebot|bingbot|yandex|baiduspider|facebookexternalhit|twitterbot|linkedinbot|slackbot|whatsapp|discordbot|telegrambot|gptbot|chatgpt|anthropic|claudebot|perplexitybot|applebot).*"
-        }
-      ],
-      "destination": "https://service.prerender.io/https://staykedarnath.in/:path*"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
